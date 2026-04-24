@@ -1,0 +1,71 @@
+import { UserCircle2 } from "lucide-react";
+import { LuInstagram } from "react-icons/lu";
+import { teamData } from "../../data/public/team.data";
+import SectionHeader from "../shared/ui/SectionHeader";
+import StarRating from "../shared/ui/StarRating";
+
+export default function Team() {
+  return (
+    <section id="team" className="py-24 bg-bg px-4">
+      <div className="max-w-6xl mx-auto">
+        <SectionHeader
+          title={teamData.subtitle}
+          subtitle={teamData.title}
+        />
+
+        {/* Team member cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {teamData.members.map((member) => (
+            <div
+              key={member.name}
+              className="bg-surface rounded-2xl p-6 flex flex-col items-center text-center gap-4 border border-surface hover:border-primary transition-colors group"
+            >
+              {/* Avatar placeholder */}
+              <div className="w-24 h-24 rounded-full bg-bg border-2 border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <UserCircle2 className="w-14 h-14" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-black">{member.name}</h3>
+                <p className="text-primary text-sm font-medium">
+                  {member.role}
+                </p>
+              </div>
+
+              {/* Rating */}
+              <div className="flex flex-col items-center gap-1">
+                <StarRating rating={member.rating} />
+                <p className="text-text/50 text-xs">
+                  {member.rating.toFixed(1)} · {member.reviews} reseñas
+                </p>
+              </div>
+
+              {/* Specialties */}
+              <div className="flex flex-wrap justify-center gap-2">
+                {member.specialties.map((specialty) => (
+                  <span
+                    key={specialty}
+                    className="text-xs bg-bg text-primary border border-primary px-3 py-1 rounded-full"
+                  >
+                    {specialty}
+                  </span>
+                ))}
+              </div>
+
+              {/* Instagram link */}
+              <a
+                href={`https://instagram.com/${member.instagram.replace("@", "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-text/50 hover:text-primary transition-colors mt-auto"
+              >
+                <LuInstagram className="w-4 h-4" />
+                {member.instagram}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
