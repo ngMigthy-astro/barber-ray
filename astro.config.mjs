@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
-import node from "@astrojs/node";
+import vercel from "@astrojs/vercel";
 import dns from "node:dns";
 
 dns.setDefaultResultOrder("ipv4first");
@@ -14,8 +14,5 @@ export default defineConfig({
   },
   integrations: [react()],
   output: "server",
-  adapter: node({
-    output: "server",
-    mode: "standalone",
-  }),
+  adapter: vercel(),
 });
