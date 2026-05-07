@@ -62,12 +62,14 @@ export default function Gallery({ images, config }: Props) {
               className="group aspect-square bg-bg rounded-2xl flex items-center justify-center border border-surface hover:border-primary transition-all overflow-hidden relative shadow-md hover:shadow-xl hover:-translate-y-1"
             >
               {img.image_url ? (
-                <img
-                  src={img.image_url}
-                  alt={img.alt || "Galería Barber Ray"}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                />
+                  <img
+                    src={img.image_url}
+                    alt={img.alt || "Galería Barber Ray"}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                  />
               ) : (
                 <ImageIcon className="w-10 h-10 text-primary opacity-30 group-hover:opacity-60 transition-opacity" />
               )}

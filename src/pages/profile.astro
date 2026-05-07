@@ -11,24 +11,34 @@ if (!user) {
 
 const supabase = createSupabaseClient(Astro.request, Astro.cookies);
 
-const { data: appointments, error } = await supabase
-  .from("appointments")
-  .select(
-    `
-    *,
-    service:service_id(name, price, duration),
-    barber:barber_id(name)
-  `,
-  )
-  .eq("user_id", user.id)
-  .order("appointment_date", { ascending: false });
+const [
+  { data: appointments, error: errApp },
+  { data: navLinks, error: errNav }
+] = await Promise.all([
+  supabase
+    .from("appointments")
+    .select(`
+      *,
+      service:service_id(name, price, duration),
+      barber:barber_id(name)
+    `)
+    .eq("user_id", user.id)
+    .order("appointment_date", { ascending: false }),
+  supabase
+    .from("nav_links")
+    .select("*")
+    .order("sort_order", { ascending: true })
+]);
 
-if (error) {
-  console.error("Error fetching appointments:", error);
+if (errApp || errNav) {
+  console.error("Error fetching profile data:", errApp || errNav);
 }
 ---
 
-<Layout title={`Perfil | ${user.user_metadata?.full_name || "Usuario"}`}>
+<Layout 
+  title={`Perfil | ${user.user_metadata?.full_name || "Usuario"}`}
+  navLinks={navLinks || []}
+>
   <main class="pt-32 pb-24 px-4 min-h-screen">
     <div class="max-w-5xl mx-auto">
       <ProfileView

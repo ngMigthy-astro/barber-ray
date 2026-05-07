@@ -41,6 +41,8 @@ export default function Team({ members = [], config }: TeamProps) {
                   <img 
                     src={member.image_url} 
                     alt={member.name} 
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />

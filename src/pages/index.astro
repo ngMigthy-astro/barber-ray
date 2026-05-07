@@ -1,5 +1,5 @@
 ---
-import Hero from "../components/public/Hero";
+import Hero from "../components/public/Hero.astro";
 import Layout from "../layouts/Layout.astro";
 import Services from "../components/public/Services";
 import Products from "../components/public/Products";
@@ -159,8 +159,9 @@ const navLinks = dbData.dbNavLinks || [];
       services={servicesData.services}
       team={teamMembers}
       lcpImage={heroData?.image_url || "/barber_hero_premium.webp"}
+      navLinks={navLinks}
     >
-      {heroData && <Hero initialData={heroData} client:idle />}
+      {heroData && <Hero initialData={heroData} />}
 
       {servicesData.services.length > 0 && (
         <Services initialData={servicesData} />

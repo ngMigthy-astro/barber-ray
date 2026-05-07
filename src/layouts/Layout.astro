@@ -10,6 +10,7 @@ interface Props {
   services?: any[];
   team?: any[];
   lcpImage?: string;
+  navLinks?: any[];
 }
 
 const {
@@ -17,22 +18,26 @@ const {
   services: initialServices = [],
   team: initialTeam = [],
   lcpImage = "/barber_hero_premium.webp",
+  navLinks: initialNavLinks = [],
 } = Astro.props;
 const { user } = Astro.locals;
 const { cookies, request } = Astro;
 
 const supabase = createSupabaseClient(request, cookies);
 
-const { data: dbNavLinks } = await supabase
-  .from("nav_links")
-  .select("*")
-  .order("sort_order", { ascending: true });
+let navLinks = initialNavLinks;
+if (navLinks.length === 0) {
+  const { data: dbNavLinks } = await supabase
+    .from("nav_links")
+    .select("*")
+    .order("sort_order", { ascending: true });
 
-const rawNavLinks = dbNavLinks || [];
-const navLinks = rawNavLinks.map((link: any) => ({
-  ...link,
-  href: link.href.startsWith("#") ? `/${link.href}` : link.href,
-}));
+  const rawNavLinks = dbNavLinks || [];
+  navLinks = rawNavLinks.map((link: any) => ({
+    ...link,
+    href: link.href.startsWith("#") ? `/${link.href}` : link.href,
+  }));
+}
 
 let services = initialServices;
 if (services.length === 0) {
