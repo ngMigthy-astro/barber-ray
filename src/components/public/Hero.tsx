@@ -35,7 +35,12 @@ export default function Hero({ initialData }: Props) {
                   key={cta.href + cta.text}
                   href={cta.href}
                   onClick={(e) => {
-                    if (cta.href === "#booking") {
+                    const isBookingAction = 
+                      cta.href === "#booking" || 
+                      cta.text.toLowerCase().includes("reservar") || 
+                      cta.text.toLowerCase().includes("agendar");
+
+                    if (isBookingAction) {
                       e.preventDefault();
                       globalThis.dispatchEvent(new CustomEvent("open-booking"));
                     }
