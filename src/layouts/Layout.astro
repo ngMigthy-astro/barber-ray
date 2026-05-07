@@ -65,14 +65,14 @@ if (team.length === 0) {
     <meta property="og:url" content={Astro.url.href} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content="Barber Ray - Estilo y tradición en cada corte. La mejor experiencia de barbería profesional." />
-    <meta property="og:image" content="/barber_hero_premium.png" />
+    <meta property="og:image" content={new URL("/barber_hero_premium.png", Astro.url)} />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url.href} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content="Barber Ray - Estilo y tradición en cada corte. La mejor experiencia de barbería profesional." />
-    <meta property="twitter:image" content="/barber_hero_premium.png" />
+    <meta property="twitter:image" content={new URL("/barber_hero_premium.png", Astro.url)} />
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
