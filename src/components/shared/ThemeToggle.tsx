@@ -16,9 +16,19 @@ export default function ThemeToggle() {
 
   const toggle = () => {
     const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
+    
+    const switchTheme = () => {
+      setIsDark(next);
+      document.documentElement.classList.toggle("dark", next);
+      localStorage.setItem("theme", next ? "dark" : "light");
+    };
+
+    if (!(document as any).startViewTransition) {
+      switchTheme();
+      return;
+    }
+
+    (document as any).startViewTransition(switchTheme);
   };
 
   return (
