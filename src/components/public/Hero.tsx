@@ -35,9 +35,9 @@ export default function Hero({ initialData }: Props) {
                   key={cta.href + cta.text}
                   href={cta.href}
                   onClick={(e) => {
-                    const isBookingAction = 
-                      cta.href === "#booking" || 
-                      cta.text.toLowerCase().includes("reservar") || 
+                    const isBookingAction =
+                      cta.href === "#booking" ||
+                      cta.text.toLowerCase().includes("reservar") ||
                       cta.text.toLowerCase().includes("agendar");
 
                     if (isBookingAction) {
@@ -74,7 +74,7 @@ export default function Hero({ initialData }: Props) {
           <div className="relative animate-in fade-in zoom-in duration-1000">
             <div className="relative rounded-5xl overflow-hidden border border-primary/10 shadow-2xl group">
               <img
-                src={initialData.image_url || "/barber_hero_premium.png"}
+                src={initialData.image_url || "/barber_hero_premium.jpg"}
                 alt={initialData.title}
                 loading="eager"
                 fetchPriority="high"
