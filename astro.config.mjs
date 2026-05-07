@@ -17,4 +17,7 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   output: "server",
   adapter: vercel(),
+  webAnalytics: {
+    enabled: true, // set to false when using @vercel/analytics@1.4.0
+  },
 });
