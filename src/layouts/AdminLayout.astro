@@ -63,14 +63,23 @@ const currentPath = url.pathname;
   <body
     class="bg-stone-950 text-stone-300 font-sans antialiased min-h-screen flex"
   >
+    <!-- Overlay para móvil -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
     <aside
-      class="w-64 bg-stone-900 border-r border-stone-800 flex flex-col fixed h-full z-10"
+      id="admin-sidebar"
+      class="w-64 bg-stone-900 border-r border-stone-800 flex flex-col fixed h-full z-50 transform transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
     >
-      <div class="p-6 border-b border-stone-800">
-        <h2 class="text-xl font-bold text-white tracking-wider uppercase">
-          Barber Ray<span class="text-amber-500">.</span>
-        </h2>
-        <p class="text-xs text-stone-500 mt-1">Panel de Control</p>
+      <div class="p-6 border-b border-stone-800 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-wider uppercase">
+            Barber Ray<span class="text-amber-500">.</span>
+          </h2>
+          <p class="text-xs text-stone-500 mt-1">Panel de Control</p>
+        </div>
+        <button id="close-sidebar-btn" class="lg:hidden p-2 text-stone-400 hover:text-white rounded-md">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
       </div>
 
       <nav class="flex-1 overflow-y-auto py-4">
@@ -126,17 +135,23 @@ const currentPath = url.pathname;
       </div>
     </aside>
 
-    <main class="flex-1 ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 lg:ml-64 flex flex-col min-h-screen w-full transition-all duration-300">
       <header
-        class="h-16 border-b border-stone-800 bg-stone-950/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-8"
+        class="h-16 border-b border-stone-800 bg-stone-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8"
       >
-        <h1 class="text-lg font-medium text-white">{title}</h1>
+        <div class="flex items-center gap-3">
+          <button id="mobile-menu-btn" class="lg:hidden p-2 -ml-2 text-stone-400 hover:text-white rounded-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+          <h1 class="text-lg font-medium text-white truncate max-w-[200px] sm:max-w-none">{title}</h1>
+        </div>
         <a
           href="/"
           target="_blank"
-          class="text-sm text-stone-400 hover:text-amber-500 transition-colors flex items-center gap-2"
+          class="text-sm text-stone-400 hover:text-amber-500 transition-colors flex items-center gap-2 whitespace-nowrap"
         >
-          Ver sitio en vivo
+          <span class="hidden sm:inline">Ver sitio en vivo</span>
+          <span class="sm:hidden">Ver sitio</span>
           <svg
             class="w-4 h-4"
             fill="none"
@@ -152,9 +167,32 @@ const currentPath = url.pathname;
         </a>
       </header>
 
-      <div class="p-8 flex-1">
+      <div class="p-4 sm:p-8 flex-1 overflow-x-hidden">
         <slot />
       </div>
     </main>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('admin-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+
+        function openSidebar() {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+        }
+
+        function closeSidebar() {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+        }
+
+        mobileBtn?.addEventListener('click', openSidebar);
+        closeBtn?.addEventListener('click', closeSidebar);
+        overlay?.addEventListener('click', closeSidebar);
+      });
+    </script>
   </body>
 </html>

@@ -34,6 +34,12 @@ export default function Hero({ initialData }: Props) {
                 <a
                   key={cta.href + cta.text}
                   href={cta.href}
+                  onClick={(e) => {
+                    if (cta.href === "#booking") {
+                      e.preventDefault();
+                      globalThis.dispatchEvent(new CustomEvent("open-booking"));
+                    }
+                  }}
                   className={
                     index === 0
                       ? "btn-premium flex items-center justify-center gap-3 w-full sm:w-auto"
