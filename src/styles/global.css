@@ -125,29 +125,24 @@
   }
 }
 
-::view-transition-group(root) {
-  animation-timing-function: var(--expo-out);
+/* View Transitions for Theme Toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 ::view-transition-new(root) {
-  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><filter id="blur"><feGaussianBlur stdDeviation="2"/></filter></defs><circle cx="0" cy="0" r="18" fill="white" filter="url(%23blur)"/></svg>')
-    top left / 0 no-repeat;
-  mask-origin: content-box;
-  animation: scale 1s;
-  animation-fill-mode: both;
-  transform-origin: top left;
+  clip-path: circle(0% at 50% 50%);
+  animation: circle-expand 0.4s ease-in-out forwards;
 }
 
-::view-transition-old(root),
-.dark::view-transition-old(root) {
-  animation: scale 1s;
-  animation-fill-mode: both;
-  transform-origin: top left;
-  z-index: -1;
-}
-
-@keyframes scale {
+@keyframes circle-expand {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
   to {
-    mask-size: 350vmax;
+    clip-path: circle(150% at 50% 50%);
   }
 }
+
