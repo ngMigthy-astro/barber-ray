@@ -9,12 +9,14 @@ interface Props {
   title?: string;
   services?: any[];
   team?: any[];
+  lcpImage?: string;
 }
 
 const {
   title = "Barber Ray",
   services: initialServices = [],
   team: initialTeam = [],
+  lcpImage = "/barber_hero_premium.png",
 } = Astro.props;
 const { user } = Astro.locals;
 const { cookies, request } = Astro;
@@ -56,6 +58,18 @@ if (team.length === 0) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Font Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Syne:wght@400;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Syne:wght@400;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Syne:wght@400;700;800&display=swap">
+    </noscript>
+
+    <!-- Preload LCP Image -->
+    <link rel="preload" as="image" href={lcpImage} fetchpriority="high">
     <Analytics />
     <script is:inline>
       function speedInsightsBeforeSend(data) {

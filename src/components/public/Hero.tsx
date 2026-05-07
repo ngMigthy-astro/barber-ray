@@ -76,6 +76,9 @@ export default function Hero({ initialData }: Props) {
               <img
                 src={initialData.image_url || "/barber_hero_premium.png"}
                 alt={initialData.title}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-linear-to-t from-bg via-transparent to-transparent opacity-60"></div>

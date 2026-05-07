@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Syne:wght@400;700;800&display=swap");
 @import "tailwindcss";
 @import "tailwind-animations";
 
@@ -111,7 +110,7 @@
   }
 
   .reveal-text {
-    @apply overflow-hidden leading-[1.1] inline-block;
+    @apply overflow-hidden leading-ultra-tight inline-block;
   }
 
   .reveal-text span {
@@ -145,4 +144,3 @@
     clip-path: circle(150% at 50% 50%);
   }
 }
-

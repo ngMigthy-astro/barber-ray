@@ -125,8 +125,9 @@ const navLinks = dbData.dbNavLinks || [];
     title="Barber Ray | Estilo y Tradición" 
     services={servicesData.services} 
     team={teamMembers}
+    lcpImage={heroData?.image_url || "/barber_hero_premium.png"}
   >
-    {heroData && <Hero initialData={heroData} client:load />}
+    {heroData && <Hero initialData={heroData} client:idle />}
     
     {servicesData.services.length > 0 && <Services initialData={servicesData} />}
     
@@ -134,7 +135,7 @@ const navLinks = dbData.dbNavLinks || [];
       <Products 
         products={products} 
         config={getConfig("products", "Nuestros Productos", "Calidad Garantizada")}
-        client:load 
+        client:visible 
       />
     )}
     
@@ -142,7 +143,7 @@ const navLinks = dbData.dbNavLinks || [];
       <Gallery 
         images={gallery} 
         config={getConfig("gallery", "Galería", "Nuestro Trabajo")}
-        client:load 
+        client:visible 
       />
     )}
     
@@ -150,7 +151,7 @@ const navLinks = dbData.dbNavLinks || [];
       <Team 
         members={teamMembers} 
         config={getConfig("team", "El Equipo", "Maestros Barberos")}
-        client:load 
+        client:visible 
       />
     )}
     
@@ -160,14 +161,14 @@ const navLinks = dbData.dbNavLinks || [];
           ...getConfig("testimonials", "Testimonios", "Lo Que Dicen Nuestros Clientes"),
           testimonials
         }}
-        client:load 
+        client:visible 
       />
     )}
     
     <Contact 
       initialData={contactData} 
       config={getConfig("contact", "Visítanos", "Ubicación y Horarios")}
-      client:load 
+      client:visible 
     />
     
     <Footer 
