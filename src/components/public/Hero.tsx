@@ -74,7 +74,7 @@ export default function Hero({ initialData }: Props) {
           <div className="relative animate-in fade-in zoom-in duration-1000">
             <div className="relative rounded-5xl overflow-hidden border border-primary/10 shadow-2xl group">
               <img
-                src={initialData.image_url || "/barber_hero_premium.jpg"}
+                src={initialData.image_url || "/barber_hero_premium.webp"}
                 alt={initialData.title}
                 loading="eager"
                 fetchPriority="high"
