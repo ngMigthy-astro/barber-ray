@@ -2,7 +2,7 @@
 import Navbar from "../components/public/Navbar";
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
-
+import SpeedInsights from "@vercel/speed-insights/astro";
 import { createSupabaseClient } from "../lib/supabase";
 
 interface Props {
@@ -57,6 +57,13 @@ if (team.length === 0) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <Analytics />
+    <script is:inline>
+      function speedInsightsBeforeSend(data) {
+        console.log("Speed Insights before send", data);
+        return data;
+      }
+    </script>
+    <SpeedInsights />
     <!-- SEO Meta Tags -->
     <title>{title}</title>
     <meta
@@ -179,6 +186,15 @@ if (team.length === 0) {
       client:load
     />
     <slot />
+
+    <Analytics />
+    <script is:inline>
+      function speedInsightsBeforeSend(data) {
+        return data;
+      }
+    </script>
+    <SpeedInsights />
+
     <script is:inline>
       document.addEventListener("mousemove", (e) => {
         const x = (e.clientX / window.innerWidth) * 100;
