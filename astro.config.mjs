@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
+import dns from "node:dns";
 
 dns.setDefaultResultOrder("ipv4first");
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
