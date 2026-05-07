@@ -1,0 +1,320 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createSupabaseClient } from "../../lib/supabase";
+import { 
+  MapPin, 
+  Phone, 
+  Clock, 
+  Save, 
+  Plus, 
+  Trash2, 
+  CheckCircle2, 
+  X,
+  Info
+} from "lucide-react";
+
+const { cookies, request } = Astro;
+const supabase = createSupabaseClient(request, cookies);
+
+let errorMessage = "";
+let successMessage = "";
+
+// Obtener datos actuales
+const { data: contact } = await supabase
+  .from("contact_info")
+  .select("*")
+  .eq("id", "default")
+  .single();
+
+// Obtener horarios de la tabla dedicada
+const { data: dbSchedule } = await supabase
+  .from("schedule_entries")
+  .select("*")
+  .order("sort_order", { ascending: true });
+
+// Manejar POST
+if (request.method === "POST") {
+  try {
+    const formData = await request.formData();
+    const action = formData.get("action");
+
+    if (action === "update_contact") {
+      const address = formData.get("address")?.toString();
+      const phone = formData.get("phone")?.toString();
+      const brand_name = formData.get("brand_name")?.toString();
+      const brand_description = formData.get("brand_description")?.toString();
+      
+      // Procesar horarios desde los inputs dinámicos
+      const days = formData.getAll("schedule_days[]");
+      const hours = formData.getAll("schedule_hours[]");
+      
+      const schedule = days.map((day, i) => ({
+        days: day.toString(),
+        hours: hours[i]?.toString() || ""
+      })).filter(item => item.days && item.hours);
+
+      // 1. Actualizar info básica
+      const { error: contactError } = await supabase
+        .from("contact_info")
+        .upsert({
+          id: "default",
+          address,
+          phone,
+          brand_name,
+          brand_description
+        });
+
+      if (contactError) throw contactError;
+
+      // 2. Actualizar horarios (Borrar e insertar de nuevo para mantener orden)
+      const { error: deleteError } = await supabase
+        .from("schedule_entries")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (deleteError) throw deleteError;
+
+      const scheduleData = days.map((day, i) => ({
+        days: day.toString(),
+        hours: hours[i]?.toString() || "",
+        sort_order: i + 1
+      })).filter(item => item.days && item.hours);
+
+      const { error: scheduleError } = await supabase
+        .from("schedule_entries")
+        .insert(scheduleData);
+
+      if (scheduleError) throw scheduleError;
+
+      return Astro.redirect("/admin/contact?success=true");
+    }
+  } catch (e) {
+    errorMessage = (e as Error).message;
+  }
+}
+
+const isSuccess = Astro.url.searchParams.get("success") === "true";
+const currentContact = contact || {
+  address: "",
+  phone: "",
+  brand_name: "Barber Ray",
+  brand_description: ""
+};
+
+const currentSchedule = dbSchedule?.length ? dbSchedule : [{ days: "Lun – Vie", hours: "9:00am – 8:00pm" }];
+---
+
+<AdminLayout title="Configuración de Contacto">
+  <div class="max-w-4xl mx-auto space-y-8">
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-black text-white uppercase tracking-tight">Información del Negocio</h2>
+        <p class="text-stone-500 text-sm mt-1 font-medium">Administra la ubicación, teléfonos y horarios de atención al cliente.</p>
+      </div>
+    </div>
+
+    {errorMessage && (
+      <div class="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center gap-3">
+        <X className="w-5 h-5" />
+        <span class="font-medium text-sm">{errorMessage}</span>
+      </div>
+    )}
+
+    {isSuccess && (
+      <div id="success-notification" class="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+        <div class="flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5" />
+          <span class="font-medium text-sm text-white">Los cambios se han guardado y publicado correctamente.</span>
+        </div>
+        <button onclick="document.getElementById('success-notification').style.display='none'" class="cursor-pointer p-1 hover:bg-emerald-500/10 rounded-lg transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    )}
+
+    <form method="POST" class="space-y-8">
+      <input type="hidden" name="action" value="update_contact" />
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Lado Izquierdo: Datos Básicos */}
+        <div class="space-y-8">
+          <div class="bg-stone-900 border border-stone-800 rounded-5xl p-8 space-y-6">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
+                <Info className="w-5 h-5" />
+              </div>
+              <h3 class="text-white font-black uppercase tracking-ultra text-2xs">Identidad y Contacto</h3>
+            </div>
+
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra ml-4">Nombre de la Marca</label>
+                <input 
+                  type="text" 
+                  name="brand_name"
+                  value={currentContact.brand_name}
+                  placeholder="Ej. Barber Ray"
+                  class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                  required
+                />
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra ml-4">Descripción (Footer)</label>
+                <textarea 
+                  name="brand_description"
+                  rows="3"
+                  placeholder="Descripción corta de la marca para el footer..."
+                  class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-colors resize-none"
+                  required
+                >{currentContact.brand_description}</textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra ml-4">Dirección Física</label>
+                <div class="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-700" />
+                  <input 
+                    type="text" 
+                    name="address"
+                    value={currentContact.address}
+                    placeholder="Ej. Av. Reforma 123, CDMX"
+                    class="w-full bg-stone-950 border border-stone-800 rounded-2xl pl-12 pr-6 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra ml-4">Teléfono de Atención</label>
+                <div class="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-700" />
+                  <input 
+                    type="text" 
+                    name="phone"
+                    value={currentContact.phone}
+                    placeholder="Ej. +52 55 1234 5678"
+                    class="w-full bg-stone-950 border border-stone-800 rounded-2xl pl-12 pr-6 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        {/* Lado Derecho: Horarios Dinámicos */}
+        <div class="space-y-8">
+          <div class="bg-stone-900 border border-stone-800 rounded-5xl p-8">
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <h3 class="text-white font-black uppercase tracking-ultra text-2xs">Gestión de Horarios</h3>
+              </div>
+              <button 
+                type="button"
+                id="add-schedule-btn"
+                class="cursor-pointer p-2 bg-amber-500/10 text-amber-500 rounded-xl hover:bg-amber-500 hover:text-stone-950 transition-all"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div id="schedule-container" class="space-y-4">
+              {currentSchedule.map((item: any, index: number) => (
+                <div class="flex gap-4 items-end group animate-in fade-in slide-in-from-right-4" style={`animation-delay: ${index * 50}ms`}>
+                  <div class="flex-1 space-y-2">
+                    {index === 0 && <label class="text-3xs font-black text-stone-600 uppercase tracking-ultra ml-4">Días</label>}
+                    <input 
+                      type="text" 
+                      name="schedule_days[]"
+                      value={item.days}
+                      placeholder="Lun - Vie"
+                      class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                      required
+                    />
+                  </div>
+                  <div class="flex-1 space-y-2">
+                    {index === 0 && <label class="text-3xs font-black text-stone-600 uppercase tracking-ultra ml-4">Horas</label>}
+                    <input 
+                      type="text" 
+                      name="schedule_hours[]"
+                      value={item.hours}
+                      placeholder="9:00am - 8:00pm"
+                      class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                      required
+                    />
+                  </div>
+                  {index > 0 && (
+                    <button 
+                      type="button"
+                      onclick="this.parentElement.remove()"
+                      class="cursor-pointer p-3 text-stone-600 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Botón Guardar Flotante / Fijo */}
+      <div class="flex justify-end pt-4">
+        <button 
+          type="submit"
+          class="cursor-pointer bg-amber-500 hover:bg-amber-400 text-stone-950 font-black px-12 py-5 rounded-2xl transition-all flex items-center gap-3 shadow-xl shadow-amber-500/10 group"
+        >
+          <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Lógica para añadir filas de horario dinámicamente
+    const container = document.getElementById('schedule-container');
+    const addBtn = document.getElementById('add-schedule-btn');
+
+    addBtn?.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'flex gap-4 items-end group animate-in fade-in slide-in-from-right-4';
+      row.innerHTML = `
+        <div class="flex-1 space-y-2">
+          <input 
+            type="text" 
+            name="schedule_days[]"
+            placeholder="Días"
+            class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+            required
+          />
+        </div>
+        <div class="flex-1 space-y-2">
+          <input 
+            type="text" 
+            name="schedule_hours[]"
+            placeholder="Horario"
+            class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+            required
+          />
+        </div>
+        <button 
+          type="button"
+          onclick="this.parentElement.remove()"
+          class="cursor-pointer p-3 text-stone-600 hover:text-red-500 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </button>
+      `;
+      container?.appendChild(row);
+    });
+  </script>
+</AdminLayout>

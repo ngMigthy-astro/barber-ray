@@ -2,7 +2,9 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
 import { heroData as staticHeroData } from "../../data/public/hero.data";
-import type { HeroData } from "../../interfaces/public/hero.interface";
+import { uploadImage } from "../../lib/storage";
+import type { HeroData, HeroCTA, HeroStat } from "../../interfaces/public/hero.interface";
+import { X, Upload, ImageIcon } from "lucide-react";
 
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
@@ -22,39 +24,61 @@ let errorMessage = "";
 if (request.method === "POST") {
   try {
     const formData = await request.formData();
-    
+
     // Procesar CTAs
-    const ctas = [
-      { text: formData.get("cta1_text"), href: formData.get("cta1_href") },
-      { text: formData.get("cta2_text"), href: formData.get("cta2_href") },
+    const ctas: HeroCTA[] = [
+      {
+        text: formData.get("cta1_text")?.toString() || "",
+        href: formData.get("cta1_href")?.toString() || "",
+      },
+      {
+        text: formData.get("cta2_text")?.toString() || "",
+        href: formData.get("cta2_href")?.toString() || "",
+      },
     ];
 
     // Procesar Stats
-    const stats = [
-      { value: formData.get("stat1_value"), label: formData.get("stat1_label") },
-      { value: formData.get("stat2_value"), label: formData.get("stat2_label") },
-      { value: formData.get("stat3_value"), label: formData.get("stat3_label") },
+    const stats: HeroStat[] = [
+      {
+        value: formData.get("stat1_value")?.toString() || "",
+        label: formData.get("stat1_label")?.toString() || "",
+      },
+      {
+        value: formData.get("stat2_value")?.toString() || "",
+        label: formData.get("stat2_label")?.toString() || "",
+      },
+      {
+        value: formData.get("stat3_value")?.toString() || "",
+        label: formData.get("stat3_label")?.toString() || "",
+      },
     ];
 
-    const updatedHero: Partial<HeroData> = {
-      title: formData.get("title")?.toString(),
-      subtitle: formData.get("subtitle")?.toString(),
-      description: formData.get("description")?.toString(),
+    const imageFile = formData.get("image") as File;
+    let image_url = formData.get("current_image")?.toString() || "";
+
+    if (imageFile && imageFile.size > 0) {
+      const uploadedUrl = await uploadImage(supabase, imageFile, "hero");
+      if (uploadedUrl) image_url = uploadedUrl;
+    }
+
+    const updatedHero: Partial<HeroData & { image_url: string }> = {
+      title: formData.get("title")?.toString() || "",
+      subtitle: formData.get("subtitle")?.toString() || "",
+      description: formData.get("description")?.toString() || "",
+      image_url,
       ctas,
       stats,
     };
 
-    const { error: updateError } = await supabase
-      .from("hero_content")
-      .upsert({ 
-        id: dbHeroData?.id, // Si existe, actualiza. Si no, crea.
-        ...updatedHero,
-        updated_at: new Date().toISOString()
-      });
+    const { error: updateError } = await supabase.from("hero_content").upsert({
+      id: dbHeroData?.id, // Si existe, actualiza. Si no, crea.
+      ...updatedHero,
+      updated_at: new Date().toISOString(),
+    });
 
     if (updateError) throw updateError;
     successMessage = "¡Hero actualizado correctamente! 🔥";
-    
+
     // Recargar datos actualizados
     return Astro.redirect("/admin/hero?success=true");
   } catch (e) {
@@ -69,47 +93,156 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
   <div class="max-w-4xl">
     <div class="mb-8">
       <h2 class="text-2xl font-bold text-white mb-2">Configuración del Hero</h2>
-      <p class="text-stone-400 text-sm">Personaliza el mensaje principal que ven tus clientes al entrar al sitio.</p>
+      <p class="text-stone-400 text-sm">
+        Personaliza el mensaje principal que ven tus clientes al entrar al
+        sitio.
+      </p>
     </div>
 
-    {isSuccess && (
-      <div class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        <span class="font-medium">¡Cambios guardados con éxito, mi perrote!</span>
-      </div>
-    )}
+    {
+      isSuccess && (
+        <div
+          id="success-notification"
+          class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span class="font-medium">Los cambios se han guardado correctamente.</span>
+          </div>
+          <button
+            onclick="document.getElementById('success-notification').style.display='none'"
+            class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )
+    }
 
-    {errorMessage && (
-      <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center gap-3">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span class="font-medium">{errorMessage}</span>
-      </div>
-    )}
+    {
+      errorMessage && (
+        <div
+          id="error-notification"
+          class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="font-medium">{errorMessage}</span>
+          </div>
+          <button
+            onclick="document.getElementById('error-notification').style.display='none'"
+            class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )
+    }
 
-    <form method="POST" class="space-y-8">
-      <!-- Textos Principales -->
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
+      <input type="hidden" name="current_image" value={hero.image_url} />
+      
+      <!-- Imagen de Fondo -->
       <div class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6">
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="text-lg font-bold text-white uppercase tracking-wider text-sm">Textos Principales</h3>
+          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">Imagen de Fondo (Hero Background)</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <div class="md:col-span-1">
+            <div class="relative group aspect-video md:aspect-square bg-stone-950 border-2 border-dashed border-stone-800 rounded-2xl overflow-hidden flex items-center justify-center hover:border-amber-500/50 transition-all">
+              <img 
+                id="hero-preview" 
+                src={hero.image_url || '/images/hero-bg.jpg'} 
+                class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
+              />
+              <div class="relative z-10 flex flex-col items-center gap-2 text-stone-500 group-hover:text-amber-500 transition-colors">
+                <Upload className="w-8 h-8" />
+                <span class="text-2xs font-black uppercase tracking-widest">Cambiar Imagen</span>
+              </div>
+              <input 
+                type="file" 
+                name="image" 
+                accept="image/*" 
+                id="hero-upload"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+              />
+            </div>
+          </div>
+          <div class="md:col-span-2 space-y-4">
+            <div class="p-4 bg-stone-950/50 rounded-xl border border-stone-800/50">
+              <p class="text-xs text-stone-400 leading-relaxed">
+                <strong class="text-amber-500">Tip de Mentor:</strong> Para el Hero, usa imágenes horizontales (landscape) de alta resolución (mínimo 1920x1080). Las imágenes con tonos oscuros funcionan mejor con el diseño "Blood & Steel".
+              </p>
+            </div>
+            <div class="flex items-center gap-3 text-stone-500">
+              <ImageIcon className="w-4 h-4" />
+              <span class="text-2xs font-bold uppercase tracking-widest">URL Actual:</span>
+              <span class="text-[10px] font-mono truncate max-w-[200px]">{hero.image_url || 'Default System Image'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Textos Principales -->
+      <div
+        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+      >
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
+          <h3
+            class="font-black text-white uppercase tracking-ultra text-2xs"
+          >
+            Textos Principales
+          </h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-2">
-            <label class="text-xs font-bold text-stone-500 uppercase tracking-widest px-1">Título</label>
-            <input 
-              type="text" 
-              name="title" 
+            <label
+              class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+              >Título</label
+            >
+            <input
+              type="text"
+              name="title"
               value={hero.title}
               class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
               required
             />
           </div>
           <div class="space-y-2">
-            <label class="text-xs font-bold text-stone-500 uppercase tracking-widest px-1">Subtítulo</label>
-            <input 
-              type="text" 
-              name="subtitle" 
+            <label
+              class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+              >Subtítulo</label
+            >
+            <input
+              type="text"
+              name="subtitle"
               value={hero.subtitle}
               class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
               required
@@ -118,80 +251,101 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
         </div>
 
         <div class="space-y-2">
-          <label class="text-xs font-bold text-stone-500 uppercase tracking-widest px-1">Descripción</label>
-          <textarea 
-            name="description" 
+          <label
+            class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+            >Descripción</label
+          >
+          <textarea
+            name="description"
             rows="3"
             class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all resize-none"
-            required
-          >{hero.description}</textarea>
+            required>{hero.description}</textarea
+          >
         </div>
       </div>
 
       <!-- Call to Actions -->
-      <div class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6">
+      <div
+        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+      >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="text-lg font-bold text-white uppercase tracking-wider text-sm">Botones (CTAs)</h3>
+          <h3
+            class="font-black text-white uppercase tracking-ultra text-2xs"
+          >
+            Botones (CTAs)
+          </h3>
         </div>
 
-        {hero.ctas.map((cta, index) => (
-          <div class="p-6 bg-stone-950 rounded-2xl border border-stone-800 space-y-4">
-            <p class="text-xs font-black text-amber-500 uppercase">Botón {index + 1}</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input 
-                type="text" 
-                name={`cta${index + 1}_text`} 
-                placeholder="Texto del botón"
-                value={cta.text}
-                class="bg-stone-900 border border-stone-800 rounded-lg px-4 py-2 text-sm text-white focus:border-amber-500 outline-none"
-              />
-              <input 
-                type="text" 
-                name={`cta${index + 1}_href`} 
-                placeholder="Enlace (ej: #services)"
-                value={cta.href}
-                class="bg-stone-900 border border-stone-800 rounded-lg px-4 py-2 text-sm text-white focus:border-amber-500 outline-none"
-              />
+        {
+          hero.ctas.map((cta, index) => (
+            <div class="p-6 bg-stone-950 rounded-2xl border border-stone-800 space-y-4">
+              <p class="text-2xs font-black text-amber-500 uppercase tracking-ultra">
+                Botón {index + 1}
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  name={`cta${index + 1}_text`}
+                  placeholder="Texto del botón"
+                  value={cta.text}
+                  class="bg-stone-900 border border-stone-800 rounded-lg px-4 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+                <input
+                  type="text"
+                  name={`cta${index + 1}_href`}
+                  placeholder="Enlace (ej: #services)"
+                  value={cta.href}
+                  class="bg-stone-900 border border-stone-800 rounded-lg px-4 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
 
       <!-- Stats -->
-      <div class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6">
+      <div
+        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+      >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="text-lg font-bold text-white uppercase tracking-wider text-sm">Estadísticas (Stats)</h3>
+          <h3
+            class="font-black text-white uppercase tracking-ultra text-2xs"
+          >
+            Estadísticas (Stats)
+          </h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {hero.stats.map((stat, index) => (
-            <div class="p-6 bg-stone-950 rounded-2xl border border-stone-800 space-y-3">
-              <input 
-                type="text" 
-                name={`stat${index + 1}_value`} 
-                placeholder="Valor (ej: 10+)"
-                value={stat.value}
-                class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-lg font-bold text-white text-center focus:border-amber-500 outline-none"
-              />
-              <input 
-                type="text" 
-                name={`stat${index + 1}_label`} 
-                placeholder="Etiqueta"
-                value={stat.label}
-                class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-500 text-center focus:border-amber-500 outline-none"
-              />
-            </div>
-          ))}
+          {
+            hero.stats.map((stat, index) => (
+              <div class="p-6 bg-stone-950 rounded-2xl border border-stone-800 space-y-3">
+                <input
+                  type="text"
+                  name={`stat${index + 1}_value`}
+                  placeholder="Valor (ej: 10+)"
+                  value={stat.value}
+                  class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-lg font-bold text-white text-center focus:border-amber-500 outline-none"
+                />
+                <input
+                  type="text"
+                  name={`stat${index + 1}_label`}
+                  placeholder="Etiqueta"
+                  value={stat.label}
+                  class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-500 text-center focus:border-amber-500 outline-none"
+                />
+              </div>
+            ))
+          }
         </div>
       </div>
 
       <!-- Submit -->
       <div class="flex justify-end">
-        <button 
+        <button
           type="submit"
-          class="bg-amber-500 hover:bg-amber-600 text-stone-950 font-black py-4 px-10 rounded-2xl transition-all shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-95"
+          class="bg-amber-500 hover:bg-amber-600 text-stone-950 font-black py-4 px-10 rounded-2xl transition-all shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-95 cursor-pointer"
         >
           Guardar Cambios
         </button>
@@ -199,3 +353,21 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
     </form>
   </div>
 </AdminLayout>
+<script>
+  const heroUpload = document.getElementById('hero-upload') as HTMLInputElement;
+  const heroPreview = document.getElementById('hero-preview') as HTMLImageElement;
+
+  if (heroUpload && heroPreview) {
+    heroUpload.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          heroPreview.src = event.target?.result as string;
+          heroPreview.style.opacity = "0.8";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+</script>

@@ -4,7 +4,23 @@ import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { productsData } from "../../data/public/products.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 
-export default function Products() {
+interface Product {
+  name: string;
+  category: string;
+  description: string;
+  price: string;
+  image_url: string;
+}
+
+interface Props {
+  products: Product[];
+  config: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+export default function Products({ products, config }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start", slidesToScroll: 1 },
     [Autoplay({ delay: 3000, stopOnInteraction: true })],
@@ -19,8 +35,8 @@ export default function Products() {
         {/* Header with navigation buttons */}
         <div className="flex items-end justify-between">
           <SectionHeader
-            title={productsData.title}
-            subtitle={productsData.subtitle}
+            title={config.title}
+            subtitle={config.subtitle}
             centered={false}
           />
           <div className="flex gap-2 mb-14">
@@ -43,32 +59,47 @@ export default function Products() {
 
         {/* Carousel */}
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-6">
-            {productsData.products.map((product) => (
+          <div className="flex -ml-6">
+            {products.map((product) => (
               <div
                 key={product.name}
-                className="flex-none w-72 bg-surface rounded-2xl p-6 flex flex-col gap-3 border border-surface hover:border-primary transition-colors"
+                className="flex-none w-full sm:w-80 pl-6"
               >
-                {/* Product image placeholder */}
-                <div className="w-full h-40 rounded-xl bg-bg flex items-center justify-center text-primary border border-surface">
-                  <ShoppingBag className="w-12 h-12 opacity-40" />
-                </div>
+                <div className="bg-surface rounded-2xl p-6 flex flex-col gap-4 border border-surface hover:border-primary/30 transition-all duration-300 h-full group shadow-lg shadow-black/5">
+                  {/* Product image */}
+                  <div className="w-full h-48 rounded-xl bg-bg flex items-center justify-center text-primary border border-surface group-hover:scale-[1.02] transition-transform duration-500 overflow-hidden">
+                    {product.image_url ? (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <ShoppingBag className="w-16 h-16 opacity-20 group-hover:opacity-40 transition-opacity" />
+                    )}
+                  </div>
 
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  {product.category}
-                </span>
-                <h3 className="text-lg font-bold">{product.name}</h3>
-                <p className="text-text/60 text-sm flex-1">
-                  {product.description}
-                </p>
+                  <div className="flex-1 space-y-3">
+                    <span className="text-2xs font-black text-primary uppercase tracking-ultra">
+                      {product.category}
+                    </span>
+                    <h3 className="text-xl font-black text-text uppercase tracking-tighter italic">
+                      {product.name}
+                    </h3>
+                    <p className="text-text-muted text-sm leading-relaxed line-clamp-3">
+                      {product.description}
+                    </p>
+                  </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-bg">
-                  <span className="text-primary font-black text-xl">
-                    {product.price}
-                  </span>
-                  <button className="text-sm font-semibold bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full transition-colors">
-                    Ver más
-                  </button>
+                  <div className="flex items-center justify-between pt-6 border-t border-surface mt-4">
+                    <span className="text-primary font-black text-2xl tracking-tighter">
+                      {product.price}
+                    </span>
+                    <button className="text-2xs font-black bg-surface border border-surface hover:border-primary/50 text-text px-6 py-3 rounded-xl transition-all uppercase tracking-ultra active:scale-95 shadow-sm">
+                      Ver más
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

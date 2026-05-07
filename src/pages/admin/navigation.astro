@@ -1,0 +1,252 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createSupabaseClient } from "../../lib/supabase";
+import { 
+  Link as LinkIcon, 
+  Save, 
+  Plus, 
+  Trash2, 
+  CheckCircle2, 
+  X,
+  GripVertical,
+  ExternalLink
+} from "lucide-react";
+
+const { cookies, request } = Astro;
+const supabase = createSupabaseClient(request, cookies);
+
+let errorMessage = "";
+
+// Obtener enlaces actuales
+const { data: navLinks } = await supabase
+  .from("nav_links")
+  .select("*")
+  .order("sort_order", { ascending: true });
+
+// Manejar POST
+if (request.method === "POST") {
+  try {
+    const formData = await request.formData();
+    const action = formData.get("action");
+
+    if (action === "save_links") {
+      const ids = formData.getAll("id[]");
+      const labels = formData.getAll("label[]");
+      const hrefs = formData.getAll("href[]");
+      const orders = formData.getAll("sort_order[]");
+
+      // Primero, identificamos los que tienen ID (actualizar) y los que no (nuevos)
+      const updates = ids.map((id, i) => {
+        const item: any = {
+          label: labels[i].toString(),
+          href: hrefs[i].toString(),
+          sort_order: parseInt(orders[i].toString()) || (i + 1)
+        };
+        if (id && id.toString() !== "") {
+          item.id = id.toString();
+        }
+        return item;
+      });
+
+      const { error } = await supabase
+        .from("nav_links")
+        .upsert(updates);
+
+      if (error) throw error;
+      return Astro.redirect("/admin/navigation?success=true");
+
+    } else if (action === "delete_link") {
+      const id = formData.get("id")?.toString();
+      if (id) {
+        const { error } = await supabase.from("nav_links").delete().eq("id", id);
+        if (error) throw error;
+      }
+      return Astro.redirect("/admin/navigation?success=true");
+    }
+  } catch (e) {
+    errorMessage = (e as Error).message;
+  }
+}
+
+const isSuccess = Astro.url.searchParams.get("success") === "true";
+const links = navLinks || [];
+---
+
+<AdminLayout title="Gestión de Navegación">
+  <div class="max-w-4xl mx-auto space-y-8 text-stone-300">
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-black text-white uppercase tracking-tight">Menú Principal</h2>
+        <p class="text-stone-500 text-sm mt-1 font-medium text-amber-500/80 italic">Controla los enlaces de la barra de navegación pública.</p>
+      </div>
+      <button 
+        type="button"
+        id="add-link-btn"
+        class="cursor-pointer bg-amber-500/10 border border-amber-500/20 text-amber-500 font-black px-6 py-3 rounded-2xl flex items-center gap-2 hover:bg-amber-500 hover:text-stone-950 transition-all shadow-lg shadow-amber-500/5 group"
+      >
+        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+        Añadir Sección
+      </button>
+    </div>
+
+    {isSuccess && (
+      <div id="success-notification" class="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+        <div class="flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5" />
+          <span class="font-medium text-sm text-white">Configuración de navegación guardada con éxito.</span>
+        </div>
+        <button onclick="document.getElementById('success-notification').style.display='none'" class="cursor-pointer p-1 hover:bg-emerald-500/10 rounded-lg transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    )}
+
+    {errorMessage && (
+      <div id="error-notification" class="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+        <div class="flex items-center gap-3">
+          <X className="w-5 h-5" />
+          <span class="font-medium text-sm">Error: {errorMessage}</span>
+        </div>
+        <button onclick="document.getElementById('error-notification').style.display='none'" class="cursor-pointer p-1 hover:bg-red-500/10 rounded-lg transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    )}
+
+    <form method="POST" id="nav-form">
+      <input type="hidden" name="action" value="save_links" />
+      
+      <div id="links-container" class="space-y-4">
+        {links.map((link, index) => (
+          <div class="bg-stone-900 border border-stone-800 p-6 rounded-5xl flex items-center gap-6 group animate-in fade-in slide-in-from-bottom-4 transition-all hover:border-stone-700" style={`animation-delay: ${index * 50}ms`}>
+            <div class="text-stone-700 group-hover:text-amber-500/50 transition-colors">
+              <GripVertical className="w-6 h-6" />
+            </div>
+            
+            <input type="hidden" name="id[]" value={link.id} />
+            
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-600 uppercase tracking-ultra ml-4">Nombre del Enlace</label>
+                <input 
+                  type="text" 
+                  name="label[]" 
+                  value={link.label}
+                  placeholder="Ej. Servicios"
+                  class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors font-medium"
+                  required
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="text-2xs font-black text-stone-600 uppercase tracking-ultra ml-4">Destino (ID o URL)</label>
+                <div class="relative">
+                  <ExternalLink className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-700" />
+                  <input 
+                    type="text" 
+                    name="href[]" 
+                    value={link.href}
+                    placeholder="Ej. #servicios"
+                    class="w-full bg-stone-950 border border-stone-800 rounded-2xl pl-12 pr-6 py-4 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors font-medium"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="w-24 space-y-2">
+              <label class="text-2xs font-black text-stone-600 uppercase tracking-ultra ml-4">Orden</label>
+              <input 
+                type="number" 
+                name="sort_order[]" 
+                value={link.sort_order}
+                class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-4 py-4 text-sm text-white text-center focus:outline-none focus:border-amber-500/50 transition-colors font-black"
+                required
+              />
+            </div>
+
+            <button 
+              type="button"
+              class="delete-btn cursor-pointer p-4 bg-stone-950 border border-stone-800 text-stone-600 hover:text-red-500 hover:border-red-500/30 rounded-2xl transition-all mt-6"
+              data-id={link.id}
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        ))}
+
+        {links.length === 0 && (
+          <div class="bg-stone-900/50 border border-dashed border-stone-800 rounded-6xl p-20 text-center">
+            <LinkIcon className="w-12 h-12 text-stone-800 mx-auto mb-4" />
+            <h3 class="text-xl font-black text-stone-600 uppercase tracking-widest">Menú Vacío</h3>
+            <p class="text-stone-500 text-sm mt-2">No hay enlaces configurados. Añade uno para empezar.</p>
+          </div>
+        )}
+      </div>
+
+      <div class="flex justify-end mt-12">
+        <button 
+          type="submit"
+          class="cursor-pointer bg-amber-500 hover:bg-amber-400 text-stone-950 font-black px-12 py-5 rounded-2xl transition-all flex items-center gap-4 shadow-xl shadow-amber-500/10 group active:scale-95"
+        >
+          <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          Publicar Cambios en Menú
+        </button>
+      </div>
+    </form>
+
+    {/* Formulario oculto para eliminar */}
+    <form id="delete-form" method="POST" class="hidden">
+      <input type="hidden" name="action" value="delete_link" />
+      <input type="hidden" name="id" id="delete-id" />
+    </form>
+  </div>
+
+  <script>
+    const container = document.getElementById('links-container');
+    const addBtn = document.getElementById('add-link-btn');
+    const deleteForm = document.getElementById('delete-form') as HTMLFormElement;
+    const deleteIdInput = document.getElementById('delete-id') as HTMLInputElement;
+
+    // Añadir nuevo
+    addBtn?.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'bg-stone-900 border border-stone-800 p-6 rounded-5xl flex items-center gap-6 group animate-in fade-in slide-in-from-bottom-4 transition-all hover:border-stone-700';
+      row.innerHTML = `
+        <div class="text-stone-700"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
+        <input type="hidden" name="id[]" value="" />
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <input type="text" name="label[]" placeholder="Nueva Sección" class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors font-medium" required />
+          </div>
+          <div class="space-y-2">
+            <input type="text" name="href[]" placeholder="#seccion" class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors font-medium" required />
+          </div>
+        </div>
+        <div class="w-24">
+          <input type="number" name="sort_order[]" value="${(container?.children.length || 0) + 1}" class="w-full bg-stone-950 border border-stone-800 rounded-2xl px-4 py-4 text-sm text-white text-center focus:outline-none focus:border-amber-500/50 transition-colors font-black" required />
+        </div>
+        <button type="button" class="p-4 bg-stone-950 border border-stone-800 text-stone-600 hover:text-red-500 rounded-2xl transition-all" onclick="this.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </button>
+      `;
+      container?.appendChild(row);
+    });
+
+    // Eliminar existente
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.delete-btn') as HTMLElement;
+      if (btn) {
+        if (confirm('¿Seguro que quieres eliminar este enlace del menú? No se puede deshacer.')) {
+          const id = btn.dataset.id;
+          if (id) {
+            deleteIdInput.value = id;
+            deleteForm?.submit();
+          } else {
+            btn.closest('.group')?.remove();
+          }
+        }
+      }
+    });
+  </script>
+</AdminLayout>

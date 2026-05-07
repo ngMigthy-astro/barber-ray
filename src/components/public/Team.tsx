@@ -4,29 +4,56 @@ import { teamData } from "../../data/public/team.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 import StarRating from "../shared/ui/StarRating";
 
-export default function Team() {
+interface TeamMember {
+  name: string;
+  role: string;
+  image_url?: string;
+  instagram: string;
+  rating: number;
+  reviews?: number;
+  specialties: string[];
+}
+
+interface TeamProps {
+  members: TeamMember[];
+  config: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+export default function Team({ members = [], config }: TeamProps) {
   return (
     <section id="team" className="py-24 bg-bg px-4">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
-          title={teamData.subtitle}
-          subtitle={teamData.title}
+          title={config.title}
+          subtitle={config.subtitle}
         />
 
         {/* Team member cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {teamData.members.map((member) => (
+          {members.map((member) => (
             <div
               key={member.name}
               className="bg-surface rounded-2xl p-6 flex flex-col items-center text-center gap-4 border border-surface hover:border-primary transition-colors group"
             >
-              {/* Avatar placeholder */}
-              <div className="w-24 h-24 rounded-full bg-bg border-2 border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                <UserCircle2 className="w-14 h-14" />
+              {/* Avatar */}
+              <div className="w-24 h-24 rounded-full bg-bg border-2 border-primary overflow-hidden flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                {member.image_url ? (
+                  <img 
+                    src={member.image_url} 
+                    alt={member.name} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <UserCircle2 className="w-14 h-14" />
+                )}
               </div>
 
               <div>
-                <h3 className="text-xl font-black">{member.name}</h3>
+                <h3 className="text-xl font-black group-hover:text-primary transition-colors">{member.name}</h3>
                 <p className="text-primary text-sm font-medium">
                   {member.role}
                 </p>

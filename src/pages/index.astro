@@ -6,29 +6,130 @@ import Products from "../components/public/Products";
 import Gallery from "../components/public/Gallery";
 import Team from "../components/public/Team";
 import Testimonials from "../components/public/Testimonials"
+import Contact from "../components/public/Contact"
 import Footer from "../components/public/Footer"
 
-// CMS Data
+// CMS Data & Libs
 import { createSupabaseClient } from "../lib/supabase";
 import { heroData as staticHeroData } from "../data/public/hero.data";
+import { servicesData as staticServicesData } from "../data/public/services.data";
+import { contactData as staticContactData } from "../data/public/contact.data";
+import { navigationLinks as staticNavLinks } from "../data/public/navigation.data";
+import { testimonialsData as staticTestimonialsData } from "../data/public/testimonials.data";
+import { productsData as staticProductsData } from "../data/public/products.data";
+import { galleryData as staticGalleryData } from "../data/public/gallery.data";
+import { teamData as staticTeamData } from "../data/public/team.data";
 
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
 
-const { data: dbHeroData } = await supabase
-  .from("hero_content")
-  .select("*")
-  .single();
+// 1. Fetch All Data in Parallel
+const [
+  { data: allConfigs },
+  { data: dbHeroData },
+  { data: dbServices },
+  { data: dbTeam },
+  { data: dbProducts },
+  { data: dbGallery },
+  { data: dbTestimonials },
+  { data: dbContact },
+  { data: dbSchedule },
+  { data: dbSocials },
+  { data: dbNavLinks }
+] = await Promise.all([
+  supabase.from("section_configs").select("*"),
+  supabase.from("hero_content").select("*").single(),
+  supabase.from("services").select("*").order("sort_order", { ascending: true }),
+  supabase.from("team_members").select("*").order("sort_order", { ascending: true }),
+  supabase.from("products").select("*").order("created_at", { ascending: false }),
+  supabase.from("gallery_images").select("*").order("sort_order", { ascending: true }),
+  supabase.from("testimonials").select("*").order("created_at", { ascending: false }),
+  supabase.from("contact_info").select("*").eq("id", "default").single(),
+  supabase.from("schedule_entries").select("*").order("sort_order", { ascending: true }),
+  supabase.from("social_links").select("*").order("sort_order", { ascending: true }),
+  supabase.from("nav_links").select("*").order("sort_order", { ascending: true })
+]);
 
+// Helper for dynamic configs
+const getConfig = (id: string, staticData: { title: string; subtitle: string }) => {
+  const config = allConfigs?.find(c => c.id === id);
+  return {
+    title: config?.title || staticData.title,
+    subtitle: config?.subtitle || staticData.subtitle,
+  };
+};
+
+// Data preparation with fallbacks
 const heroData = dbHeroData || staticHeroData;
+
+const servicesData = {
+  ...getConfig("services", staticServicesData),
+  services: dbServices?.length ? dbServices : staticServicesData.services
+};
+
+const teamMembers = dbTeam?.length 
+  ? dbTeam.reduce((acc: any[], current) => {
+      if (!acc.find(item => item.name === current.name)) acc.push(current);
+      return acc;
+    }, [])
+  : staticTeamData.members;
+
+const contactData = {
+  ...(dbContact || staticContactData),
+  schedule: dbSchedule?.length ? dbSchedule : staticContactData.schedule,
+  socials: dbSocials || []
+};
+
+const products = dbProducts?.length ? dbProducts : staticProductsData.products;
+const gallery = dbGallery?.length ? dbGallery : staticGalleryData.images;
+const testimonials = dbTestimonials?.length ? dbTestimonials : staticTestimonialsData.testimonials;
+const navLinks = dbNavLinks?.length ? dbNavLinks : staticNavLinks;
 ---
 
-<Layout title="Barber Ray | Estilo y Tradición">
+<Layout 
+  title="Barber Ray | Estilo y Tradición" 
+  services={servicesData.services} 
+  team={teamMembers}
+>
   <Hero initialData={heroData} client:load />
-  <Services />
-  <Products client:load />
-  <Gallery client:load />
-  <Team client:load />
-  <Testimonials client:load />
-  <Footer/>
+  
+  <Services initialData={servicesData} />
+  
+  <Products 
+    products={products} 
+    config={getConfig("products", staticProductsData)}
+    client:load 
+  />
+  
+  <Gallery 
+    images={gallery} 
+    config={getConfig("gallery", staticGalleryData)}
+    client:load 
+  />
+  
+  <Team 
+    members={teamMembers} 
+    config={getConfig("team", staticTeamData)}
+    client:load 
+  />
+  
+  <Testimonials 
+    initialData={{
+      ...getConfig("testimonials", staticTestimonialsData),
+      testimonials
+    }}
+    client:load 
+  />
+  
+  <Contact 
+    initialData={contactData} 
+    config={getConfig("contact", { title: "Visítanos", subtitle: "Ubicación y Horarios" })}
+    client:load 
+  />
+  
+  <Footer 
+    navLinks={navLinks} 
+    contactData={contactData} 
+  />
 </Layout>
+

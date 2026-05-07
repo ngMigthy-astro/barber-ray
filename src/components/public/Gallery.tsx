@@ -4,33 +4,52 @@ import { galleryData } from "../../data/public/gallery.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 import Lightbox from "../shared/ui/Lightbox";
 
-export default function Gallery() {
+interface GalleryImage {
+  id: string;
+  image_url: string;
+  category: string;
+  alt?: string;
+}
+
+interface Props {
+  images: GalleryImage[];
+  config: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+export default function Gallery({ images, config }: Props) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
+  // Extraer categorías únicas de las imágenes
+  const categories = ["Todos", ...new Set(images.map(img => img.category))];
 
   const filteredImages =
     activeCategory === "Todos"
-      ? galleryData.images
-      : galleryData.images.filter((img) => img.category === activeCategory);
+      ? images
+      : images.filter((img) => img.category === activeCategory);
 
   return (
     <section id="gallery" className="py-24 bg-surface px-4">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
-          title={galleryData.description}
-          subtitle={galleryData.title}
+          title={config.title}
+          subtitle={config.subtitle}
         />
 
         {/* Category filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
-          {galleryData.categories.map((category) => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold border transition-colors ${
+              className={`px-5 py-2 rounded-full text-sm font-semibold border transition-colors uppercase tracking-widest ${
                 activeCategory === category
-                  ? "bg-primary border-primary text-white"
-                  : "border-primary text-primary hover:bg-primary hover:text-white"
+                  ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                  : "border-primary/20 text-text/60 hover:border-primary hover:text-primary"
               }`}
             >
               {category}
@@ -43,14 +62,27 @@ export default function Gallery() {
           {filteredImages.map((img) => (
             <button
               key={img.id}
-              onClick={() => setLightboxOpen(true)}
-              className="group aspect-square bg-bg rounded-2xl flex items-center justify-center border border-surface hover:border-primary transition-colors overflow-hidden relative"
+              onClick={() => {
+                setSelectedImage(img);
+                setLightboxOpen(true);
+              }}
+              className="group aspect-square bg-bg rounded-2xl flex items-center justify-center border border-surface hover:border-primary transition-all overflow-hidden relative shadow-md hover:shadow-xl hover:-translate-y-1"
             >
-              <ImageIcon className="w-10 h-10 text-primary opacity-30 group-hover:opacity-60 transition-opacity" />
-              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors rounded-2xl" />
-              <span className="absolute bottom-2 left-0 right-0 text-center text-xs text-text/50 px-2 truncate">
-                {img.alt}
-              </span>
+              {img.image_url ? (
+                <img 
+                  src={img.image_url} 
+                  alt={img.alt || "Galería Barber Ray"} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <ImageIcon className="w-10 h-10 text-primary opacity-30 group-hover:opacity-60 transition-opacity" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <span className="text-white text-[10px] font-black uppercase tracking-ultra">
+                  {img.category}
+                </span>
+              </div>
             </button>
           ))}
         </div>
@@ -59,7 +91,12 @@ export default function Gallery() {
       {/* Lightbox modal */}
       <Lightbox
         isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
+        onClose={() => {
+          setLightboxOpen(false);
+          setSelectedImage(null);
+        }}
+        imageUrl={selectedImage?.image_url}
+        alt={selectedImage?.alt}
       />
     </section>
   );

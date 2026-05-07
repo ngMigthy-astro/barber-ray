@@ -5,6 +5,7 @@ import {
   Users,
   MessageSquare,
   Image as ImageIcon,
+  Package,
 } from "lucide-react";
 import { createSupabaseClient } from "../../lib/supabase";
 
@@ -15,11 +16,13 @@ const [
   { count: teamCount },
   { count: testimonialsCount },
   { count: galleryCount },
+  { count: productsCount },
 ] = await Promise.all([
   supabase.from("services").select("*", { count: "exact", head: true }),
   supabase.from("team_members").select("*", { count: "exact", head: true }),
   supabase.from("testimonials").select("*", { count: "exact", head: true }),
   supabase.from("gallery_images").select("*", { count: "exact", head: true }),
+  supabase.from("products").select("*", { count: "exact", head: true }),
 ]);
 
 const stats = [
@@ -28,6 +31,12 @@ const stats = [
     value: servicesCount || 0,
     icon: Scissors,
     href: "/admin/services",
+  },
+  {
+    label: "Productos",
+    value: productsCount || 0,
+    icon: Package,
+    href: "/admin/products",
   },
   {
     label: "Miembros del Equipo",

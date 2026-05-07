@@ -6,6 +6,7 @@ export const servicesData: ServicesData = {
   subtitle: "Lo que ofrecemos",
   services: [
     {
+      id: "550e8400-e29b-41d4-a716-446655440001",
       icon: Scissors,
       name: "Corte Clásico",
       description: "Corte tradicional con acabado perfecto a tijera o maquina",
@@ -13,6 +14,7 @@ export const servicesData: ServicesData = {
       duration: "30 min",
     },
     {
+      id: "550e8400-e29b-41d4-a716-446655440002",
       icon: Brush,
       name: "Corte + Barba",
       description: "Combo completo: corte de cabello y perfilado de barba",
@@ -20,6 +22,7 @@ export const servicesData: ServicesData = {
       duration: "50 min",
     },
     {
+      id: "550e8400-e29b-41d4-a716-446655440003",
       icon: Sparkles,
       name: "Afeitado Clásico",
       description:
@@ -28,6 +31,7 @@ export const servicesData: ServicesData = {
       duration: "40 min",
     },
     {
+      id: "550e8400-e29b-41d4-a716-446655440004",
       icon: Wind,
       name: "Tinte + Corte",
       description:
