@@ -18,7 +18,6 @@ const supabase = createSupabaseClient(request, cookies);
 
 let errorMessage = "";
 
-// Manejar POST (Alternar destacado o eliminar)
 if (request.method === "POST") {
   try {
     const formData = await request.formData();
@@ -47,7 +46,6 @@ if (request.method === "POST") {
 
 const isSuccess = Astro.url.searchParams.get("success") === "true";
 
-// Obtener todas las reseñas con info de la cita
 const { data: reviews, error: fetchError } = await supabase
   .from("appointment_reviews")
   .select(`

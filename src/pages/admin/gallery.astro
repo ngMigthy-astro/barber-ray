@@ -2,7 +2,14 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
 import { uploadImage } from "../../lib/storage";
-import { Trash2, Plus, Save, Upload, Image as ImageIcon, X } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Save,
+  Upload,
+  Image as ImageIcon,
+  X,
+} from "lucide-react";
 
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
@@ -73,12 +80,20 @@ const gallery = dbGallery || [];
   <div class="max-w-6xl mx-auto">
     {
       isSuccess && (
-        <div id="success-notification" class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="success-notification"
+          class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <Save className="w-5 h-5" />
-            <span class="font-medium">La galería de imágenes ha sido actualizada correctamente.</span>
+            <span class="font-medium">
+              La galería de imágenes ha sido actualizada correctamente.
+            </span>
           </div>
-          <button onclick="document.getElementById('success-notification').style.display='none'" class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('success-notification').style.display='none'"
+            class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -87,11 +102,17 @@ const gallery = dbGallery || [];
 
     {
       errorMessage && (
-        <div id="error-notification" class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="error-notification"
+          class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <span class="font-medium">Error: {errorMessage}</span>
           </div>
-          <button onclick="document.getElementById('error-notification').style.display='none'" class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('error-notification').style.display='none'"
+            class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -132,14 +153,20 @@ const gallery = dbGallery || [];
                   id="new-gallery-preview-container"
                   class="w-full h-32 bg-stone-950 border border-dashed border-stone-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-stone-500 group-hover:border-amber-500 group-hover:text-amber-500 transition-colors"
                 >
-                  <div id="new-gallery-upload-ui" class="flex flex-col items-center justify-center pointer-events-none">
+                  <div
+                    id="new-gallery-upload-ui"
+                    class="flex flex-col items-center justify-center pointer-events-none"
+                  >
                     <Upload className="w-6 h-6 mb-2" />
                     <span
                       class="text-xs font-bold uppercase tracking-widest text-center"
                       >Seleccionar</span
                     >
                   </div>
-                  <img id="new-gallery-image-preview" class="hidden w-full h-full object-cover" />
+                  <img
+                    id="new-gallery-image-preview"
+                    class="hidden w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -197,8 +224,7 @@ const gallery = dbGallery || [];
           {
             gallery.map((image, index) => (
               <div class="bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden hover:border-amber-500/50 transition-all group flex flex-col">
-                {/* Imagen Wrapper */}
-                <div class="relative aspect-[4/3] w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+                <div class="relative aspect-4/3 w-full bg-stone-950 flex items-center justify-center overflow-hidden">
                   {image.image_url ? (
                     <img
                       src={image.image_url}
@@ -209,7 +235,6 @@ const gallery = dbGallery || [];
                     <ImageIcon className="w-10 h-10 text-stone-800" />
                   )}
 
-                  {/* Formulario de actualización de imagen (Overlay on Hover) */}
                   <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer z-10">
                     <form
                       method="POST"
@@ -239,7 +264,7 @@ const gallery = dbGallery || [];
                       <span class="text-xs text-white font-bold uppercase tracking-widest">
                         Cambiar Imagen
                       </span>
-                      {/* Al cambiar el archivo, necesitamos una forma de auto-submit, pero por ahora confiaremos en un botón Guardar o el usuario presiona Enter. Mejor lo manejamos vía el botón Guardar del footer de la card */}
+
                       <input
                         type="file"
                         name="image"
@@ -251,7 +276,6 @@ const gallery = dbGallery || [];
                   </div>
                 </div>
 
-                {/* Controles de Info */}
                 <div class="p-5 flex-1 flex flex-col">
                   <form method="POST" class="flex-1 space-y-3">
                     <input type="hidden" name="action" value="upsert_gallery" />
@@ -313,26 +337,30 @@ const gallery = dbGallery || [];
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('new-gallery-image') as HTMLInputElement;
-    const previewImg = document.getElementById('new-gallery-image-preview') as HTMLImageElement;
-    const uploadUi = document.getElementById('new-gallery-upload-ui');
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById(
+      "new-gallery-image",
+    ) as HTMLInputElement;
+    const previewImg = document.getElementById(
+      "new-gallery-image-preview",
+    ) as HTMLImageElement;
+    const uploadUi = document.getElementById("new-gallery-upload-ui");
 
     if (fileInput && previewImg && uploadUi) {
-      fileInput.addEventListener('change', (e) => {
+      fileInput.addEventListener("change", (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
           const reader = new FileReader();
           reader.onload = (e) => {
             previewImg.src = e.target?.result as string;
-            previewImg.classList.remove('hidden');
-            uploadUi.classList.add('hidden');
+            previewImg.classList.remove("hidden");
+            uploadUi.classList.add("hidden");
           };
           reader.readAsDataURL(file);
         } else {
-          previewImg.src = '';
-          previewImg.classList.add('hidden');
-          uploadUi.classList.remove('hidden');
+          previewImg.src = "";
+          previewImg.classList.add("hidden");
+          uploadUi.classList.remove("hidden");
         }
       });
     }

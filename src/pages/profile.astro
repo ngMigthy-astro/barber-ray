@@ -5,21 +5,21 @@ import ProfileView from "../components/public/ProfileView";
 
 const { user } = Astro.locals;
 
-// Auth Guard: Si no hay usuario, redirigir al home con el modal de login abierto
 if (!user) {
   return Astro.redirect("/?login=true");
 }
 
 const supabase = createSupabaseClient(Astro.request, Astro.cookies);
 
-// Fetch user appointments with service and barber details
 const { data: appointments, error } = await supabase
   .from("appointments")
-  .select(`
+  .select(
+    `
     *,
     service:service_id(name, price, duration),
     barber:barber_id(name)
-  `)
+  `,
+  )
   .eq("user_id", user.id)
   .order("appointment_date", { ascending: false });
 
@@ -28,13 +28,13 @@ if (error) {
 }
 ---
 
-<Layout title={`Perfil | ${user.user_metadata?.full_name || 'Usuario'}`}>
+<Layout title={`Perfil | ${user.user_metadata?.full_name || "Usuario"}`}>
   <main class="pt-32 pb-24 px-4 min-h-screen">
     <div class="max-w-5xl mx-auto">
-      <ProfileView 
-        user={user} 
-        initialAppointments={appointments || []} 
-        client:load 
+      <ProfileView
+        user={user}
+        initialAppointments={appointments || []}
+        client:load
       />
     </div>
   </main>

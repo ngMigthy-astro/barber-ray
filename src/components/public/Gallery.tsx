@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ImageIcon } from "lucide-react";
-import { galleryData } from "../../data/public/gallery.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 import Lightbox from "../shared/ui/Lightbox";
 
@@ -12,10 +11,10 @@ interface GalleryImage {
 }
 
 interface Props {
-  images: GalleryImage[];
-  config: {
-    title: string;
-    subtitle: string;
+  readonly images: GalleryImage[];
+  readonly config: {
+    readonly title: string;
+    readonly subtitle: string;
   };
 }
 
@@ -24,8 +23,7 @@ export default function Gallery({ images, config }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
-  // Extraer categorías únicas de las imágenes
-  const categories = ["Todos", ...new Set(images.map(img => img.category))];
+  const categories = ["Todos", ...new Set(images.map((img) => img.category))];
 
   const filteredImages =
     activeCategory === "Todos"
@@ -35,12 +33,8 @@ export default function Gallery({ images, config }: Props) {
   return (
     <section id="gallery" className="py-24 bg-surface px-4">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          title={config.title}
-          subtitle={config.subtitle}
-        />
+        <SectionHeader title={config.title} subtitle={config.subtitle} />
 
-        {/* Category filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {categories.map((category) => (
             <button
@@ -57,7 +51,6 @@ export default function Gallery({ images, config }: Props) {
           ))}
         </div>
 
-        {/* Image grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {filteredImages.map((img) => (
             <button
@@ -69,17 +62,17 @@ export default function Gallery({ images, config }: Props) {
               className="group aspect-square bg-bg rounded-2xl flex items-center justify-center border border-surface hover:border-primary transition-all overflow-hidden relative shadow-md hover:shadow-xl hover:-translate-y-1"
             >
               {img.image_url ? (
-                <img 
-                  src={img.image_url} 
-                  alt={img.alt || "Galería Barber Ray"} 
+                <img
+                  src={img.image_url}
+                  alt={img.alt || "Galería Barber Ray"}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
               ) : (
                 <ImageIcon className="w-10 h-10 text-primary opacity-30 group-hover:opacity-60 transition-opacity" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <span className="text-white text-[10px] font-black uppercase tracking-ultra">
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <span className="text-white text-2xs font-black uppercase tracking-ultra">
                   {img.category}
                 </span>
               </div>
@@ -88,7 +81,6 @@ export default function Gallery({ images, config }: Props) {
         </div>
       </div>
 
-      {/* Lightbox modal */}
       <Lightbox
         isOpen={lightboxOpen}
         onClose={() => {

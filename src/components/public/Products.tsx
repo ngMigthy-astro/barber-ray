@@ -1,7 +1,6 @@
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
-import { productsData } from "../../data/public/products.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 
 interface Product {
@@ -32,7 +31,6 @@ export default function Products({ products, config }: Props) {
   return (
     <section id="products" className="py-24 bg-bg px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header with navigation buttons */}
         <div className="flex items-end justify-between">
           <SectionHeader
             title={config.title}
@@ -57,7 +55,6 @@ export default function Products({ products, config }: Props) {
           </div>
         </div>
 
-        {/* Carousel */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex -ml-6">
             {products.map((product) => (
@@ -66,7 +63,6 @@ export default function Products({ products, config }: Props) {
                 className="flex-none w-full sm:w-80 pl-6"
               >
                 <div className="bg-surface rounded-2xl p-6 flex flex-col gap-4 border border-surface hover:border-primary/30 transition-all duration-300 h-full group shadow-lg shadow-black/5">
-                  {/* Product image */}
                   <div className="w-full h-48 rounded-xl bg-bg flex items-center justify-center text-primary border border-surface group-hover:scale-[1.02] transition-transform duration-500 overflow-hidden">
                     {product.image_url ? (
                       <img 

@@ -39,17 +39,16 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
       );
     }
 
-    // Escuchar evento para abrir reserva desde cualquier lugar
     const handleOpenBooking = () => setIsBookingOpen(true);
-    window.addEventListener("open-booking", handleOpenBooking);
+    globalThis.addEventListener("open-booking", handleOpenBooking);
 
-    return () => window.removeEventListener("open-booking", handleOpenBooking);
+    return () =>
+      globalThis.removeEventListener("open-booking", handleOpenBooking);
   }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-bg border-b border-surface shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
         <a
           href="/"
           className="flex items-center gap-2 font-bold text-xl text-primary"
@@ -58,7 +57,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
           Barber Ray
         </a>
 
-        {/* Desktop navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {navLinks.map((link) => (
             <a
@@ -71,7 +69,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
           ))}
         </nav>
 
-        {/* Actions */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
@@ -83,9 +80,14 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 onBlur={() => setTimeout(() => setUserMenuOpen(false), 200)}
               >
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 overflow-hidden">
-                  {(user.user_metadata?.avatar_url || user.user_metadata?.picture) && !navbarImageError ? (
+                  {(user.user_metadata?.avatar_url ||
+                    user.user_metadata?.picture) &&
+                  !navbarImageError ? (
                     <img
-                      src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                      src={
+                        user.user_metadata?.avatar_url ||
+                        user.user_metadata?.picture
+                      }
                       alt={user.user_metadata?.full_name}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
@@ -104,7 +106,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 />
               </button>
 
-              {/* Dropdown Menu */}
               <div
                 className={`absolute right-0 mt-2 w-48 bg-surface border border-surface shadow-xl rounded-2xl py-2 z-60 transition-all transform origin-top-right ${userMenuOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
               >
@@ -168,7 +169,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
             Agendar Cita
           </button>
 
-          {/* Mobile menu toggle */}
           <button
             className="md:hidden p-2 text-text"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -179,7 +179,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileMenuOpen && (
         <nav className="md:hidden bg-bg border-t border-surface px-4 py-4 flex flex-col gap-4 text-sm font-medium">
           {navLinks.map((link) => (
@@ -198,9 +197,14 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
               <>
                 <div className="flex items-center gap-3 px-2">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
-                    {(user.user_metadata?.avatar_url || user.user_metadata?.picture) && !navbarImageError ? (
+                    {(user.user_metadata?.avatar_url ||
+                      user.user_metadata?.picture) &&
+                    !navbarImageError ? (
                       <img
-                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                        src={
+                          user.user_metadata?.avatar_url ||
+                          user.user_metadata?.picture
+                        }
                         alt={user.user_metadata?.full_name}
                         className="w-full h-full object-cover"
                         onError={() => setNavbarImageError(true)}
@@ -245,10 +249,8 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
         </nav>
       )}
 
-      {/* Login Modal */}
       {isLoginModalOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <button
             type="button"
             className="absolute inset-0 bg-bg/80 backdrop-blur-sm transition-opacity w-full h-full border-none cursor-default"
@@ -257,7 +259,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
             title="Cerrar modal"
           />
 
-          {/* Modal Content */}
           <div className="relative bg-surface border border-surface w-full max-w-md rounded-3xl p-8 md:p-10 shadow-2xl transform transition-all animate-in fade-in zoom-in duration-300">
             <button
               onClick={() => setIsLoginModalOpen(false)}
@@ -318,7 +319,6 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
           </div>
         </div>
       )}
-      {/* Booking Modal */}
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}

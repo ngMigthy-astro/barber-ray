@@ -33,10 +33,9 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulamos el envío por ahora
     setTimeout(() => {
       setIsSubmitting(false);
       setStatus("success");
@@ -49,13 +48,11 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
       id="contact"
       className="py-32 bg-stone-950 relative overflow-hidden"
     >
-      {/* Background Decor */}
       <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-amber-500/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-amber-500/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-          {/* Columna 1: Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           <div className="space-y-12">
             <div>
               <div className="flex items-center gap-3 mb-6">
@@ -64,7 +61,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                   {config.subtitle}
                 </span>
               </div>
-              <h2 className="text-5xl md:text-6xl font-black text-white leading-ultra-tight uppercase tracking-tighter">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-ultra-tight uppercase tracking-tighter">
                 {config.title}
               </h2>
               <p className="text-stone-500 text-lg mt-6 max-w-md leading-relaxed">
@@ -75,7 +72,6 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Dirección */}
               <div className="bg-stone-900/40 backdrop-blur-sm border border-stone-800/50 p-8 rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
                 <div className="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-amber-500/5">
                   <MapPin className="w-7 h-7" />
@@ -88,7 +84,6 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                 </p>
               </div>
 
-              {/* Teléfono */}
               <div className="bg-stone-900/40 backdrop-blur-sm border border-stone-800/50 p-8 rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
                 <div className="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-amber-500/5">
                   <Phone className="w-7 h-7" />
@@ -100,7 +95,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                   {initialData.phone}
                 </p>
                 <a
-                  href={`tel:${initialData.phone.replace(/\s/g, "")}`}
+                  href={`tel:${initialData.phone.replaceAll(/\s/g, "")}`}
                   className="inline-flex items-center gap-2 text-amber-500 text-2xs font-black uppercase tracking-ultra hover:text-white transition-colors"
                 >
                   Llamar ahora <span className="text-lg">→</span>
@@ -108,7 +103,6 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
               </div>
             </div>
 
-            {/* Horarios */}
             <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800/50 p-10 rounded-6xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
                 <Clock className="w-32 h-32 rotate-12" />
@@ -122,9 +116,9 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                 </h3>
               </div>
               <div className="space-y-5">
-                {initialData.schedule.map((item, index) => (
+                {initialData.schedule.map((item) => (
                   <div
-                    key={index}
+                    key={item.days}
                     className="flex justify-between items-center border-b border-stone-800/50 pb-4 last:border-0 last:pb-0 group/item"
                   >
                     <span className="text-stone-400 font-bold uppercase tracking-widest text-2xs group-hover/item:text-stone-300 transition-colors">
@@ -138,17 +132,16 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
               </div>
             </div>
 
-            {/* Redes Sociales Dinámicas */}
             <div className="mt-16 pt-10 border-t border-stone-800/50">
               <p className="text-3xs font-black text-stone-600 uppercase tracking-giga text-center mb-8 italic">
                 Síguenos en nuestras redes
               </p>
               <div className="flex justify-center gap-10">
-                {initialData.socials.map((social, index) => {
+                {initialData.socials.map((social) => {
                   const Icon = SOCIAL_ICONS[social.platform] || MessageCircle;
                   return (
                     <a
-                      key={index}
+                      key={social.platform}
                       href={social.href}
                       title={social.label}
                       target="_blank"
@@ -163,8 +156,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
             </div>
           </div>
 
-          {/* Columna 2: Formulario */}
-          <div className="bg-stone-900 border border-stone-800/80 p-10 md:p-14 rounded-7xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+          <div className="bg-stone-900 border border-stone-800/80 p-6 sm:p-10 md:p-14 rounded-7xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">
                 Hablemos
@@ -176,10 +168,15 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-3">
-                    <label className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4">
+                    <label
+                      htmlFor="name"
+                      className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4"
+                    >
                       Tu Nombre
                     </label>
                     <input
+                      id="name"
+                      name="name"
                       type="text"
                       placeholder="Ej. Juan Pérez"
                       className="w-full bg-stone-950/50 border border-stone-800 rounded-3xl px-8 py-5 text-white placeholder:text-stone-800 focus:outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/5 transition-all duration-300 font-medium"
@@ -187,10 +184,15 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4">
+                    <label
+                      htmlFor="email"
+                      className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4"
+                    >
                       Correo Electrónico
                     </label>
                     <input
+                      id="email"
+                      name="email"
                       type="email"
                       placeholder="tu@email.com"
                       className="w-full bg-stone-950/50 border border-stone-800 rounded-3xl px-8 py-5 text-white placeholder:text-stone-800 focus:outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/5 transition-all duration-300 font-medium"
@@ -200,10 +202,15 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4">
+                  <label
+                    htmlFor="message"
+                    className="text-2xs font-black text-stone-500 uppercase tracking-mega ml-4"
+                  >
                     Tu Mensaje
                   </label>
                   <textarea
+                    id="message"
+                    name="message"
                     rows={5}
                     placeholder="¿En qué podemos ayudarte?"
                     className="w-full bg-stone-950/50 border border-stone-800 rounded-3xl px-8 py-5 text-white placeholder:text-stone-800 focus:outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/5 transition-all duration-300 resize-none font-medium"

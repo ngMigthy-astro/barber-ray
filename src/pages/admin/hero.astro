@@ -1,7 +1,6 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
-import { heroData as staticHeroData } from "../../data/public/hero.data";
 import { uploadImage } from "../../lib/storage";
 import type { HeroData, HeroCTA, HeroStat } from "../../interfaces/public/hero.interface";
 import { X, Upload, ImageIcon } from "lucide-react";
@@ -9,15 +8,27 @@ import { X, Upload, ImageIcon } from "lucide-react";
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
 
-// 1. Obtener datos actuales
 const { data: dbHeroData, error: fetchError } = await supabase
   .from("hero_content")
   .select("*")
   .single();
 
-const hero = (dbHeroData as unknown as HeroData) || staticHeroData;
+const hero: HeroData = (dbHeroData as unknown as HeroData) || {
+  title: "",
+  subtitle: "",
+  description: "",
+  image_url: "",
+  ctas: [
+    { text: "", href: "" },
+    { text: "", href: "" }
+  ],
+  stats: [
+    { value: "", label: "" },
+    { value: "", label: "" },
+    { value: "", label: "" }
+  ]
+};
 
-// 2. Manejar la actualización (POST)
 let successMessage = "";
 let errorMessage = "";
 
@@ -25,7 +36,6 @@ if (request.method === "POST") {
   try {
     const formData = await request.formData();
 
-    // Procesar CTAs
     const ctas: HeroCTA[] = [
       {
         text: formData.get("cta1_text")?.toString() || "",
@@ -37,7 +47,6 @@ if (request.method === "POST") {
       },
     ];
 
-    // Procesar Stats
     const stats: HeroStat[] = [
       {
         value: formData.get("stat1_value")?.toString() || "",
@@ -71,15 +80,14 @@ if (request.method === "POST") {
     };
 
     const { error: updateError } = await supabase.from("hero_content").upsert({
-      id: dbHeroData?.id, // Si existe, actualiza. Si no, crea.
+      id: dbHeroData?.id,
       ...updatedHero,
       updated_at: new Date().toISOString(),
     });
 
     if (updateError) throw updateError;
-    successMessage = "¡Hero actualizado correctamente! 🔥";
+    successMessage = "Hero actualizado correctamente.";
 
-    // Recargar datos actualizados
     return Astro.redirect("/admin/hero?success=true");
   } catch (e) {
     errorMessage = "Error al actualizar: " + (e as Error).message;

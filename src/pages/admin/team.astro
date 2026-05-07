@@ -77,12 +77,20 @@ const team = dbTeam || [];
   <div class="max-w-5xl mx-auto">
     {
       isSuccess && (
-        <div id="success-notification" class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="success-notification"
+          class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <Save className="w-5 h-5" />
-            <span class="font-medium">La información del equipo ha sido actualizada correctamente.</span>
+            <span class="font-medium">
+              La información del equipo ha sido actualizada correctamente.
+            </span>
           </div>
-          <button onclick="document.getElementById('success-notification').style.display='none'" class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('success-notification').style.display='none'"
+            class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -91,11 +99,17 @@ const team = dbTeam || [];
 
     {
       errorMessage && (
-        <div id="error-notification" class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="error-notification"
+          class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <span class="font-medium">Error: {errorMessage}</span>
           </div>
-          <button onclick="document.getElementById('error-notification').style.display='none'" class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('error-notification').style.display='none'"
+            class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -136,14 +150,20 @@ const team = dbTeam || [];
                   id="new-team-preview-container"
                   class="w-full h-32 bg-stone-950 border border-dashed border-stone-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-stone-500 group-hover:border-amber-500 group-hover:text-amber-500 transition-colors"
                 >
-                  <div id="new-team-upload-ui" class="flex flex-col items-center justify-center pointer-events-none">
+                  <div
+                    id="new-team-upload-ui"
+                    class="flex flex-col items-center justify-center pointer-events-none"
+                  >
                     <Upload className="w-6 h-6 mb-2" />
                     <span
                       class="text-xs font-bold uppercase tracking-widest text-center"
                       >Subir Imagen</span
                     >
                   </div>
-                  <img id="new-team-image-preview" class="hidden w-full h-full object-cover" />
+                  <img
+                    id="new-team-image-preview"
+                    class="hidden w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -241,7 +261,6 @@ const team = dbTeam || [];
                   />
                   <input type="hidden" name="rating" value={member.rating} />
 
-                  {/* Imagen del miembro */}
                   <div class="flex flex-col items-center gap-4">
                     <div class="w-24 h-24 rounded-2xl bg-stone-950 border border-stone-800 overflow-hidden relative">
                       {member.image_url ? (
@@ -254,7 +273,10 @@ const team = dbTeam || [];
                       ) : (
                         <div class="w-full h-full flex items-center justify-center text-stone-700 relative">
                           <Users className="w-8 h-8" />
-                          <img id={`edit-team-preview-${member.id}`} class="hidden absolute inset-0 w-full h-full object-cover" />
+                          <img
+                            id={`edit-team-preview-${member.id}`}
+                            class="hidden absolute inset-0 w-full h-full object-cover"
+                          />
                         </div>
                       )}
                       <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
@@ -275,7 +297,6 @@ const team = dbTeam || [];
                     </div>
                   </div>
 
-                  {/* Formulario de edición */}
                   <div class="flex-1 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
@@ -315,7 +336,9 @@ const team = dbTeam || [];
                         name="specialties"
                         rows="2"
                         class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3 text-stone-400 text-sm outline-none focus:border-amber-500 transition-colors resize-none"
-                      >{(member.specialties || []).join(", ")}</textarea>
+                      >
+                        {(member.specialties || []).join(", ")}
+                      </textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-2 border-t border-stone-800/50">
@@ -352,47 +375,53 @@ const team = dbTeam || [];
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('new-team-image') as HTMLInputElement;
-    const previewImg = document.getElementById('new-team-image-preview') as HTMLImageElement;
-    const uploadUi = document.getElementById('new-team-upload-ui');
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById(
+      "new-team-image",
+    ) as HTMLInputElement;
+    const previewImg = document.getElementById(
+      "new-team-image-preview",
+    ) as HTMLImageElement;
+    const uploadUi = document.getElementById("new-team-upload-ui");
 
     if (fileInput && previewImg && uploadUi) {
-      fileInput.addEventListener('change', (e) => {
+      fileInput.addEventListener("change", (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
           const reader = new FileReader();
           reader.onload = (e) => {
             previewImg.src = e.target?.result as string;
-            previewImg.classList.remove('hidden');
-            uploadUi.classList.add('hidden');
+            previewImg.classList.remove("hidden");
+            uploadUi.classList.add("hidden");
           };
           reader.readAsDataURL(file);
         } else {
-          previewImg.src = '';
-          previewImg.classList.add('hidden');
-          uploadUi.classList.remove('hidden');
+          previewImg.src = "";
+          previewImg.classList.add("hidden");
+          uploadUi.classList.remove("hidden");
         }
       });
     }
 
-    // Logic for edit forms
-    const editFileInputs = document.querySelectorAll('.edit-team-file-input');
-    editFileInputs.forEach(input => {
-      input.addEventListener('change', (e) => {
+    const editFileInputs = document.querySelectorAll(".edit-team-file-input");
+    editFileInputs.forEach((input) => {
+      input.addEventListener("change", (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
-        const previewId = (e.target as HTMLInputElement).getAttribute('data-preview-id');
+        const previewId = (e.target as HTMLInputElement).getAttribute(
+          "data-preview-id",
+        );
         if (file && previewId) {
-          const previewImg = document.getElementById(previewId) as HTMLImageElement;
+          const previewImg = document.getElementById(
+            previewId,
+          ) as HTMLImageElement;
           if (previewImg) {
             const reader = new FileReader();
             reader.onload = (event) => {
               previewImg.src = event.target?.result as string;
-              previewImg.classList.remove('hidden');
-              // If there was no image before, hide the generic Users icon wrapper's sibling
+              previewImg.classList.remove("hidden");
               const iconWrapper = previewImg.previousElementSibling;
-              if (iconWrapper && iconWrapper.tagName === 'svg') {
-                iconWrapper.classList.add('hidden');
+              if (iconWrapper && iconWrapper.tagName === "svg") {
+                iconWrapper.classList.add("hidden");
               }
             };
             reader.readAsDataURL(file);

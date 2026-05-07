@@ -23,12 +23,8 @@ export default function Testimonials({ initialData }: Props) {
   return (
     <section id="testimonials" className="py-24 bg-surface px-4">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          title={title}
-          subtitle={subtitle}
-        />
+        <SectionHeader title={title} subtitle={subtitle} />
 
-        {/* Testimonial cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <div
@@ -44,7 +40,9 @@ export default function Testimonials({ initialData }: Props) {
               <div className="flex items-center justify-between pt-3 border-t border-surface">
                 <div>
                   <p className="font-bold text-sm">{testimonial.name}</p>
-                  <p className="text-text/40 text-xs">{testimonial.review_time || (testimonial as any).time}</p>
+                  <p className="text-text/40 text-xs">
+                    {testimonial.review_time || (testimonial as any).time}
+                  </p>
                 </div>
                 <StarRating rating={testimonial.rating} />
               </div>

@@ -1,7 +1,6 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
-import { servicesData as staticServicesData } from "../../data/public/services.data";
 import {
   Scissors,
   Brush,
@@ -16,7 +15,6 @@ import {
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
 
-// 1. Obtener configuración de la sección
 const { data: sectionConfig } = await supabase
   .from("section_configs")
   .select("*")
@@ -24,25 +22,17 @@ const { data: sectionConfig } = await supabase
   .single();
 
 const config = sectionConfig || {
-  title: staticServicesData.title,
-  subtitle: staticServicesData.subtitle,
+  title: "Nuestros Servicios",
+  subtitle: "Experiencia Premium",
 };
 
-// 2. Obtener lista de servicios
 const { data: dbServices } = await supabase
   .from("services")
   .select("*")
   .order("sort_order", { ascending: true });
 
-const services = dbServices?.length
-  ? dbServices
-  : staticServicesData.services.map((s, i) => ({
-      ...s,
-      icon_name: s.icon.name || "Scissors", // Fallback
-      sort_order: i,
-    }));
+const services = dbServices || [];
 
-// 3. Manejar Acciones (POST)
 let successMessage = "";
 let errorMessage = "";
 
@@ -307,18 +297,15 @@ const availableIcons = [
                   <input type="hidden" name="id" value={service.id} />
                   <input type="hidden" name="sort_order" value={index} />
 
-                  {/* Icono y Meta */}
                   <div class="flex flex-col items-center gap-4">
                     <div class="w-16 h-16 rounded-2xl bg-stone-950 flex items-center justify-center text-primary border border-stone-800">
-                      {
-                        (() => {
-                          const iconEntry = availableIcons.find(
-                            (i) => i.name === service.icon_name,
-                          );
-                          const IconComponent = iconEntry?.icon || Scissors;
-                          return <IconComponent className="w-8 h-8" />;
-                        })()
-                      }
+                      {(() => {
+                        const iconEntry = availableIcons.find(
+                          (i) => i.name === service.icon_name,
+                        );
+                        const IconComponent = iconEntry?.icon || Scissors;
+                        return <IconComponent className="w-8 h-8" />;
+                      })()}
                     </div>
                     <select
                       name="icon_name"
@@ -335,7 +322,6 @@ const availableIcons = [
                     </select>
                   </div>
 
-                  {/* Formulario Principal */}
                   <div class="flex-1 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
@@ -387,7 +373,6 @@ const availableIcons = [
                   </div>
                 </form>
 
-                {/* Formulario Oculto para Eliminar */}
                 <form id={`delete-${service.id}`} method="POST" class="hidden">
                   <input type="hidden" name="action" value="delete_service" />
                   <input type="hidden" name="id" value={service.id} />

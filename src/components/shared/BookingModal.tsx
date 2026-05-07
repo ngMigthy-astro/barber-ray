@@ -2,15 +2,11 @@ import { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
-  User,
   Scissors,
   Check,
-  ChevronRight,
   ChevronLeft,
   X,
   Loader2,
-  CalendarCheck,
-  Star,
   Sparkles,
   Wind,
   Brush,
@@ -68,7 +64,6 @@ export default function BookingModal({
   const [loading, setLoading] = useState(false);
   const [fetchingSlots, setFetchingSlots] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [navbarImageError, setNavbarImageError] = useState(false);
 
   const [selectedService, setSelectedService] = useState<DBService | null>(
     null,
@@ -151,8 +146,11 @@ export default function BookingModal({
       setSuccess(true);
     } catch (error) {
       console.error("Full booking error:", error);
-      const message = error instanceof Error ? error.message : "Error desconocido";
-      alert(`Error al reservar: ${message}. Verifica que tu sesión esté activa.`);
+      const message =
+        error instanceof Error ? error.message : "Error desconocido";
+      alert(
+        `Error al reservar: ${message}. Verifica que tu sesión esté activa.`,
+      );
     } finally {
       setLoading(false);
     }
@@ -227,9 +225,9 @@ export default function BookingModal({
           </div>
         ) : (
           <>
-            <div className="p-8 border-b border-glass-border flex items-center justify-between bg-surface/50">
-              <div>
-                <h2 className="text-2xl font-black text-text uppercase tracking-tighter">
+            <div className="p-5 sm:p-8 border-b border-glass-border flex flex-col sm:flex-row items-start sm:items-center justify-between bg-surface/50 gap-4 sm:gap-0">
+              <div className="w-full flex justify-between items-center sm:block">
+                <h2 className="text-xl sm:text-2xl font-black text-text uppercase tracking-tighter">
                   Reserva tu Cita
                 </h2>
                 <div className="flex gap-1 mt-1">
@@ -243,13 +241,13 @@ export default function BookingModal({
               </div>
               <button
                 onClick={resetAndClose}
-                className="p-3 rounded-full hover:bg-primary/10 text-text-muted hover:text-primary transition-all"
+                className="hidden sm:block p-3 rounded-full hover:bg-primary/10 text-text-muted hover:text-primary transition-all"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-8 max-h-modal-body overflow-y-auto custom-scrollbar">
+            <div className="p-5 sm:p-8 max-h-modal-body overflow-y-auto custom-scrollbar">
               {step === 1 && (
                 <div className="space-y-4">
                   <p className="text-2xs font-black text-primary uppercase tracking-ultra mb-4 text-center">
@@ -257,7 +255,8 @@ export default function BookingModal({
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {services.map((service) => {
-                      const ServiceIcon = IconMap[service.icon_name] || Scissors;
+                      const ServiceIcon =
+                        IconMap[service.icon_name] || Scissors;
                       return (
                         <button
                           key={service.id}
@@ -382,21 +381,21 @@ export default function BookingModal({
                                   setSelectedDate(day.fullDate);
                                   setSelectedTime("");
                                 }}
-                                className={`flex-shrink-0 snap-start min-w-[70px] sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border transition-all relative overflow-hidden group ${
+                                className={`shrink-0 snap-start min-w-17.5 sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border transition-all relative overflow-hidden group ${
                                   isSelected
                                     ? "border-primary bg-primary/10 shadow-blood-sm scale-105"
                                     : "border-glass-border bg-surface hover:border-primary/40"
                                 }`}
                               >
                                 <span
-                                  className={`text-[10px] font-black uppercase tracking-tighter ${isSelected ? "text-primary" : "text-text-muted"}`}
+                                  className={`text-2xs font-black uppercase tracking-tighter ${isSelected ? "text-primary" : "text-text-muted"}`}
                                 >
                                   {day.dayName}
                                 </span>
                                 <span className="text-xl font-black text-text leading-none my-1">
                                   {day.dayNumber}
                                 </span>
-                                <span className="text-[10px] font-bold uppercase text-text-muted tracking-tighter">
+                                <span className="text-2xs font-bold uppercase text-text-muted tracking-tighter">
                                   {day.monthName}
                                 </span>
                               </button>
@@ -426,7 +425,7 @@ export default function BookingModal({
                                 "bg-surface-hover border-glass-border text-text-muted/80 cursor-not-allowed";
                             } else if (isSelected) {
                               buttonStyles =
-                                "bg-primary border-primary text-white shadow-blood-md"
+                                "bg-primary border-primary text-white shadow-blood-md";
                             } else {
                               buttonStyles =
                                 "border-glass-border hover:border-primary/50 text-text-muted";
@@ -458,7 +457,7 @@ export default function BookingModal({
               )}
             </div>
 
-            <div className="p-8 border-t border-glass-border bg-surface/50 flex items-center justify-between">
+            <div className="p-5 sm:p-8 border-t border-glass-border bg-surface/50 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
               {step > 1 ? (
                 <button
                   onClick={() => setStep(step - 1)}
@@ -474,7 +473,7 @@ export default function BookingModal({
                 <button
                   onClick={handleBooking}
                   disabled={!selectedDate || !selectedTime || loading}
-                  className="btn-premium min-w-50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-premium w-full sm:w-auto min-w-50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

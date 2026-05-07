@@ -65,12 +65,20 @@ const products = dbProducts || [];
   <div class="max-w-5xl mx-auto">
     {
       isSuccess && (
-        <div id="success-notification" class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="success-notification"
+          class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <Save className="w-5 h-5" />
-            <span class="font-medium">El catálogo de productos ha sido actualizado correctamente.</span>
+            <span class="font-medium">
+              El catálogo de productos ha sido actualizado correctamente.
+            </span>
           </div>
-          <button onclick="document.getElementById('success-notification').style.display='none'" class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('success-notification').style.display='none'"
+            class="text-emerald-500/70 hover:text-emerald-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -79,11 +87,17 @@ const products = dbProducts || [];
 
     {
       errorMessage && (
-        <div id="error-notification" class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
+        <div
+          id="error-notification"
+          class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+        >
           <div class="flex items-center gap-3">
             <span class="font-medium">Error: {errorMessage}</span>
           </div>
-          <button onclick="document.getElementById('error-notification').style.display='none'" class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer">
+          <button
+            onclick="document.getElementById('error-notification').style.display='none'"
+            class="text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -123,14 +137,20 @@ const products = dbProducts || [];
                   id="new-product-preview-container"
                   class="w-full bg-stone-950 border border-dashed border-stone-800 rounded-xl px-4 py-6 flex flex-col items-center justify-center text-stone-500 group-hover:border-amber-500 group-hover:text-amber-500 transition-colors overflow-hidden"
                 >
-                  <div id="new-product-upload-ui" class="flex flex-col items-center justify-center pointer-events-none">
+                  <div
+                    id="new-product-upload-ui"
+                    class="flex flex-col items-center justify-center pointer-events-none"
+                  >
                     <Upload className="w-6 h-6 mb-2" />
                     <span
                       class="text-xs font-bold uppercase tracking-widest text-center"
                       >Subir Imagen</span
                     >
                   </div>
-                  <img id="new-product-image-preview" class="hidden w-full h-32 object-contain" />
+                  <img
+                    id="new-product-image-preview"
+                    class="hidden w-full h-32 object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -227,32 +247,36 @@ const products = dbProducts || [];
                     value={product.image_url}
                   />
 
-                  {/* Imagen del Producto */}
                   <div class="w-24 h-24 shrink-0 rounded-2xl bg-stone-950 border border-stone-800 overflow-hidden relative flex items-center justify-center">
-                    <div id={`preview-container-${product.id}`} class="w-full h-full flex items-center justify-center">
+                    <div
+                      id={`preview-container-${product.id}`}
+                      class="w-full h-full flex items-center justify-center"
+                    >
                       <img
                         id={`img-preview-${product.id}`}
-                        src={product.image_url || ''}
+                        src={product.image_url || ""}
                         alt={product.name}
-                        class={`w-full h-full object-cover ${!product.image_url ? 'hidden' : ''}`}
+                        class={`w-full h-full object-cover ${!product.image_url ? "hidden" : ""}`}
                       />
                       {!product.image_url && (
-                        <Package id={`icon-placeholder-${product.id}`} className="w-8 h-8 text-stone-700" />
+                        <Package
+                          id={`icon-placeholder-${product.id}`}
+                          className="w-8 h-8 text-stone-700"
+                        />
                       )}
                     </div>
                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                       <Upload className="w-5 h-5 text-white" />
-                        <input
-                          type="file"
-                          name="image"
-                          data-product-id={product.id}
-                          accept="image/*"
-                          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
+                      <input
+                        type="file"
+                        name="image"
+                        data-product-id={product.id}
+                        accept="image/*"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
                     </div>
                   </div>
 
-                  {/* Info del Producto */}
                   <div class="flex-1 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
@@ -325,50 +349,56 @@ const products = dbProducts || [];
 </AdminLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. Manejador para el formulario de Nuevo Producto (se mantiene igual)
-    const newFileInput = document.getElementById('new-product-image') as HTMLInputElement;
-    const newPreviewImg = document.getElementById('new-product-image-preview') as HTMLImageElement;
-    const newUploadUi = document.getElementById('new-product-upload-ui');
-    const newContainer = document.getElementById('new-product-preview-container');
+  document.addEventListener("DOMContentLoaded", () => {
+    const newFileInput = document.getElementById(
+      "new-product-image",
+    ) as HTMLInputElement;
+    const newPreviewImg = document.getElementById(
+      "new-product-image-preview",
+    ) as HTMLImageElement;
+    const newUploadUi = document.getElementById("new-product-upload-ui");
+    const newContainer = document.getElementById(
+      "new-product-preview-container",
+    );
 
     if (newFileInput && newPreviewImg && newUploadUi && newContainer) {
-      newFileInput.addEventListener('change', (e) => {
+      newFileInput.addEventListener("change", (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
           const reader = new FileReader();
           reader.onload = (e) => {
             newPreviewImg.src = e.target?.result as string;
-            newPreviewImg.classList.remove('hidden');
-            newUploadUi.classList.add('hidden');
-            newContainer.classList.remove('py-6');
+            newPreviewImg.classList.remove("hidden");
+            newUploadUi.classList.add("hidden");
+            newContainer.classList.remove("py-6");
           };
           reader.readAsDataURL(file);
         }
       });
     }
 
-    // 2. Manejador para los productos existentes en el inventario
-    document.querySelectorAll('input[name="image"]').forEach(input => {
-      if (input.id === 'new-product-image') return;
+    document.querySelectorAll('input[name="image"]').forEach((input) => {
+      if (input.id === "new-product-image") return;
 
-      input.addEventListener('change', (e) => {
+      input.addEventListener("change", (e) => {
         const fileInput = e.target as HTMLInputElement;
-        const productId = fileInput.getAttribute('data-product-id');
+        const productId = fileInput.getAttribute("data-product-id");
         const file = fileInput.files?.[0];
-        
+
         if (file && productId) {
-          const img = document.getElementById(`img-preview-${productId}`) as HTMLImageElement;
+          const img = document.getElementById(
+            `img-preview-${productId}`,
+          ) as HTMLImageElement;
           const icon = document.getElementById(`icon-placeholder-${productId}`);
-          
+
           const reader = new FileReader();
           reader.onload = (event) => {
             if (img) {
               img.src = event.target?.result as string;
-              img.classList.remove('hidden');
+              img.classList.remove("hidden");
             }
             if (icon) {
-              icon.classList.add('hidden');
+              icon.classList.add("hidden");
             }
           };
           reader.readAsDataURL(file);

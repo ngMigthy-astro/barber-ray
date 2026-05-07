@@ -6,7 +6,6 @@
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", sans-serif;
 
-  /* ⚪️ PALETA LIGHT (Parchment & Crimson) */
   --color-bg: #fefcf8;
   --color-surface: #f8f3e8;
   --color-surface-hover: #f2ead3;
@@ -17,13 +16,12 @@
   --color-accent: #b91c1c;
   --color-glass: rgba(254, 252, 248, 0.8);
   --color-glass-border: rgba(28, 25, 23, 0.08);
-  --color-spotlight: rgba(185, 28, 28, 0.05); /* Rojo sutil para el modo claro */
+  --color-spotlight: rgba(185, 28, 28, 0.05);
 
-  /* 📏 SISTEMA DE DISEÑO - Barber Ray */
-  --font-size-4xs: 8px;
-  --font-size-3xs: 9px;
-  --font-size-2xs: 10px;
-  
+  --text-4xs: 8px;
+  --text-3xs: 9px;
+  --text-2xs: 10px;
+
   --radius-4xl: 32px;
   --radius-5xl: 40px;
   --radius-6xl: 48px;
@@ -44,7 +42,6 @@
 
   --h-modal-body: 60vh;
 
-  /* Animación Float */
   --animate-float: float 6s ease-in-out infinite;
   @keyframes float {
     0%,
@@ -57,7 +54,6 @@
   }
 }
 
-/* ⚫️ PALETA DARK (Red & Black) - El alma de la barbería */
 .dark {
   --color-bg: #050505;
   --color-surface: #0f0f0f;
@@ -68,12 +64,11 @@
   --color-text-muted: #a1a1aa;
   --color-glass: rgba(15, 15, 15, 0.7);
   --color-glass-border: rgba(220, 38, 38, 0.2);
-  --color-spotlight: rgba(220, 38, 38, 0.08); /* Rojo "Blood" para el modo oscuro */
+  --color-spotlight: rgba(220, 38, 38, 0.08);
 }
 
 @layer base {
   body {
-    /* Spotlight Effect: Color dinámico según la variable --color-spotlight */
     background-image: radial-gradient(
       circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%),
       var(--color-spotlight) 0%,

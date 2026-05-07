@@ -8,21 +8,16 @@ interface Props {
 export default function Hero({ initialData }: Props) {
   return (
     <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 overflow-hidden">
-      {/* QUITAMOS los div decorativos que hacían manchas y dejamos que el body maneje el spotlight */}
-
       <div className="max-w-7xl mx-auto px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Column: Content */}
           <div className="space-y-8 relative z-10">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-primary/10 text-primary text-xs font-black uppercase tracking-ultra animate-in fade-in slide-in-from-left-10 duration-700">
               <Star className="w-3 h-3 fill-primary" />
               {initialData.badge || "Estilo & Tradición desde 2014"}
             </div>
 
-            {/* Main Title */}
             <div className="space-y-1">
-              <h1 className="text-6xl md:text-8xl font-black leading-tightest reveal-text">
+              <h1 className="text-4xl sm:text-5xl md:text-8xl font-black leading-tightest reveal-text">
                 <span className="block">{initialData.title}</span>
                 <span className="text-gradient block">
                   {initialData.subtitle}
@@ -30,21 +25,19 @@ export default function Hero({ initialData }: Props) {
               </h1>
             </div>
 
-            {/* Description */}
-            <p className="text-lg md:text-xl text-text-muted max-w-lg leading-relaxed animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-200">
+            <p className="text-base sm:text-lg md:text-xl text-text-muted max-w-lg leading-relaxed animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-200">
               {initialData.description}
             </p>
 
-            {/* Actions */}
-            <div className="flex flex-wrap gap-5 pt-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-5 pt-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
               {initialData.ctas.map((cta, index) => (
                 <a
                   key={cta.href + cta.text}
                   href={cta.href}
                   className={
                     index === 0
-                      ? "btn-premium flex items-center gap-3"
-                      : "btn-outline flex items-center gap-3"
+                      ? "btn-premium flex items-center justify-center gap-3 w-full sm:w-auto"
+                      : "btn-outline flex items-center justify-center gap-3 w-full sm:w-auto"
                   }
                 >
                   {index === 0 && <Calendar className="w-4 h-4" />}
@@ -53,12 +46,13 @@ export default function Hero({ initialData }: Props) {
               ))}
             </div>
 
-            {/* Stats bar */}
-            <div className="grid grid-cols-3 gap-8 pt-10 border-t border-primary/10 animate-in fade-in duration-1000 delay-500">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-10 border-t border-primary/10 animate-in fade-in duration-1000 delay-500">
               {initialData.stats.map((stat) => (
                 <div key={stat.label} className="space-y-1">
-                  <p className="text-2xl font-black text-text">{stat.value}</p>
-                  <p className="text-2xs text-text-muted uppercase tracking-ultra font-bold">
+                  <p className="text-xl sm:text-2xl font-black text-text">
+                    {stat.value}
+                  </p>
+                  <p className="text-2xs sm:text-2xs text-text-muted uppercase tracking-ultra font-bold">
                     {stat.label}
                   </p>
                 </div>
@@ -66,9 +60,7 @@ export default function Hero({ initialData }: Props) {
             </div>
           </div>
 
-          {/* Right Column: Image & Visuals */}
           <div className="relative animate-in fade-in zoom-in duration-1000">
-            {/* Main Image Container */}
             <div className="relative rounded-5xl overflow-hidden border border-primary/10 shadow-2xl group">
               <img
                 src={initialData.image_url || "/barber_hero_premium.png"}
@@ -78,8 +70,7 @@ export default function Hero({ initialData }: Props) {
               <div className="absolute inset-0 bg-linear-to-t from-bg via-transparent to-transparent opacity-60"></div>
             </div>
 
-            {/* Floating Decorative Elements */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-surface glass rounded-3xl flex flex-col items-center justify-center gap-2 p-4 animate-float shadow-2xl">
+            <div className="hidden sm:flex absolute -top-10 -right-10 w-32 h-32 bg-surface glass rounded-3xl flex-col items-center justify-center gap-2 p-4 animate-float shadow-2xl">
               <div className="p-2 bg-primary/10 rounded-xl text-primary">
                 <ShieldCheck className="w-6 h-6" />
               </div>
@@ -88,7 +79,7 @@ export default function Hero({ initialData }: Props) {
               </p>
             </div>
 
-            <div className="absolute -bottom-6 -left-6 px-6 py-4 bg-surface glass rounded-2xl flex items-center gap-4 animate-float animate-delay-1000 shadow-2xl">
+            <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 px-4 sm:px-6 py-3 sm:py-4 bg-surface glass rounded-2xl flex items-center gap-3 sm:gap-4 animate-float animate-delay-1000 shadow-2xl scale-90 sm:scale-100">
               <div className="flex -space-x-3">
                 {[1, 2, 3].map((i) => (
                   <div

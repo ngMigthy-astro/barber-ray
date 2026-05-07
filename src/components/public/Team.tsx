@@ -1,6 +1,5 @@
 import { UserCircle2 } from "lucide-react";
 import { LuInstagram } from "react-icons/lu";
-import { teamData } from "../../data/public/team.data";
 import SectionHeader from "../shared/ui/SectionHeader";
 import StarRating from "../shared/ui/StarRating";
 
@@ -31,14 +30,12 @@ export default function Team({ members = [], config }: TeamProps) {
           subtitle={config.subtitle}
         />
 
-        {/* Team member cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {members.map((member) => (
             <div
               key={member.name}
               className="bg-surface rounded-2xl p-6 flex flex-col items-center text-center gap-4 border border-surface hover:border-primary transition-colors group"
             >
-              {/* Avatar */}
               <div className="w-24 h-24 rounded-full bg-bg border-2 border-primary overflow-hidden flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 {member.image_url ? (
                   <img 
@@ -59,7 +56,6 @@ export default function Team({ members = [], config }: TeamProps) {
                 </p>
               </div>
 
-              {/* Rating */}
               <div className="flex flex-col items-center gap-1">
                 <StarRating rating={member.rating} />
                 <p className="text-text/50 text-xs">
@@ -67,7 +63,6 @@ export default function Team({ members = [], config }: TeamProps) {
                 </p>
               </div>
 
-              {/* Specialties */}
               <div className="flex flex-wrap justify-center gap-2">
                 {member.specialties.map((specialty) => (
                   <span
@@ -79,7 +74,6 @@ export default function Team({ members = [], config }: TeamProps) {
                 ))}
               </div>
 
-              {/* Instagram link */}
               <a
                 href={`https://instagram.com/${member.instagram.replace("@", "")}`}
                 target="_blank"

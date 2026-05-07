@@ -9,127 +9,170 @@ import Testimonials from "../components/public/Testimonials"
 import Contact from "../components/public/Contact"
 import Footer from "../components/public/Footer"
 
-// CMS Data & Libs
 import { createSupabaseClient } from "../lib/supabase";
-import { heroData as staticHeroData } from "../data/public/hero.data";
-import { servicesData as staticServicesData } from "../data/public/services.data";
-import { contactData as staticContactData } from "../data/public/contact.data";
-import { navigationLinks as staticNavLinks } from "../data/public/navigation.data";
-import { testimonialsData as staticTestimonialsData } from "../data/public/testimonials.data";
-import { productsData as staticProductsData } from "../data/public/products.data";
-import { galleryData as staticGalleryData } from "../data/public/gallery.data";
-import { teamData as staticTeamData } from "../data/public/team.data";
 
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
 
-// 1. Fetch All Data in Parallel
-const [
-  { data: allConfigs },
-  { data: dbHeroData },
-  { data: dbServices },
-  { data: dbTeam },
-  { data: dbProducts },
-  { data: dbGallery },
-  { data: dbTestimonials },
-  { data: dbContact },
-  { data: dbSchedule },
-  { data: dbSocials },
-  { data: dbNavLinks }
-] = await Promise.all([
-  supabase.from("section_configs").select("*"),
-  supabase.from("hero_content").select("*").single(),
-  supabase.from("services").select("*").order("sort_order", { ascending: true }),
-  supabase.from("team_members").select("*").order("sort_order", { ascending: true }),
-  supabase.from("products").select("*").order("created_at", { ascending: false }),
-  supabase.from("gallery_images").select("*").order("sort_order", { ascending: true }),
-  supabase.from("testimonials").select("*").order("created_at", { ascending: false }),
-  supabase.from("contact_info").select("*").eq("id", "default").single(),
-  supabase.from("schedule_entries").select("*").order("sort_order", { ascending: true }),
-  supabase.from("social_links").select("*").order("sort_order", { ascending: true }),
-  supabase.from("nav_links").select("*").order("sort_order", { ascending: true })
-]);
+let hasError = false;
+let dbData: any = {};
 
-// Helper for dynamic configs
-const getConfig = (id: string, staticData: { title: string; subtitle: string }) => {
-  const config = allConfigs?.find(c => c.id === id);
+try {
+  const [
+    { data: allConfigs, error: errConfigs },
+    { data: dbHeroData, error: errHero },
+    { data: dbServices, error: errServices },
+    { data: dbTeam, error: errTeam },
+    { data: dbProducts, error: errProducts },
+    { data: dbGallery, error: errGallery },
+    { data: dbTestimonials, error: errTestimonials },
+    { data: dbContact, error: errContact },
+    { data: dbSchedule, error: errSchedule },
+    { data: dbSocials, error: errSocials },
+    { data: dbNavLinks, error: errNav }
+  ] = await Promise.all([
+    supabase.from("section_configs").select("*"),
+    supabase.from("hero_content").select("*").single(),
+    supabase.from("services").select("*").order("sort_order", { ascending: true }),
+    supabase.from("team_members").select("*").order("sort_order", { ascending: true }),
+    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase.from("gallery_images").select("*").order("sort_order", { ascending: true }),
+    supabase.from("testimonials").select("*").order("created_at", { ascending: false }),
+    supabase.from("contact_info").select("*").eq("id", "default").single(),
+    supabase.from("schedule_entries").select("*").order("sort_order", { ascending: true }),
+    supabase.from("social_links").select("*").order("sort_order", { ascending: true }),
+    supabase.from("nav_links").select("*").order("sort_order", { ascending: true })
+  ]);
+
+  if (errServices || errTeam || errProducts || errConfigs) {
+    console.error("Database connection error:", errServices || errTeam || errProducts || errConfigs);
+    hasError = true;
+  }
+
+  dbData = {
+    allConfigs,
+    dbHeroData,
+    dbServices,
+    dbTeam,
+    dbProducts,
+    dbGallery,
+    dbTestimonials,
+    dbContact,
+    dbSchedule,
+    dbSocials,
+    dbNavLinks
+  };
+} catch (error) {
+  console.error("Critical error fetching database data:", error);
+  hasError = true;
+}
+
+const getConfig = (id: string, defaultTitle: string, defaultSubtitle: string) => {
+  const config = dbData.allConfigs?.find((c: any) => c.id === id);
   return {
-    title: config?.title || staticData.title,
-    subtitle: config?.subtitle || staticData.subtitle,
+    title: config?.title || defaultTitle,
+    subtitle: config?.subtitle || defaultSubtitle,
   };
 };
 
-// Data preparation with fallbacks
-const heroData = dbHeroData || staticHeroData;
+const heroData = dbData.dbHeroData || null;
 
 const servicesData = {
-  ...getConfig("services", staticServicesData),
-  services: dbServices?.length ? dbServices : staticServicesData.services
+  ...getConfig("services", "Nuestros Servicios", "Experiencia Premium"),
+  services: dbData.dbServices || []
 };
 
-const teamMembers = dbTeam?.length 
-  ? dbTeam.reduce((acc: any[], current) => {
+const teamMembers = dbData.dbTeam?.length 
+  ? dbData.dbTeam.reduce((acc: any[], current: any) => {
       if (!acc.find(item => item.name === current.name)) acc.push(current);
       return acc;
     }, [])
-  : staticTeamData.members;
+  : [];
 
 const contactData = {
-  ...(dbContact || staticContactData),
-  schedule: dbSchedule?.length ? dbSchedule : staticContactData.schedule,
-  socials: dbSocials || []
+  ...(dbData.dbContact || { email: "", phone: "", address: "", map_url: "" }),
+  schedule: dbData.dbSchedule || [],
+  socials: dbData.dbSocials || []
 };
 
-const products = dbProducts?.length ? dbProducts : staticProductsData.products;
-const gallery = dbGallery?.length ? dbGallery : staticGalleryData.images;
-const testimonials = dbTestimonials?.length ? dbTestimonials : staticTestimonialsData.testimonials;
-const navLinks = dbNavLinks?.length ? dbNavLinks : staticNavLinks;
+const products = dbData.dbProducts || [];
+const gallery = dbData.dbGallery || [];
+const testimonials = dbData.dbTestimonials || [];
+const navLinks = dbData.dbNavLinks || [];
 ---
 
-<Layout 
-  title="Barber Ray | Estilo y Tradición" 
-  services={servicesData.services} 
-  team={teamMembers}
->
-  <Hero initialData={heroData} client:load />
-  
-  <Services initialData={servicesData} />
-  
-  <Products 
-    products={products} 
-    config={getConfig("products", staticProductsData)}
-    client:load 
-  />
-  
-  <Gallery 
-    images={gallery} 
-    config={getConfig("gallery", staticGalleryData)}
-    client:load 
-  />
-  
-  <Team 
-    members={teamMembers} 
-    config={getConfig("team", staticTeamData)}
-    client:load 
-  />
-  
-  <Testimonials 
-    initialData={{
-      ...getConfig("testimonials", staticTestimonialsData),
-      testimonials
-    }}
-    client:load 
-  />
-  
-  <Contact 
-    initialData={contactData} 
-    config={getConfig("contact", { title: "Visítanos", subtitle: "Ubicación y Horarios" })}
-    client:load 
-  />
-  
-  <Footer 
-    navLinks={navLinks} 
-    contactData={contactData} 
-  />
-</Layout>
-
+{hasError ? (
+  <Layout title="Barber Ray | Error de Conexión">
+    <div class="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-center px-4">
+      <div class="space-y-6 max-w-md">
+        <h1 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
+          Conexión Interrumpida
+        </h1>
+        <p class="text-stone-400 text-sm md:text-base leading-relaxed">
+          Ocurrió un problema al conectar con nuestra base de datos para cargar el sitio. Por favor, intenta recargar la página.
+        </p>
+        <button 
+          onclick="window.location.reload()" 
+          class="inline-block bg-amber-500 hover:bg-amber-600 text-stone-950 px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors"
+        >
+          Recargar Página
+        </button>
+      </div>
+    </div>
+  </Layout>
+) : (
+  <Layout 
+    title="Barber Ray | Estilo y Tradición" 
+    services={servicesData.services} 
+    team={teamMembers}
+  >
+    {heroData && <Hero initialData={heroData} client:load />}
+    
+    {servicesData.services.length > 0 && <Services initialData={servicesData} />}
+    
+    {products.length > 0 && (
+      <Products 
+        products={products} 
+        config={getConfig("products", "Nuestros Productos", "Calidad Garantizada")}
+        client:load 
+      />
+    )}
+    
+    {gallery.length > 0 && (
+      <Gallery 
+        images={gallery} 
+        config={getConfig("gallery", "Galería", "Nuestro Trabajo")}
+        client:load 
+      />
+    )}
+    
+    {teamMembers.length > 0 && (
+      <Team 
+        members={teamMembers} 
+        config={getConfig("team", "El Equipo", "Maestros Barberos")}
+        client:load 
+      />
+    )}
+    
+    {testimonials.length > 0 && (
+      <Testimonials 
+        initialData={{
+          ...getConfig("testimonials", "Testimonios", "Lo Que Dicen Nuestros Clientes"),
+          testimonials
+        }}
+        client:load 
+      />
+    )}
+    
+    <Contact 
+      initialData={contactData} 
+      config={getConfig("contact", "Visítanos", "Ubicación y Horarios")}
+      client:load 
+    />
+    
+    <Footer 
+      navLinks={navLinks} 
+      contactData={contactData} 
+    />
+  </Layout>
+)}

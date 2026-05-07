@@ -13,8 +13,8 @@ export interface HeroData {
   subtitle: string;
   description: string;
   image_url?: string;
-  badge?: string;           // Nuevo
-  guarantee_text?: string;  // Nuevo
+  badge?: string;
+  guarantee_text?: string;
   ctas: HeroCTA[];
   stats: HeroStat[];
 }

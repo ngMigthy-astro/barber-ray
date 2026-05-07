@@ -2,11 +2,7 @@
 import Navbar from "../components/public/Navbar";
 import "../styles/global.css";
 
-// CMS Data
 import { createSupabaseClient } from "../lib/supabase";
-import { navigationLinks as staticNavLinks } from "../data/public/navigation.data";
-import { servicesData as staticServicesData } from "../data/public/services.data";
-import { teamData as staticTeamData } from "../data/public/team.data";
 
 interface Props {
   title?: string;
@@ -18,44 +14,40 @@ const { title = "Barber Ray", services: initialServices = [], team: initialTeam 
 const { user } = Astro.locals;
 const { cookies, request } = Astro;
 
-// Fetch Database Data
 const supabase = createSupabaseClient(request, cookies);
 
-// 1. Navigation
 const { data: dbNavLinks } = await supabase
   .from("nav_links")
   .select("*")
   .order("sort_order", { ascending: true });
 
-const rawNavLinks = dbNavLinks?.length ? dbNavLinks : staticNavLinks;
+const rawNavLinks = dbNavLinks || [];
 const navLinks = rawNavLinks.map((link: any) => ({
   ...link,
   href: link.href.startsWith("#") ? `/${link.href}` : link.href,
 }));
 
-// 2. Services (Auto-fetch if empty)
 let services = initialServices;
 if (services.length === 0) {
   const { data: dbServices } = await supabase
     .from("services")
     .select("*")
     .order("sort_order", { ascending: true });
-  services = dbServices?.length ? dbServices : staticServicesData.services;
+  services = dbServices || [];
 }
 
-// 3. Team (Auto-fetch if empty)
 let team = initialTeam;
 if (team.length === 0) {
   const { data: dbTeam } = await supabase
     .from("team_members")
     .select("*")
     .order("sort_order", { ascending: true });
-  team = dbTeam?.length ? dbTeam : staticTeamData.members;
+  team = dbTeam || [];
 }
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class="overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -82,7 +74,7 @@ if (team.length === 0) {
       }
     </script>
   </head>
-  <body class="bg-bg text-text min-h-screen">
+  <body class="bg-bg text-text min-h-screen overflow-x-hidden w-full relative">
     <Navbar 
       user={user} 
       services={services} 

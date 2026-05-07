@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import {
   User,
   Calendar,
-  Clock,
   CalendarX,
-  AlertCircle,
   Scissors,
   Loader2,
   ChevronRight,
   X,
-  AlertTriangle,
   Star,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
@@ -52,15 +49,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [imageError, setImageError] = useState(false);
 
-  const getFriendlyDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-ES", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
-  };
-
   const getFriendlyTime = (dateStr: string) => {
     const date = new Date(dateStr);
     let h = date.getUTCHours();
@@ -101,7 +89,7 @@ export default function ProfileView({ user, initialAppointments }: Props) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("appointment_reviews")
           .select("*")
           .in(
@@ -157,26 +145,27 @@ export default function ProfileView({ user, initialAppointments }: Props) {
   };
 
   const upcomingAppointments = appointments.filter(
-    (app) => 
-      new Date(app.appointment_date) > new Date() && 
-      app.status !== "cancelled"
+    (app) =>
+      new Date(app.appointment_date) > new Date() && app.status !== "cancelled",
   );
 
   const pastAppointments = appointments.filter(
-    (app) => 
-      new Date(app.appointment_date) <= new Date() || 
-      app.status === "cancelled"
+    (app) =>
+      new Date(app.appointment_date) <= new Date() ||
+      app.status === "cancelled",
   );
 
   return (
     <div className="max-w-4xl mx-auto space-y-16 pb-20">
-      {/* Header Minimalista y Centrado */}
       <header className="text-center space-y-8 animate-in fade-in slide-in-from-top-10 duration-1000 mt-8">
         <div className="relative inline-block">
           <div className="w-32 h-32 rounded-full bg-surface border-2 border-primary/20 p-1 shadow-2xl mx-auto overflow-hidden group">
-            {(user.user_metadata?.avatar_url || user.user_metadata?.picture) && !imageError ? (
+            {(user.user_metadata?.avatar_url || user.user_metadata?.picture) &&
+            !imageError ? (
               <img
-                src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                src={
+                  user.user_metadata?.avatar_url || user.user_metadata?.picture
+                }
                 alt={user.user_metadata?.full_name}
                 className="w-full h-full object-cover rounded-full transition-transform duration-700 group-hover:scale-110"
                 onError={() => setImageError(true)}
@@ -211,9 +200,7 @@ export default function ProfileView({ user, initialAppointments }: Props) {
         </div>
       </header>
 
-      {/* Main Content Grid */}
       <div className="space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-        {/* Próximas Citas */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 px-2">
             <div className="w-1.5 h-6 bg-primary rounded-full"></div>
@@ -229,7 +216,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                   key={app.id}
                   className="group glass rounded-3xl p-6 border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row items-center gap-6 relative overflow-hidden"
                 >
-                  {/* Left: Date/Time Badge */}
                   <div className="w-full md:w-40 flex flex-col items-center justify-center p-4 bg-primary/5 rounded-2xl border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                     <span className="text-2xs font-black uppercase tracking-tighter opacity-60">
                       {new Date(app.appointment_date).toLocaleDateString(
@@ -245,7 +231,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                     </span>
                   </div>
 
-                  {/* Middle: Service Info */}
                   <div className="flex-1 text-center md:text-left space-y-2">
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                       <h3 className="text-2xl font-black text-text tracking-tight uppercase">
@@ -261,7 +246,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                     </p>
                   </div>
 
-                  {/* Right: Price & Cancel */}
                   <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-black/5 dark:border-white/5 pt-4 md:pt-0">
                     <div className="text-right">
                       <p className="text-2xl font-black text-primary tracking-tighter">
@@ -297,8 +281,10 @@ export default function ProfileView({ user, initialAppointments }: Props) {
               <p className="text-text-muted text-sm font-bold uppercase tracking-ultra mb-8">
                 No tienes citas agendadas para los próximos días.
               </p>
-              <button 
-                onClick={() => window.dispatchEvent(new CustomEvent("open-booking"))}
+              <button
+                onClick={() =>
+                  globalThis.dispatchEvent(new CustomEvent("open-booking"))
+                }
                 className="btn-premium px-12"
               >
                 Agendar Cita
@@ -307,96 +293,118 @@ export default function ProfileView({ user, initialAppointments }: Props) {
           )}
         </section>
 
-        {/* Historial */}
         {pastAppointments.length > 0 && (
           <section className="space-y-6 pt-8">
             <h2 className="text-xs font-black text-text-muted uppercase tracking-giga px-2">
               Historial Reciente
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {pastAppointments.map((app) => (
-                <button
-                  key={app.id}
-                  onClick={() => {
-                    setReviewingAppointment(app);
-                    const existing = reviews[app.id];
-                    if (existing) {
-                      setRating(existing.rating);
-                      setComment(existing.comment || "");
-                    } else {
-                      setRating(5);
-                      setComment("");
-                    }
-                  }}
-                  className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${
-                    !isLoadingReviews && !reviews[app.id]
-                      ? "opacity-100 border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-500/5"
-                      : "opacity-70 hover:opacity-100 border-primary/5"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${
-                      app.status === "cancelled"
-                        ? "bg-red-500/10 text-red-500"
-                        : !isLoadingReviews && !reviews[app.id]
-                        ? "bg-amber-500 text-white animate-pulse"
-                        : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
-                    }`}>
-                      {app.status === "cancelled" ? (
-                        <X className="w-6 h-6" />
-                      ) : !isLoadingReviews && !reviews[app.id] ? (
-                        <Star className="w-6 h-6 fill-current" />
-                      ) : (
-                        <Scissors className="w-6 h-6" />
+              {pastAppointments.map((app) => {
+                const isCancelled = app.status === "cancelled";
+                const isPendingReview =
+                  !isLoadingReviews && !reviews[app.id] && !isCancelled;
+
+                let iconWrapperClass =
+                  "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white";
+                let buttonOpacityClass =
+                  "opacity-70 hover:opacity-100 border-primary/5";
+                let StatusIcon = Scissors;
+                let iconFillClass = "";
+                let titleClass = "text-text";
+                let StatusBadge = null;
+
+                if (isCancelled) {
+                  iconWrapperClass = "bg-red-500/10 text-red-500";
+                  StatusIcon = X;
+                  titleClass = "text-text/40 line-through";
+                  StatusBadge = (
+                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 text-4xs font-black uppercase tracking-tighter">
+                      Cancelada
+                    </span>
+                  );
+                } else if (isPendingReview) {
+                  iconWrapperClass = "bg-amber-500 text-white animate-pulse";
+                  buttonOpacityClass =
+                    "opacity-100 border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-500/5";
+                  StatusIcon = Star;
+                  iconFillClass = "fill-current";
+                  StatusBadge = (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500 text-4xs font-black uppercase text-white tracking-tighter">
+                      Pendiente
+                    </span>
+                  );
+                }
+
+                return (
+                  <button
+                    key={app.id}
+                    onClick={() => {
+                      setReviewingAppointment(app);
+                      const existing = reviews[app.id];
+                      if (existing) {
+                        setRating(existing.rating);
+                        setComment(existing.comment || "");
+                      } else {
+                        setRating(5);
+                        setComment("");
+                      }
+                    }}
+                    className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${buttonOpacityClass}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${iconWrapperClass}`}
+                      >
+                        <StatusIcon className={`w-6 h-6 ${iconFillClass}`} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className={`font-bold text-sm ${titleClass}`}>
+                            {app.service.name}
+                          </p>
+                          {StatusBadge}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-2xs text-text-muted group-hover:text-text font-bold uppercase tracking-tighter transition-colors">
+                            {new Date(
+                              app.appointment_date,
+                            ).toLocaleDateString()}{" "}
+                            • {app.barber.name}
+                          </p>
+                          {reviews[app.id] && (
+                            <div className="flex items-center gap-0.5 text-amber-500">
+                              <Star className="w-2 h-2 fill-current" />
+                              <span className="text-4xs font-bold">
+                                {reviews[app.id].rating}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {!isLoadingReviews && !reviews[app.id] && (
+                        <span className="text-2xs font-black text-amber-500 uppercase tracking-tight hidden md:block">
+                          Dejar Reseña
+                        </span>
                       )}
+                      <ChevronRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className={`font-bold text-sm ${app.status === "cancelled" ? "text-text/40 line-through" : "text-text"}`}>
-                          {app.service.name}
-                        </p>
-                        {app.status === "cancelled" ? (
-                          <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 text-[8px] font-black uppercase tracking-tighter">
-                            Cancelada
-                          </span>
-                        ) : !isLoadingReviews && !reviews[app.id] && (
-                          <span className="px-2 py-0.5 rounded-full bg-amber-500 text-[8px] font-black uppercase text-white tracking-tighter">
-                            Pendiente
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-2xs text-text-muted group-hover:text-text font-bold uppercase tracking-tighter transition-colors">
-                          {new Date(app.appointment_date).toLocaleDateString()} • {app.barber.name}
-                        </p>
-                        {reviews[app.id] && (
-                          <div className="flex items-center gap-0.5 text-amber-500">
-                            <Star className="w-2 h-2 fill-current" />
-                            <span className="text-4xs font-bold">
-                              {reviews[app.id].rating}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!isLoadingReviews && !reviews[app.id] && <span className="text-[10px] font-black text-amber-500 uppercase tracking-tight hidden md:block">Dejar Reseña</span>}
-                    <ChevronRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </section>
         )}
       </div>
 
-      {/* Modal de Confirmación Premium */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-bg/80 backdrop-blur-md animate-in fade-in duration-300"
+          <button
+            type="button"
+            className="absolute inset-0 w-full h-full bg-bg/80 backdrop-blur-md animate-in fade-in duration-300 border-none cursor-default"
             onClick={() => setShowConfirmModal(null)}
+            aria-label="Cerrar modal"
           />
 
           <div className="relative bg-surface border border-white/10 w-full max-w-sm rounded-4xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300 text-center space-y-6">
@@ -438,16 +446,16 @@ export default function ProfileView({ user, initialAppointments }: Props) {
           </div>
         </div>
       )}
-      {/* Modal de Detalle y Calificación */}
       {reviewingAppointment && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-bg/80 backdrop-blur-md animate-in fade-in duration-300"
+          <button
+            type="button"
+            className="absolute inset-0 w-full h-full bg-bg/80 backdrop-blur-md animate-in fade-in duration-300 border-none cursor-default"
             onClick={() => setReviewingAppointment(null)}
+            aria-label="Cerrar modal de reseña"
           />
 
           <div className="relative bg-surface border border-primary/10 w-full max-w-md rounded-5xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
-            {/* Header del Modal */}
             <div className="p-8 bg-primary text-white space-y-4">
               <div className="flex justify-between items-start">
                 <div className="p-3 bg-white/10 rounded-2xl">
@@ -470,7 +478,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
               </div>
             </div>
 
-            {/* Info de la Cita */}
             <div className="p-8 space-y-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1">
@@ -509,7 +516,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                 </div>
               </div>
 
-              {/* Sección de Calificación */}
               <div className="pt-6 border-t border-primary/5 space-y-6">
                 <div className="text-center space-y-4">
                   <p className="text-xs font-black text-text uppercase tracking-widest">
@@ -524,7 +530,7 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                         onClick={() =>
                           !reviews[reviewingAppointment.id] && setRating(star)
                         }
-                        className={`transition-all duration-300 ${!reviews[reviewingAppointment.id] ? "hover:scale-125 cursor-pointer" : "cursor-default"}`}
+                        className={`transition-all duration-300 ${reviews[reviewingAppointment.id] ? "cursor-default" : "hover:scale-125 cursor-pointer"}`}
                       >
                         <Star
                           className={`w-8 h-8 ${
@@ -538,7 +544,14 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                   </div>
                 </div>
 
-                {!reviews[reviewingAppointment.id] ? (
+                {reviews[reviewingAppointment.id] ? (
+                  <div className="p-4 bg-bg rounded-2xl border border-primary/5 italic text-sm text-text-muted text-center">
+                    "
+                    {reviews[reviewingAppointment.id].comment ||
+                      "Sin comentarios adicionales."}
+                    "
+                  </div>
+                ) : (
                   <div className="space-y-4">
                     <textarea
                       placeholder="Déjanos un comentario..."
@@ -557,13 +570,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                         "Enviar Calificación"
                       )}
                     </button>
-                  </div>
-                ) : (
-                  <div className="p-4 bg-bg rounded-2xl border border-primary/5 italic text-sm text-text-muted text-center">
-                    "
-                    {reviews[reviewingAppointment.id].comment ||
-                      "Sin comentarios adicionales."}
-                    "
                   </div>
                 )}
               </div>

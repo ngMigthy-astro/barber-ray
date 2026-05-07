@@ -6,7 +6,7 @@ const ICON_MAP = {
   Scissors: Scissors,
   Brush: Brush,
   Sparkles: Sparkles,
-  Wind: Wind
+  Wind: Wind,
 };
 
 interface Props {
@@ -19,8 +19,10 @@ interface Props {
 
 export default function Services({ initialData }: Props) {
   return (
-    <section id="services" className="py-24 bg-bg px-4 relative overflow-hidden">
-      {/* Decorative background flare */}
+    <section
+      id="services"
+      className="py-24 bg-bg px-4 relative overflow-hidden"
+    >
       <div className="absolute top-1/2 left-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -z-10"></div>
 
       <div className="max-w-6xl mx-auto">
@@ -29,13 +31,14 @@ export default function Services({ initialData }: Props) {
           subtitle={initialData.subtitle}
         />
 
-        {/* Service cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {initialData.services.map((service) => {
             // Determinar qué icono usar
-            const IconComponent = typeof service.icon === 'function' 
-              ? service.icon 
-              : (ICON_MAP[service.icon_name as keyof typeof ICON_MAP] || Scissors);
+            const IconComponent =
+              typeof service.icon === "function"
+                ? service.icon
+                : ICON_MAP[service.icon_name as keyof typeof ICON_MAP] ||
+                  Scissors;
 
             return (
               <div
@@ -45,7 +48,7 @@ export default function Services({ initialData }: Props) {
                 <div className="p-4 rounded-2xl bg-primary/10 text-primary w-fit group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:rotate-12">
                   <IconComponent className="w-8 h-8" />
                 </div>
-                
+
                 <div className="space-y-3 flex-1">
                   <h3 className="text-2xl font-bold text-text group-hover:text-accent transition-colors">
                     {service.name}
