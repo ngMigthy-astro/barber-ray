@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Phone,
   Link,
+  Calendar,
 } from "lucide-react";
 
 interface Props {
@@ -25,6 +26,7 @@ const userEmail = user?.email || "Admin";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/agenda", label: "Agenda Semanal", icon: Calendar },
   { href: "/admin/hero", label: "Hero (Inicio)", icon: Home },
   { href: "/admin/services", label: "Servicios", icon: Scissors },
   { href: "/admin/products", label: "Productos", icon: Package },

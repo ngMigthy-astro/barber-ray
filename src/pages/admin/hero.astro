@@ -2,7 +2,11 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
 import { uploadImage } from "../../lib/storage";
-import type { HeroData, HeroCTA, HeroStat } from "../../interfaces/public/hero.interface";
+import type {
+  HeroData,
+  HeroCTA,
+  HeroStat,
+} from "../../interfaces/public/hero.interface";
 import { X, Upload, ImageIcon } from "lucide-react";
 
 const { cookies, request } = Astro;
@@ -20,13 +24,13 @@ const hero: HeroData = (dbHeroData as unknown as HeroData) || {
   image_url: "",
   ctas: [
     { text: "", href: "" },
-    { text: "", href: "" }
+    { text: "", href: "" },
   ],
   stats: [
     { value: "", label: "" },
     { value: "", label: "" },
-    { value: "", label: "" }
-  ]
+    { value: "", label: "" },
+  ],
 };
 
 let successMessage = "";
@@ -127,7 +131,9 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            <span class="font-medium">Los cambios se han guardado correctamente.</span>
+            <span class="font-medium">
+              Los cambios se han guardado correctamente.
+            </span>
           </div>
           <button
             onclick="document.getElementById('success-notification').style.display='none'"
@@ -173,45 +179,55 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
 
     <form method="POST" enctype="multipart/form-data" class="space-y-8">
       <input type="hidden" name="current_image" value={hero.image_url} />
-      
+
       <!-- Imagen de Fondo -->
-      <div class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6">
+      <div
+        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+      >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">Imagen de Fondo (Hero Background)</h3>
+          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
+            Imagen de Fondo (Hero Background)
+          </h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div class="md:col-span-1">
-            <div class="relative group aspect-video md:aspect-square bg-stone-950 border-2 border-dashed border-stone-800 rounded-2xl overflow-hidden flex items-center justify-center hover:border-amber-500/50 transition-all">
-              <img 
-                id="hero-preview" 
-                src={hero.image_url || '/images/hero-bg.jpg'} 
-                class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
+            <div
+              class="relative group aspect-video md:aspect-square bg-stone-950 border-2 border-dashed border-stone-800 rounded-2xl overflow-hidden flex items-center justify-center hover:border-amber-500/50 transition-all"
+            >
+              <img
+                id="hero-preview"
+                src={hero.image_url || "/images/hero-bg.jpg"}
+                class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity"
               />
-              <div class="relative z-10 flex flex-col items-center gap-2 text-stone-500 group-hover:text-amber-500 transition-colors">
+              <div
+                class="relative z-10 flex flex-col items-center gap-2 text-stone-500 group-hover:text-amber-500 transition-colors"
+              >
                 <Upload className="w-8 h-8" />
-                <span class="text-2xs font-black uppercase tracking-widest">Cambiar Imagen</span>
+                <span class="text-2xs font-black uppercase tracking-widest"
+                  >Cambiar Imagen</span
+                >
               </div>
-              <input 
-                type="file" 
-                name="image" 
-                accept="image/*" 
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
                 id="hero-upload"
                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
               />
             </div>
           </div>
           <div class="md:col-span-2 space-y-4">
-            <div class="p-4 bg-stone-950/50 rounded-xl border border-stone-800/50">
+            <div
+              class="p-4 bg-stone-950/50 rounded-xl border border-stone-800/50"
+            >
               <p class="text-xs text-stone-400 leading-relaxed">
-                <strong class="text-amber-500">Tip de Mentor:</strong> Para el Hero, usa imágenes horizontales (landscape) de alta resolución (mínimo 1920x1080). Las imágenes con tonos oscuros funcionan mejor con el diseño "Blood & Steel".
+                <strong class="text-amber-500">Tip </strong> Para el Hero, usa imágenes
+                horizontales (landscape) de alta resolución (mínimo 1920x1080). Las
+                imágenes con tonos oscuros funcionan mejor con el diseño "Blood &
+                Steel".
               </p>
-            </div>
-            <div class="flex items-center gap-3 text-stone-500">
-              <ImageIcon className="w-4 h-4" />
-              <span class="text-2xs font-bold uppercase tracking-widest">URL Actual:</span>
-              <span class="text-[10px] font-mono truncate max-w-[200px]">{hero.image_url || 'Default System Image'}</span>
             </div>
           </div>
         </div>
@@ -222,9 +238,7 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3
-            class="font-black text-white uppercase tracking-ultra text-2xs"
-          >
+          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
             Textos Principales
           </h3>
         </div>
@@ -278,9 +292,7 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3
-            class="font-black text-white uppercase tracking-ultra text-2xs"
-          >
+          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
             Botones (CTAs)
           </h3>
         </div>
@@ -318,9 +330,7 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       >
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3
-            class="font-black text-white uppercase tracking-ultra text-2xs"
-          >
+          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
             Estadísticas (Stats)
           </h3>
         </div>
@@ -362,11 +372,13 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
   </div>
 </AdminLayout>
 <script>
-  const heroUpload = document.getElementById('hero-upload') as HTMLInputElement;
-  const heroPreview = document.getElementById('hero-preview') as HTMLImageElement;
+  const heroUpload = document.getElementById("hero-upload") as HTMLInputElement;
+  const heroPreview = document.getElementById(
+    "hero-preview",
+  ) as HTMLImageElement;
 
   if (heroUpload && heroPreview) {
-    heroUpload.addEventListener('change', (e) => {
+    heroUpload.addEventListener("change", (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
