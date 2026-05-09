@@ -14,10 +14,19 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      // Excluir rutas privadas del sitemap para que Google no las indexe
+      filter: (page) =>
+        !page.includes("/admin/") &&
+        !page.includes("/profile") &&
+        !page.includes("/api/"),
+    }),
+  ],
   output: "server",
   adapter: vercel(),
   webAnalytics: {
-    enabled: true, // set to false when using @vercel/analytics@1.4.0
+    enabled: true,
   },
 });

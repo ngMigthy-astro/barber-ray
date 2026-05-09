@@ -46,6 +46,9 @@ const currentPath = url.pathname;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Admin: Bloqueamos indexación del panel de control -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={Astro.url.href} />
     <title>{title} | Barber Ray Admin</title>
     <script is:inline>
       const theme = (() => {
