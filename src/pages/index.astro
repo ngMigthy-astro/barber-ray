@@ -1,6 +1,7 @@
 ---
 import Hero from "../components/public/Hero.astro";
 import Layout from "../layouts/Layout.astro";
+import WhatsAppButton from "../components/public/WhatsAppButton.astro";
 import Services from "../components/public/Services";
 import Products from "../components/public/Products";
 import Gallery from "../components/public/Gallery";
@@ -13,6 +14,11 @@ import { createSupabaseClient } from "../lib/supabase";
 
 const { cookies, request } = Astro;
 const supabase = createSupabaseClient(request, cookies);
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+const isLoggedIn = !!user;
 
 let hasError = false;
 let dbData: any = {};
@@ -162,11 +168,9 @@ const navLinks = dbData.dbNavLinks || [];
       navLinks={navLinks}
     >
       {heroData && <Hero initialData={heroData} />}
-
       {servicesData.services.length > 0 && (
         <Services initialData={servicesData} />
       )}
-
       {products.length > 0 && (
         <Products
           products={products}
@@ -178,7 +182,6 @@ const navLinks = dbData.dbNavLinks || [];
           client:visible
         />
       )}
-
       {gallery.length > 0 && (
         <Gallery
           images={gallery}
@@ -186,7 +189,6 @@ const navLinks = dbData.dbNavLinks || [];
           client:visible
         />
       )}
-
       {teamMembers.length > 0 && (
         <Team
           members={teamMembers}
@@ -194,7 +196,6 @@ const navLinks = dbData.dbNavLinks || [];
           client:visible
         />
       )}
-
       {testimonials.length > 0 && (
         <Testimonials
           initialData={{
@@ -208,14 +209,19 @@ const navLinks = dbData.dbNavLinks || [];
           client:visible
         />
       )}
-
       <Contact
         initialData={contactData}
         config={getConfig("contact", "Visítanos", "Ubicación y Horarios")}
         client:visible
       />
-
       <Footer navLinks={navLinks} contactData={contactData} />
+      {isLoggedIn && (
+        <WhatsAppButton
+          phone="4626009179"
+          message="¡Hola! Me gustaría agendar una cita"
+        />
+      )}
+      )
     </Layout>
   )
 }
