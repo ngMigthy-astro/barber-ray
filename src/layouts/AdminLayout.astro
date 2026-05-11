@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Phone,
   Link,
+  Calendar,
 } from "lucide-react";
 
 interface Props {
@@ -25,6 +26,7 @@ const userEmail = user?.email || "Admin";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/agenda", label: "Agenda Semanal", icon: Calendar },
   { href: "/admin/hero", label: "Hero (Inicio)", icon: Home },
   { href: "/admin/services", label: "Servicios", icon: Scissors },
   { href: "/admin/products", label: "Productos", icon: Package },
@@ -44,6 +46,9 @@ const currentPath = url.pathname;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Admin: Bloqueamos indexación del panel de control -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={Astro.url.href} />
     <title>{title} | Barber Ray Admin</title>
     <script is:inline>
       const theme = (() => {

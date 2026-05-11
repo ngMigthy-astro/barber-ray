@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
 
+# Bloquear panel de admin y API de indexación
+Disallow: /admin/
+Disallow: /api/
+Disallow: /profile/
+
 Sitemap: https://barber-ray.vercel.app/sitemap-index.xml
