@@ -133,7 +133,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
             </div>
 
             <div className="mt-16 pt-10 border-t border-glass-border">
-              <p className="text-xs font-black text-text-muted/60 uppercase tracking-mega text-center mb-8 italic">
+              <p className="text-xs font-black text-text-muted uppercase tracking-mega text-center mb-8 italic">
                 Síguenos en nuestras redes
               </p>
               <div className="flex justify-center gap-10">

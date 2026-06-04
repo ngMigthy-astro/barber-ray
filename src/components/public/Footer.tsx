@@ -118,7 +118,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                 <div className="flex flex-col gap-3">
                   {(contactData?.schedule || []).map((entry) => (
                     <div key={entry.days} className="flex flex-col">
-                      <span className="text-xs font-black text-text-muted/70 uppercase tracking-ultra">
+                      <span className="text-xs font-black text-text-muted uppercase tracking-ultra">
                         {entry.days}
                       </span>
                       <span className="text-text-muted font-bold tracking-wider">
@@ -132,7 +132,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
           </div>
         </div>
 
-        <div className="border-t border-glass-border pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-black text-text-muted/70 uppercase tracking-mega">
+        <div className="border-t border-glass-border pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-black text-text-muted uppercase tracking-mega">
           <p>
             &copy; {new Date().getFullYear()} {brandName}. Todos los derechos
             reservados.

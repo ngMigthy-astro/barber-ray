@@ -33,14 +33,14 @@ export default function Testimonials({ initialData }: Props) {
             >
               <Quote className="w-8 h-8 text-primary opacity-40" />
 
-              <p className="text-text/70 text-sm leading-relaxed flex-1">
+              <p className="text-text-muted text-sm leading-relaxed flex-1">
                 "{testimonial.comment}"
               </p>
 
               <div className="flex items-center justify-between pt-3 border-t border-surface">
                 <div>
                   <p className="font-bold text-sm">{testimonial.name}</p>
-                  <p className="text-text/40 text-xs">
+                  <p className="text-text/70 text-xs">
                     {testimonial.review_time || (testimonial as any).time}
                   </p>
                 </div>

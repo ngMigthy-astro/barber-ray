@@ -60,7 +60,7 @@ export default function Team({ members = [], config }: TeamProps) {
 
               <div className="flex flex-col items-center gap-1">
                 <StarRating rating={member.rating} />
-                <p className="text-text/50 text-xs">
+                <p className="text-text-muted text-xs">
                   {member.rating.toFixed(1)} · {member.reviews} reseñas
                 </p>
               </div>
@@ -80,7 +80,7 @@ export default function Team({ members = [], config }: TeamProps) {
                 href={`https://instagram.com/${member.instagram.replace("@", "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-text/50 hover:text-primary transition-colors mt-auto"
+                className="flex items-center gap-2 text-sm text-text-muted hover:text-primary transition-colors mt-auto"
               >
                 <LuInstagram className="w-4 h-4" />
                 {member.instagram}

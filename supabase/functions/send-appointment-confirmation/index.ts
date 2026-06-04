@@ -178,7 +178,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Edge function error:', message)
 
     return new Response(
       JSON.stringify({ error: message }),

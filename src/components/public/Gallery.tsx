@@ -43,7 +43,7 @@ export default function Gallery({ images, config }: Props) {
               className={`px-5 py-2 rounded-full text-sm font-semibold border transition-colors uppercase tracking-widest ${
                 activeCategory === category
                   ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
-                  : "border-primary/20 text-text/60 hover:border-primary hover:text-primary"
+                  : "border-primary/20 text-text-muted hover:border-primary hover:text-primary"
               }`}
             >
               {category}
