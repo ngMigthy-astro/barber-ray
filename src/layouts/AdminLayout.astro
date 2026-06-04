@@ -23,6 +23,8 @@ const { url } = Astro;
 const { user } = Astro.locals;
 
 const userEmail = user?.email || "Admin";
+const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+const fullName = user?.user_metadata?.full_name || userEmail.split("@")[0];
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -142,13 +144,23 @@ const currentPath = url.pathname;
 
       <div class="p-4 border-t border-stone-800">
         <div class="flex items-center gap-3 px-3 py-2 mb-2">
-          <div
-            class="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center text-sm font-bold text-stone-300"
-          >
-            {userEmail.charAt(0).toUpperCase()}
-          </div>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={fullName}
+              class="w-8 h-8 rounded-full object-cover border border-stone-800"
+              referrerpolicy="no-referrer"
+            />
+          ) : (
+            <div
+              class="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center text-sm font-bold text-stone-300"
+            >
+              {userEmail.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-white truncate">{userEmail}</p>
+            <p class="text-sm font-medium text-white truncate">{fullName}</p>
+            <p class="text-3xs text-stone-500 truncate">{userEmail}</p>
           </div>
         </div>
 
@@ -193,26 +205,64 @@ const currentPath = url.pathname;
             {title}
           </h1>
         </div>
-        <a
-          href="/"
-          target="_blank"
-          class="text-sm text-stone-400 hover:text-amber-500 transition-colors flex items-center gap-2 whitespace-nowrap"
-        >
-          <span class="hidden sm:inline">Ver sitio en vivo</span>
-          <span class="sm:hidden">Ver sitio</span>
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            ></path></svg
+        <div class="flex items-center gap-4">
+          <button
+            id="admin-theme-toggle"
+            aria-label="Cambiar tema"
+            class="p-2 rounded-full border border-stone-300 dark:border-stone-800 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer flex items-center justify-center focus:outline-none"
           >
-        </a>
+            <!-- Icono Sol -->
+            <svg
+              id="sun-icon"
+              class="w-5 h-5 hidden"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <!-- Icono Luna -->
+            <svg
+              id="moon-icon"
+              class="w-5 h-5 hidden"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <a
+            href="/"
+            target="_blank"
+            class="text-sm text-stone-400 hover:text-amber-500 transition-colors flex items-center gap-2 whitespace-nowrap"
+          >
+            <span class="hidden sm:inline">Ver sitio en vivo</span>
+            <span class="sm:hidden">Ver sitio</span>
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              ></path></svg
+            >
+          </a>
+        </div>
       </header>
 
       <div class="p-4 sm:p-8 flex-1 overflow-x-hidden">
@@ -221,26 +271,190 @@ const currentPath = url.pathname;
     </main>
 
     <script is:inline>
-      document.addEventListener("DOMContentLoaded", () => {
+      function initAdminDashboard() {
+        // --- 1. Lógica del Sidebar ---
         const sidebar = document.getElementById("admin-sidebar");
         const overlay = document.getElementById("sidebar-overlay");
         const mobileBtn = document.getElementById("mobile-menu-btn");
         const closeBtn = document.getElementById("close-sidebar-btn");
 
-        function openSidebar() {
-          sidebar.classList.remove("-translate-x-full");
-          overlay.classList.remove("hidden");
+        if (sidebar && overlay) {
+          function openSidebar() {
+            sidebar.classList.remove("-translate-x-full");
+            overlay.classList.remove("hidden");
+          }
+
+          function closeSidebar() {
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+          }
+
+          mobileBtn?.addEventListener("click", openSidebar);
+          closeBtn?.addEventListener("click", closeSidebar);
+          overlay?.addEventListener("click", closeSidebar);
         }
 
-        function closeSidebar() {
-          sidebar.classList.add("-translate-x-full");
-          overlay.classList.add("hidden");
-        }
+        // --- 2. Lógica del Theme Toggle ---
+        const themeToggleBtn = document.getElementById("admin-theme-toggle");
+        const sunIcon = document.getElementById("sun-icon");
+        const moonIcon = document.getElementById("moon-icon");
 
-        mobileBtn?.addEventListener("click", openSidebar);
-        closeBtn?.addEventListener("click", closeSidebar);
-        overlay?.addEventListener("click", closeSidebar);
-      });
+        if (themeToggleBtn && sunIcon && moonIcon) {
+          function updateIcons(isDark) {
+            if (isDark) {
+              sunIcon.classList.remove("hidden");
+              moonIcon.classList.add("hidden");
+            } else {
+              sunIcon.classList.add("hidden");
+              moonIcon.classList.remove("hidden");
+            }
+          }
+
+          // Inicializar iconos
+          const isDarkInitial = document.documentElement.classList.contains("dark");
+          updateIcons(isDarkInitial);
+
+          // Evitar acumulamiento de listeners en re-renderizados
+          const newThemeToggleBtn = themeToggleBtn.cloneNode(true);
+          themeToggleBtn.parentNode.replaceChild(newThemeToggleBtn, themeToggleBtn);
+
+          newThemeToggleBtn.addEventListener("click", () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            const nextDark = !isDark;
+
+            const toggleTheme = () => {
+              document.documentElement.classList.toggle("dark", nextDark);
+              localStorage.setItem("theme", nextDark ? "dark" : "light");
+              updateIcons(nextDark);
+            };
+
+            if (!document.startViewTransition) {
+              toggleTheme();
+              return;
+            }
+            document.startViewTransition(toggleTheme);
+          });
+        }
+      }
+
+      // Ejecutar inmediatamente al final del body
+      initAdminDashboard();
+
+      // Por si se usa Astro View Transitions
+      document.addEventListener("astro:page-load", initAdminDashboard);
     </script>
+
+    <style is:global>
+      /* --- Tema Claro Suave para el Panel de Admin (Activo solo si no existe la clase .dark en el html) --- */
+      
+      /* Fondo general y texto base */
+      html:not(.dark) body {
+        background-color: #f5f5f4 !important; /* stone-100 (gris suave, no quema ojos) */
+        color: #44403c !important; /* stone-700 */
+      }
+
+      /* Encabezados y títulos */
+      html:not(.dark) h1, 
+      html:not(.dark) h2, 
+      html:not(.dark) h3, 
+      html:not(.dark) h4, 
+      html:not(.dark) h5, 
+      html:not(.dark) h6, 
+      html:not(.dark) .text-white {
+        color: #1c1917 !important; /* stone-900 */
+      }
+
+      /* Sidebar y Header superior */
+      html:not(.dark) #admin-sidebar {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e7e5e4 !important; /* stone-200 */
+      }
+
+      html:not(.dark) header {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border-bottom: 1px solid #e7e5e4 !important;
+      }
+
+      /* Tarjetas y Contenedores (bg-stone-900) */
+      html:not(.dark) .bg-stone-900 {
+        background-color: #ffffff !important;
+        border: 1px solid #e7e5e4 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+      }
+
+      /* Elementos secundarios o contenedores oscuros (bg-stone-950) */
+      html:not(.dark) .bg-stone-950 {
+        background-color: #fafaf9 !important; /* stone-50 */
+        border-color: #e7e5e4 !important;
+      }
+
+      /* Inputs, Selects y Textareas */
+      html:not(.dark) input, 
+      html:not(.dark) select, 
+      html:not(.dark) textarea, 
+      html:not(.dark) .bg-stone-950\/50 {
+        background-color: #fafaf9 !important;
+        border: 1px solid #e7e5e4 !important;
+        color: #1c1917 !important;
+      }
+
+      html:not(.dark) input:focus, 
+      html:not(.dark) select:focus, 
+      html:not(.dark) textarea:focus {
+        border-color: #d97706 !important; /* amber-600 */
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1) !important;
+      }
+
+      /* Textos mutados y stone */
+      html:not(.dark) .text-stone-300 {
+        color: #44403c !important; /* stone-700 */
+      }
+      html:not(.dark) .text-stone-400 {
+        color: #57534e !important; /* stone-600 */
+      }
+      html:not(.dark) .text-stone-500 {
+        color: #78716c !important; /* stone-500 */
+      }
+
+      /* Hover de enlaces inactivos en el Sidebar */
+      html:not(.dark) .text-stone-400.hover\:text-white:hover {
+        color: #1c1917 !important;
+        background-color: #f5f5f4 !important;
+      }
+
+      /* Enlaces activos en el Sidebar */
+      html:not(.dark) #admin-sidebar a.text-amber-500 {
+        background-color: #fef3c7 !important; /* amber-100 */
+        color: #b45309 !important; /* amber-700 */
+      }
+
+      /* Alertas */
+      html:not(.dark) .bg-emerald-500\/10 {
+        background-color: #d1fae5 !important;
+        color: #065f46 !important;
+        border-color: #a7f3d0 !important;
+      }
+      
+      html:not(.dark) .bg-red-500\/10 {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border-color: #fca5a5 !important;
+      }
+      
+      /* Botones de acción */
+      html:not(.dark) .bg-emerald-500 {
+        background-color: #10b981 !important;
+        color: #ffffff !important;
+      }
+      html:not(.dark) .bg-emerald-500:hover {
+        background-color: #059669 !important;
+      }
+
+      /* Elementos específicos de listas */
+      html:not(.dark) .bg-stone-900\/40, 
+      html:not(.dark) .bg-stone-900\/60 {
+        background-color: #ffffff !important;
+      }
+    </style>
   </body>
 </html>

@@ -237,7 +237,7 @@ export default function ProfileView({ user, initialAppointments }: Props) {
                         {app.service.name}
                       </h3>
                       <span className="w-fit mx-auto md:mx-0 px-3 py-1 rounded-lg bg-primary/10 text-primary text-2xs font-black uppercase">
-                        {app.service.duration}
+                        {String(app.service.duration).toLowerCase().includes("min") ? app.service.duration : `${app.service.duration} min`}
                       </span>
                     </div>
                     <p className="text-text-muted text-xs font-bold uppercase flex items-center justify-center md:justify-start gap-2">

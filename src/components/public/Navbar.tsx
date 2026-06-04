@@ -1,6 +1,7 @@
 import ThemeToggle from "../shared/ThemeToggle";
 import BookingModal from "../shared/BookingModal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import useFocusTrap from "../../lib/hooks/useFocusTrap";
 import {
   Menu,
   X,
@@ -27,6 +28,21 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [navbarImageError, setNavbarImageError] = useState(false);
+
+  // Activamos el focus trap cuando el modal de login está abierto
+  const loginModalRef = useFocusTrap(isLoginModalOpen);
+
+  // Cerrar modal de login con la tecla Escape
+  useEffect(() => {
+    if (!isLoginModalOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsLoginModalOpen(false);
+      }
+    };
+    globalThis.addEventListener("keydown", handleEscape);
+    return () => globalThis.removeEventListener("keydown", handleEscape);
+  }, [isLoginModalOpen]);
 
   useEffect(() => {
     const params = new URLSearchParams(globalThis.location.search);
@@ -78,6 +94,9 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 className="flex items-center gap-2 text-sm font-medium text-text/80 hover:text-primary transition-colors p-1"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 onBlur={() => setTimeout(() => setUserMenuOpen(false), 200)}
+                aria-expanded={userMenuOpen}
+                aria-haspopup="menu"
+                aria-label="Menú de usuario"
               >
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 overflow-hidden">
                   {(user.user_metadata?.avatar_url ||
@@ -107,9 +126,11 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
               </button>
 
               <div
+                role="menu"
+                aria-label="Opciones de usuario"
                 className={`absolute right-0 mt-2 w-48 bg-surface border border-surface shadow-xl rounded-2xl py-2 z-60 transition-all transform origin-top-right ${userMenuOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
               >
-                <div className="px-4 py-2 border-b border-bg/50 mb-1">
+                <div className="px-4 py-2 border-b border-bg/50 mb-1" role="presentation">
                   <p className="text-2xs text-text/40 font-medium uppercase tracking-ultra">
                     Cuenta
                   </p>
@@ -117,6 +138,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
 
                 <a
                   href="/profile"
+                  role="menuitem"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-text/70 hover:text-primary hover:bg-primary/5 transition-colors"
                 >
                   <User className="w-4 h-4" />
@@ -126,6 +148,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 {user.isAdmin && (
                   <a
                     href="/admin"
+                    role="menuitem"
                     className="flex items-center gap-3 px-4 py-2 text-sm text-amber-500 hover:bg-amber-500/5 transition-colors font-semibold"
                   >
                     <LayoutDashboard className="w-4 h-4" />
@@ -133,15 +156,17 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                   </a>
                 )}
 
-                <div className="my-1 border-t border-bg/50"></div>
+                <div className="my-1 border-t border-bg/50" role="presentation"></div>
 
                 <form
                   action="/api/auth/signout"
                   method="post"
                   className="w-full"
+                  role="none"
                 >
                   <button
                     type="submit"
+                    role="menuitem"
                     className="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-500/5 transition-colors w-full text-left"
                   >
                     <LogOut className="w-4 h-4" />
@@ -250,7 +275,10 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
       )}
 
       {isLoginModalOpen && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        <div 
+          ref={loginModalRef}
+          className="fixed inset-0 z-100 flex items-center justify-center p-4"
+        >
           <button
             type="button"
             className="absolute inset-0 bg-bg/80 backdrop-blur-sm transition-opacity w-full h-full border-none cursor-default"
@@ -259,9 +287,15 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
             title="Cerrar modal"
           />
 
-          <div className="relative bg-surface border border-surface w-full max-w-md rounded-3xl p-8 md:p-10 shadow-2xl transform transition-all animate-in fade-in zoom-in duration-300">
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="login-modal-title"
+            className="relative bg-surface border border-surface w-full max-w-md rounded-3xl p-8 md:p-10 shadow-2xl transform transition-all animate-in fade-in zoom-in duration-300"
+          >
             <button
               onClick={() => setIsLoginModalOpen(false)}
+              aria-label="Cerrar modal"
               className="absolute top-6 right-6 p-2 text-text/40 hover:text-primary transition-colors"
             >
               <X className="w-6 h-6" />
@@ -272,7 +306,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 <Scissors className="w-8 h-8 text-primary" />
               </div>
 
-              <h2 className="text-3xl font-black text-text mb-2">
+              <h2 id="login-modal-title" className="text-3xl font-black text-text mb-2">
                 Bienvenido<span className="text-primary">.</span>
               </h2>
               <p className="text-text/60 mb-10 text-sm">

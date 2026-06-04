@@ -1,0 +1,226 @@
+---
+import Hero from "../components/public/Hero.astro";
+import Layout from "../layouts/Layout.astro";
+import WhatsAppButton from "../components/public/WhatsAppButton.astro";
+import Services from "../components/public/Services";
+import Products from "../components/public/Products";
+import Gallery from "../components/public/Gallery";
+import Team from "../components/public/Team";
+import Testimonials from "../components/public/Testimonials";
+import Contact from "../components/public/Contact";
+import Footer from "../components/public/Footer";
+
+import { createSupabaseClient } from "../lib/supabase";
+
+const { cookies, request } = Astro;
+const supabase = createSupabaseClient(request, cookies);
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+const isLoggedIn = !!user;
+
+let hasError = false;
+let dbData: any = {};
+
+try {
+  const [
+    { data: allConfigs, error: errConfigs },
+    { data: dbHeroData, error: errHero },
+    { data: dbServices, error: errServices },
+    { data: dbTeam, error: errTeam },
+    { data: dbProducts, error: errProducts },
+    { data: dbGallery, error: errGallery },
+    { data: dbTestimonials, error: errTestimonials },
+    { data: dbContact, error: errContact },
+    { data: dbSchedule, error: errSchedule },
+    { data: dbSocials, error: errSocials },
+    { data: dbNavLinks, error: errNav },
+  ] = await Promise.all([
+    supabase.from("section_configs").select("*"),
+    supabase.from("hero_content").select("*").single(),
+    supabase
+      .from("services")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("team_members")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("gallery_images")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("testimonials")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase.from("contact_info").select("*").eq("id", "default").single(),
+    supabase
+      .from("schedule_entries")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("social_links")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("nav_links")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+  ]);
+
+  if (errServices || errTeam || errProducts || errConfigs) {
+    console.error(
+      "Database connection error:",
+      errServices || errTeam || errProducts || errConfigs,
+    );
+    hasError = true;
+  }
+
+  dbData = {
+    allConfigs,
+    dbHeroData,
+    dbServices,
+    dbTeam,
+    dbProducts,
+    dbGallery,
+    dbTestimonials,
+    dbContact,
+    dbSchedule,
+    dbSocials,
+    dbNavLinks,
+  };
+} catch (error) {
+  console.error("Critical error fetching database data:", error);
+  hasError = true;
+}
+
+const getConfig = (
+  id: string,
+  defaultTitle: string,
+  defaultSubtitle: string,
+) => {
+  const config = dbData.allConfigs?.find((c: any) => c.id === id);
+  return {
+    title: config?.title || defaultTitle,
+    subtitle: config?.subtitle || defaultSubtitle,
+  };
+};
+
+const heroData = dbData.dbHeroData || null;
+
+const servicesData = {
+  ...getConfig("services", "Nuestros Servicios", "Experiencia Premium"),
+  services: dbData.dbServices || [],
+};
+
+const teamMembers = dbData.dbTeam?.length
+  ? dbData.dbTeam.reduce((acc: any[], current: any) => {
+      if (!acc.find((item) => item.name === current.name)) acc.push(current);
+      return acc;
+    }, [])
+  : [];
+
+const contactData = {
+  ...(dbData.dbContact || { email: "", phone: "", address: "", map_url: "" }),
+  schedule: dbData.dbSchedule || [],
+  socials: dbData.dbSocials || [],
+};
+
+const products = dbData.dbProducts || [];
+const gallery = dbData.dbGallery || [];
+const testimonials = dbData.dbTestimonials || [];
+const navLinks = dbData.dbNavLinks || [];
+---
+
+{
+  hasError ? (
+    <Layout title="Barber Ray | Error de Conexión">
+      <div class="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-center px-4">
+        <div class="space-y-6 max-w-md">
+          <h1 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
+            Conexión Interrumpida
+          </h1>
+          <p class="text-stone-400 text-sm md:text-base leading-relaxed">
+            Ocurrió un problema al conectar con nuestra base de datos para
+            cargar el sitio. Por favor, intenta recargar la página.
+          </p>
+          <button
+            onclick="window.location.reload()"
+            class="inline-block bg-amber-500 hover:bg-amber-600 text-stone-950 px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors"
+          >
+            Recargar Página
+          </button>
+        </div>
+      </div>
+    </Layout>
+  ) : (
+    <Layout
+      title="Barber Ray | Estilo y Tradición"
+      services={servicesData.services}
+      team={teamMembers}
+      lcpImage={heroData?.image_url || "/barber_hero_premium.webp"}
+      navLinks={navLinks}
+    >
+      {heroData && <Hero initialData={heroData} />}
+      {servicesData.services.length > 0 && (
+        <Services initialData={servicesData} />
+      )}
+      {products.length > 0 && (
+        <Products
+          products={products}
+          config={getConfig(
+            "products",
+            "Nuestros Productos",
+            "Calidad Garantizada",
+          )}
+          client:visible
+        />
+      )}
+      {gallery.length > 0 && (
+        <Gallery
+          images={gallery}
+          config={getConfig("gallery", "Galería", "Nuestro Trabajo")}
+          client:visible
+        />
+      )}
+      {teamMembers.length > 0 && (
+        <Team
+          members={teamMembers}
+          config={getConfig("team", "El Equipo", "Maestros Barberos")}
+          client:visible
+        />
+      )}
+      {testimonials.length > 0 && (
+        <Testimonials
+          initialData={{
+            ...getConfig(
+              "testimonials",
+              "Testimonios",
+              "Lo Que Dicen Nuestros Clientes",
+            ),
+            testimonials,
+          }}
+          client:visible
+        />
+      )}
+      <Contact
+        initialData={contactData}
+        config={getConfig("contact", "Visítanos", "Ubicación y Horarios")}
+        client:visible
+      />
+      <Footer navLinks={navLinks} contactData={contactData} />
+      {isLoggedIn && (
+        <WhatsAppButton
+          phone="+5214626009179"
+          message="¡Hola! Me gustaría agendar una cita"
+        />
+      )}
+    </Layout>
+  )
+}

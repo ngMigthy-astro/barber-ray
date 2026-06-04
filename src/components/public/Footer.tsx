@@ -10,14 +10,14 @@ import {
 import { LuFacebook, LuInstagram, LuTwitter } from "react-icons/lu";
 
 interface FooterProps {
-  navLinks: { label: string; href: string }[];
-  contactData: {
-    brand_name?: string;
-    brand_description?: string;
-    address: string;
-    phone: string;
-    schedule: { days: string; hours: string }[];
-    socials: { id?: string; platform: string; href: string; label: string }[];
+  readonly navLinks: { readonly label: string; readonly href: string }[];
+  readonly contactData: {
+    readonly brand_name?: string;
+    readonly brand_description?: string;
+    readonly address: string;
+    readonly phone: string;
+    readonly schedule: { days: string; hours: string }[];
+    readonly socials: { id?: string; platform: string; href: string; label: string }[];
   };
 }
 
@@ -35,19 +35,19 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
     "Elevando el estándar del cuidado masculino desde hace más de una década.";
 
   return (
-    <footer className="bg-stone-950 border-t border-stone-900 pt-24 pb-12 px-6">
+    <footer className="bg-surface border-t border-glass-border pt-24 pb-12 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-16 mb-16 md:mb-20">
           <div className="flex flex-col gap-6 md:col-span-1">
             <a
               href="/"
-              className="flex items-center gap-2 font-black text-2xl text-white uppercase tracking-tighter"
+              className="flex items-center gap-2 font-black text-2xl text-text uppercase tracking-tighter"
             >
               <Scissors className="w-8 h-8 text-amber-500" />
               {brandName}
               <span className="text-amber-500">.</span>
             </a>
-            <p className="text-stone-500 text-sm leading-relaxed font-medium">
+            <p className="text-text-muted text-sm leading-relaxed font-medium">
               {brandDesc}
             </p>
             <div className="flex gap-4 mt-2">
@@ -61,7 +61,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                     title={social.label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-stone-900 text-stone-500 hover:text-amber-500 hover:bg-stone-800 transition-all"
+                    className="p-2.5 rounded-xl bg-bg border border-glass-border text-text-muted hover:text-amber-500 hover:bg-surface-hover transition-all"
                   >
                     <Icon className="w-5 h-5" />
                   </a>
@@ -71,7 +71,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
           </div>
 
           <div className="flex flex-col gap-8">
-            <h4 className="font-black text-xs uppercase tracking-mega text-white italic">
+            <h4 className="font-black text-sm uppercase tracking-mega text-text italic">
               Navegación
             </h4>
             <nav className="flex flex-col gap-4">
@@ -79,7 +79,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-stone-500 hover:text-amber-500 transition-colors text-sm font-bold uppercase tracking-ultra"
+                  className="text-text-muted hover:text-amber-500 transition-colors text-sm font-bold uppercase tracking-ultra"
                 >
                   {link.label}
                 </a>
@@ -88,7 +88,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
           </div>
 
           <div className="flex flex-col gap-8 md:col-span-2">
-            <h4 className="font-black text-xs uppercase tracking-mega text-white italic">
+            <h4 className="font-black text-sm uppercase tracking-mega text-text italic">
               Encuéntranos
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -97,7 +97,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                   <div className="p-2 bg-amber-500/10 rounded-lg shrink-0">
                     <MapPin className="w-4 h-4 text-amber-500" />
                   </div>
-                  <span className="text-stone-500 font-medium leading-relaxed">
+                  <span className="text-text-muted font-medium leading-relaxed">
                     {contactData.address}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                   <div className="p-2 bg-amber-500/10 rounded-lg shrink-0">
                     <Phone className="w-4 h-4 text-amber-500" />
                   </div>
-                  <span className="text-stone-500 font-bold">
+                  <span className="text-text-muted font-bold">
                     {contactData.phone}
                   </span>
                 </div>
@@ -118,10 +118,10 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
                 <div className="flex flex-col gap-3">
                   {(contactData?.schedule || []).map((entry) => (
                     <div key={entry.days} className="flex flex-col">
-                      <span className="text-2xs font-black text-stone-700 uppercase tracking-ultra">
+                      <span className="text-xs font-black text-text-muted/70 uppercase tracking-ultra">
                         {entry.days}
                       </span>
-                      <span className="text-stone-400 font-bold tracking-wider">
+                      <span className="text-text-muted font-bold tracking-wider">
                         {entry.hours}
                       </span>
                     </div>
@@ -132,7 +132,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
           </div>
         </div>
 
-        <div className="border-t border-stone-900 pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-2xs font-black text-stone-700 uppercase tracking-mega">
+        <div className="border-t border-glass-border pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-black text-text-muted/70 uppercase tracking-mega">
           <p>
             &copy; {new Date().getFullYear()} {brandName}. Todos los derechos
             reservados.

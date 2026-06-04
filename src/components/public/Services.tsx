@@ -60,10 +60,10 @@ export default function Services({ initialData }: Props) {
 
                 <div className="flex items-center justify-between pt-6 border-t border-glass-border">
                   <span className="text-primary font-black text-2xl tracking-tighter">
-                    {service.price}
+                    ${String(service.price).replace(/[^0-9]/g, "")}
                   </span>
                   <span className="text-2xs text-text-muted font-bold uppercase tracking-ultra">
-                    {service.duration}
+                    {String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`}
                   </span>
                 </div>
               </div>

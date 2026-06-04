@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import useFocusTrap from "../../lib/hooks/useFocusTrap";
 import {
   Calendar,
   Clock,
@@ -45,6 +46,64 @@ interface DBBarber extends TeamMember {
   readonly image_url?: string;
 }
 
+interface ActiveAppointment {
+  date: Date;
+  duration: number;
+}
+
+function getBusinessHours(dateStr: string) {
+  if (!dateStr) return { startHour: 9, endHour: 20 };
+  const date = new Date(`${dateStr}T12:00:00`);
+  const day = date.getDay();
+  if (day === 0) return { startHour: 10, endHour: 15 }; // Domingo
+  if (day === 6) return { startHour: 9, endHour: 18 };  // Sábado
+  return { startHour: 9, endHour: 20 }; // Lunes a Viernes
+}
+
+function generateTimeSlots(dateStr: string, serviceDuration: number) {
+  const { startHour, endHour } = getBusinessHours(dateStr);
+  const slots: string[] = [];
+  
+  let currentMins = startHour * 60;
+  // Duración del servicio + 5 minutos de colchón
+  const totalDuration = serviceDuration + 5;
+  const endMins = endHour * 60 - totalDuration;
+  
+  while (currentMins <= endMins) {
+    const h = Math.floor(currentMins / 60);
+    const m = currentMins % 60;
+    slots.push(
+      h.toString().padStart(2, "0") + ":" + m.toString().padStart(2, "0")
+    );
+    currentMins += 15; // Intervalos de 15 minutos
+  }
+  return slots;
+}
+
+function isSlotOccupied(
+  slotTime: string,
+  selectedDate: string,
+  serviceDuration: number,
+  existingAppointments: ActiveAppointment[]
+) {
+  const proposedStart = new Date(`${selectedDate}T${slotTime}:00Z`).getTime();
+  const proposedEnd = proposedStart + (serviceDuration + 5) * 60 * 1000;
+  
+  // Si el slot ya pasó en tiempo real, lo marcamos como ocupado/deshabilitado
+  const now = new Date().getTime();
+  if (proposedStart < now) {
+    return true;
+  }
+  
+  return existingAppointments.some((app) => {
+    const existingStart = app.date.getTime();
+    const existingEnd = existingStart + (app.duration + 5) * 60 * 1000;
+    
+    // Condición de solape de intervalos
+    return proposedStart < existingEnd && existingStart < proposedEnd;
+  });
+}
+
 interface Props {
   readonly isOpen: boolean;
   readonly onClose: () => void;
@@ -65,26 +124,30 @@ export default function BookingModal({
   const [fetchingSlots, setFetchingSlots] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Activamos el focus trap cuando el modal de reserva está abierto
+  const bookingModalRef = useFocusTrap(isOpen);
+
+  // Cerrar modal al presionar la tecla Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        resetAndClose();
+      }
+    };
+    globalThis.addEventListener("keydown", handleEscape);
+    return () => globalThis.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
+
   const [selectedService, setSelectedService] = useState<DBService | null>(
     null,
   );
   const [selectedBarber, setSelectedBarber] = useState<DBBarber | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
+  const [existingAppointments, setExistingAppointments] = useState<ActiveAppointment[]>([]);
 
-  // Barber shop business hours
-  const timeSlots = [
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-  ];
+
 
   // Effect to fetch occupied appointments
   useEffect(() => {
@@ -99,23 +162,28 @@ export default function BookingModal({
     try {
       const { data, error } = await supabase
         .from("appointments")
-        .select("appointment_date")
+        .select(`
+          appointment_date,
+          status,
+          service:service_id(duration)
+        `)
         .eq("barber_id", selectedBarber.id)
+        .neq("status", "cancelled")
         .filter("appointment_date", "gte", `${selectedDate}T00:00:00Z`)
         .filter("appointment_date", "lte", `${selectedDate}T23:59:59Z`);
 
       if (error) throw error;
 
       if (data) {
-        const occupied = data.map((app) => {
-          const date = new Date(app.appointment_date);
-          return (
-            date.getUTCHours().toString().padStart(2, "0") +
-            ":" +
-            date.getUTCMinutes().toString().padStart(2, "0")
-          );
+        const apps = data.map((app: any) => {
+          const rawDur = app.service?.duration || "30";
+          const duration = Number.parseInt(String(rawDur).replace(/[^0-9]/g, ""), 10) || 30;
+          return {
+            date: new Date(app.appointment_date),
+            duration: duration,
+          };
         });
-        setOccupiedSlots(occupied);
+        setExistingAppointments(apps);
       }
     } catch (err) {
       console.error("Error checking availability:", err);
@@ -149,7 +217,7 @@ export default function BookingModal({
       const message =
         error instanceof Error ? error.message : "Error desconocido";
       alert(
-        `Error al reservar: ${message}. Verifica que tu sesión esté activa.`,
+        `Error al reservar: ${message}`,
       );
     } finally {
       setLoading(false);
@@ -163,7 +231,7 @@ export default function BookingModal({
     setSelectedBarber(null);
     setSelectedDate("");
     setSelectedTime("");
-    setOccupiedSlots([]);
+    setExistingAppointments([]);
     onClose();
   };
 
@@ -190,15 +258,23 @@ export default function BookingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+    <div 
+      ref={bookingModalRef}
+      className="fixed inset-0 z-100 flex items-center justify-center p-4"
+    >
       <button
         type="button"
         className="absolute inset-0 bg-bg/80 backdrop-blur-md w-full h-full border-none cursor-default"
         onClick={resetAndClose}
-        aria-label="Close modal"
+        aria-label="Cerrar modal"
       />
 
-      <div className="relative bg-surface border border-glass-border w-full max-w-2xl rounded-5xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-modal-title"
+        className="relative bg-surface border border-glass-border w-full max-w-2xl max-h-[85vh] rounded-5xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-300"
+      >
         {success ? (
           <div className="p-12 text-center space-y-6 animate-in zoom-in duration-500">
             <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-500">
@@ -227,7 +303,7 @@ export default function BookingModal({
           <>
             <div className="p-5 sm:p-8 border-b border-glass-border flex flex-col sm:flex-row items-start sm:items-center justify-between bg-surface/50 gap-4 sm:gap-0">
               <div className="w-full flex justify-between items-center sm:block">
-                <h2 className="text-xl sm:text-2xl font-black text-text uppercase tracking-tighter">
+                <h2 id="booking-modal-title" className="text-xl sm:text-2xl font-black text-text uppercase tracking-tighter">
                   Reserva tu Cita
                 </h2>
                 <div className="flex gap-1 mt-1">
@@ -241,13 +317,14 @@ export default function BookingModal({
               </div>
               <button
                 onClick={resetAndClose}
+                aria-label="Cerrar modal"
                 className="hidden sm:block p-3 rounded-full hover:bg-primary/10 text-text-muted hover:text-primary transition-all"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-5 sm:p-8 max-h-modal-body overflow-y-auto custom-scrollbar">
+            <div className="p-5 sm:p-8 flex-1 overflow-y-auto custom-scrollbar">
               {step === 1 && (
                 <div className="space-y-4">
                   <p className="text-2xs font-black text-primary uppercase tracking-ultra mb-4 text-center">
@@ -264,6 +341,7 @@ export default function BookingModal({
                             setSelectedService(service);
                             setStep(2);
                           }}
+                          aria-pressed={selectedService?.id === service.id}
                           className={`flex items-center gap-4 p-4 rounded-3xl border transition-all text-left group ${selectedService?.id === service.id ? "border-primary bg-primary/5 shadow-blood-sm" : "border-glass-border bg-surface hover:border-primary/50"}`}
                         >
                           <div
@@ -276,7 +354,7 @@ export default function BookingModal({
                               {service.name}
                             </p>
                             <p className="text-2xs text-text-muted font-black uppercase">
-                              {service.price} • {service.duration}
+                              ${String(service.price).replace(/[^0-9]/g, "")} • {String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`}
                             </p>
                           </div>
                         </button>
@@ -299,6 +377,7 @@ export default function BookingModal({
                           setSelectedBarber(barber);
                           setStep(3);
                         }}
+                        aria-pressed={selectedBarber?.id === barber.id}
                         className={`flex flex-col items-center gap-3 p-6 rounded-3xl border transition-all ${selectedBarber?.id === barber.id ? "border-primary bg-primary/5 shadow-blood-sm" : "border-glass-border bg-surface hover:border-primary/50"}`}
                       >
                         <div className="relative">
@@ -381,6 +460,7 @@ export default function BookingModal({
                                   setSelectedDate(day.fullDate);
                                   setSelectedTime("");
                                 }}
+                                aria-pressed={isSelected}
                                 className={`shrink-0 snap-start min-w-17.5 sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border transition-all relative overflow-hidden group ${
                                   isSelected
                                     ? "border-primary bg-primary/10 shadow-blood-sm scale-105"
@@ -414,34 +494,54 @@ export default function BookingModal({
                       </label>
                       {selectedDate ? (
                         <div className="grid grid-cols-3 gap-2">
-                          {timeSlots.map((time) => {
-                            const isOccupied = occupiedSlots.includes(time);
-                            const isSelected = selectedTime === time;
-
-                            let buttonStyles = "";
-
-                            if (isOccupied) {
-                              buttonStyles =
-                                "bg-surface-hover border-glass-border text-text-muted/80 cursor-not-allowed";
-                            } else if (isSelected) {
-                              buttonStyles =
-                                "bg-primary border-primary text-white shadow-blood-md";
-                            } else {
-                              buttonStyles =
-                                "border-glass-border hover:border-primary/50 text-text-muted";
+                          {(() => {
+                            const serviceDuration = selectedService
+                              ? Number.parseInt(String(selectedService.duration).replace(/[^0-9]/g, ""), 10) || 30
+                              : 30;
+                            const slots = generateTimeSlots(selectedDate, serviceDuration);
+                            if (slots.length === 0) {
+                              return (
+                                <div className="col-span-3 text-center py-4 text-xs font-bold text-text-muted">
+                                  No hay horarios disponibles para este día
+                                </div>
+                              );
                             }
+                            return slots.map((time) => {
+                              const isOccupied = isSlotOccupied(
+                                time,
+                                selectedDate,
+                                serviceDuration,
+                                existingAppointments
+                              );
+                              const isSelected = selectedTime === time;
 
-                            return (
-                              <button
-                                key={time}
-                                disabled={isOccupied}
-                                onClick={() => setSelectedTime(time)}
-                                className={`py-2 rounded-xl border text-2xs font-black transition-all ${buttonStyles}`}
-                              >
-                                {isOccupied ? "Ocupado" : time}
-                              </button>
-                            );
-                          })}
+                              let buttonStyles = "";
+
+                              if (isOccupied) {
+                                buttonStyles =
+                                  "bg-surface-hover border-glass-border text-text-muted/40 cursor-not-allowed line-through";
+                              } else if (isSelected) {
+                                buttonStyles =
+                                  "bg-primary border-primary text-white shadow-blood-md";
+                              } else {
+                                buttonStyles =
+                                  "border-glass-border hover:border-primary/50 text-text-muted";
+                              }
+
+                              return (
+                                <button
+                                  key={time}
+                                  disabled={isOccupied}
+                                  type="button"
+                                  onClick={() => setSelectedTime(time)}
+                                  aria-pressed={isSelected}
+                                  className={`py-2 rounded-xl border text-2xs font-black transition-all ${buttonStyles}`}
+                                >
+                                  {isOccupied ? "Ocupado" : time}
+                                </button>
+                              );
+                            });
+                          })()}
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center py-8 bg-surface/50 rounded-2xl border border-dashed border-primary/10">

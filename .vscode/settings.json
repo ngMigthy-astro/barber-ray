@@ -1,3 +1,7 @@
 {
-  "cSpell.words": ["ctas", "embla", "lucide", "supabase", "Supabase", "vercel"]
+  "cSpell.words": ["ctas", "embla", "lucide", "supabase", "Supabase", "vercel"],
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "supabase/functions"
+  ]
 }

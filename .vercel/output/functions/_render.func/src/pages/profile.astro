@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { createSupabaseClient } from "../lib/supabase";
+import ProfileView from "../components/public/ProfileView";
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect("/?login=true");
+}
+
+const supabase = createSupabaseClient(Astro.request, Astro.cookies);
+
+const [
+  { data: appointments, error: errApp },
+  { data: navLinks, error: errNav }
+] = await Promise.all([
+  supabase
+    .from("appointments")
+    .select(`
+      *,
+      service:service_id(name, price, duration),
+      barber:barber_id(name)
+    `)
+    .eq("user_id", user.id)
+    .order("appointment_date", { ascending: false }),
+  supabase
+    .from("nav_links")
+    .select("*")
+    .order("sort_order", { ascending: true })
+]);
+
+if (errApp || errNav) {
+  console.error("Error fetching profile data:", errApp || errNav);
+}
+---
+
+<Layout 
+  title={`Perfil | ${user.user_metadata?.full_name || "Usuario"}`}
+  navLinks={navLinks || []}
+>
+  <main class="pt-32 pb-24 px-4 min-h-screen">
+    <div class="max-w-5xl mx-auto">
+      <ProfileView
+        user={user}
+        initialAppointments={appointments || []}
+        client:load
+      />
+    </div>
+  </main>
+</Layout>
