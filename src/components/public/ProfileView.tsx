@@ -79,7 +79,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
         ),
       );
     } catch (err) {
-      console.error("Error cancelling appointment:", err);
       alert("No pudimos cancelar la cita. Inténtalo de nuevo.");
     } finally {
       setIsCancelling(null);
