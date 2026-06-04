@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import useFocusTrap from "../../lib/hooks/useFocusTrap";
 import {
   Calendar,
@@ -90,7 +90,7 @@ function isSlotOccupied(
   const proposedEnd = proposedStart + (serviceDuration + 5) * 60 * 1000;
   
   // Si el slot ya pasó en tiempo real, lo marcamos como ocupado/deshabilitado
-  const now = new Date().getTime();
+  const now = Date.now();
   if (proposedStart < now) {
     return true;
   }
@@ -177,7 +177,7 @@ export default function BookingModal({
       if (data) {
         const apps = data.map((app: any) => {
           const rawDur = app.service?.duration || "30";
-          const duration = Number.parseInt(String(rawDur).replace(/[^0-9]/g, ""), 10) || 30;
+          const duration = Number.parseInt(String(rawDur).replaceAll(/\D/g, ""), 10) || 30;
           return {
             date: new Date(app.appointment_date),
             duration: duration,
@@ -349,7 +349,7 @@ export default function BookingModal({
                               {service.name}
                             </p>
                             <p className="text-2xs text-text-muted font-black uppercase">
-                              ${String(service.price).replace(/[^0-9]/g, "")} • {String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`}
+                              ${String(service.price).replaceAll(/\D/g, "")} • {String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`}
                             </p>
                           </div>
                         </button>
@@ -491,7 +491,7 @@ export default function BookingModal({
                         <div className="grid grid-cols-3 gap-2">
                           {(() => {
                             const serviceDuration = selectedService
-                              ? Number.parseInt(String(selectedService.duration).replace(/[^0-9]/g, ""), 10) || 30
+                              ? Number.parseInt(String(selectedService.duration).replaceAll(/\D/g, ""), 10) || 30
                               : 30;
                             const slots = generateTimeSlots(selectedDate, serviceDuration);
                             if (slots.length === 0) {
