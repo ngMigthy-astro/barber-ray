@@ -78,8 +78,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
           app.id === id ? { ...app, status: "cancelled" } : app,
         ),
       );
-    } catch (err) {
-      alert("No pudimos cancelar la cita. Inténtalo de nuevo.");
     } finally {
       setIsCancelling(null);
     }
@@ -103,9 +101,7 @@ export default function ProfileView({ user, initialAppointments }: Props) {
           }, {});
           setReviews(reviewsMap);
         }
-      } catch (err) {
-        console.error("Error fetching reviews:", err);
-      } finally {
+      }finally {
         setIsLoadingReviews(false);
       }
     };
@@ -135,9 +131,6 @@ export default function ProfileView({ user, initialAppointments }: Props) {
         [reviewingAppointment.id]: { rating, comment },
       });
       setReviewingAppointment(null);
-    } catch (err) {
-      console.error("Error submitting review:", err);
-      alert("No pudimos guardar tu calificación. Inténtalo de nuevo.");
     } finally {
       setIsSubmittingReview(false);
     }

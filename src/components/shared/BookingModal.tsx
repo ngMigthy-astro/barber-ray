@@ -185,8 +185,6 @@ export default function BookingModal({
         });
         setExistingAppointments(apps);
       }
-    } catch (err) {
-      console.error("Error checking availability:", err);
     } finally {
       setFetchingSlots(false);
     }
@@ -208,12 +206,10 @@ export default function BookingModal({
       ]);
 
       if (error) {
-        console.error("Supabase error details:", error);
         throw error;
       }
       setSuccess(true);
     } catch (error) {
-      console.error("Full booking error:", error);
       const message =
         error instanceof Error ? error.message : "Error desconocido";
       alert(
@@ -269,8 +265,7 @@ export default function BookingModal({
         aria-label="Cerrar modal"
       />
 
-      <div 
-        role="dialog"
+      <dialog 
         aria-modal="true"
         aria-labelledby="booking-modal-title"
         className="relative bg-surface border border-glass-border w-full max-w-2xl max-h-[85vh] rounded-5xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-300"
@@ -589,7 +584,7 @@ export default function BookingModal({
             </div>
           </>
         )}
-      </div>
+      </dialog>
     </div>
   );
 }

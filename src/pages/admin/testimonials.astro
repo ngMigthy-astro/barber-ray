@@ -59,7 +59,6 @@ const { data: reviews, error: fetchError } = await supabase
   .order("created_at", { ascending: false });
 
 if (fetchError) {
-  console.error("Error fetching reviews:", fetchError);
   errorMessage = "Error al cargar reseñas: " + fetchError.message;
 }
 

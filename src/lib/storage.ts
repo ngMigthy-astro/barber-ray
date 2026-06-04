@@ -19,7 +19,6 @@ export async function uploadImage(
     });
 
   if (error) {
-    console.error("Error subiendo imagen:", error);
     return null;
   }
 

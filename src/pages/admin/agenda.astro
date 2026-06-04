@@ -28,9 +28,6 @@ const { data: rawAppointments, error } = await supabase
   .order("appointment_date", { ascending: true })
   .gte("appointment_date", new Date().toISOString());
 
-if (error) {
-  console.error("Error al traer agenda:", error);
-}
 
 // 4. Transformamos (Mapeo) el objeto crudo de DB a nuestra Interfaz limpia (SRP)
 const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any) => ({
@@ -87,7 +84,8 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
                 const timeStr = dateObj.toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit' });
                 
                 let badgeClass = "bg-stone-800 text-stone-400 border border-stone-700";
-                let statusText = app.status;
+                // statusText es la etiqueta visual (español), distinta al valor de dominio (inglés)
+                let statusText: string = app.status;
                 
                 if (app.status === 'pending') {
                   badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";

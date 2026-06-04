@@ -75,10 +75,6 @@ try {
   ]);
 
   if (errServices || errTeam || errProducts || errConfigs) {
-    console.error(
-      "Database connection error:",
-      errServices || errTeam || errProducts || errConfigs,
-    );
     hasError = true;
   }
 
@@ -96,7 +92,6 @@ try {
     dbNavLinks,
   };
 } catch (error) {
-  console.error("Critical error fetching database data:", error);
   hasError = true;
 }
 
