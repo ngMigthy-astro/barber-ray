@@ -1,7 +1,7 @@
 import { c as createComponent } from './astro-component_DIAFUT9k.mjs';
 import { V as renderTemplate, C as maybeRenderHead, a6 as addAttribute } from './sequence_krGa48tk.mjs';
-import { r as renderComponent } from './entrypoint_CrODMIMm.mjs';
-import { $ as $$AdminLayout } from './AdminLayout_B1K9u8oz.mjs';
+import { r as renderComponent } from './entrypoint_DGDZclkY.mjs';
+import { $ as $$AdminLayout } from './AdminLayout_BYekw57A.mjs';
 import { c as createSupabaseClient } from './supabase_CNNSamdl.mjs';
 
 const $$Agenda = createComponent(async ($$result, $$props, $$slots) => {

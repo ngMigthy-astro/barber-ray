@@ -1,7 +1,7 @@
 import { c as createComponent } from './astro-component_DIAFUT9k.mjs';
 import { V as renderTemplate, C as maybeRenderHead, a6 as addAttribute } from './sequence_krGa48tk.mjs';
-import { r as renderComponent } from './entrypoint_CrODMIMm.mjs';
-import { $ as $$Layout } from './Layout_DxOM2QhA.mjs';
+import { r as renderComponent } from './entrypoint_DGDZclkY.mjs';
+import { $ as $$Layout } from './Layout_RTe7k9Oi.mjs';
 
 const $$Terms = createComponent(($$result, $$props, $$slots) => {
   const lastUpdated = "08 de mayo de 2026";

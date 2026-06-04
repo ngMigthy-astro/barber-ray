@@ -1,6 +1,6 @@
 import { c as createComponent } from './astro-component_DIAFUT9k.mjs';
 import { V as renderTemplate, G as renderSlot, bb as renderHead, a6 as addAttribute, C as maybeRenderHead } from './sequence_krGa48tk.mjs';
-import { r as renderComponent } from './entrypoint_CrODMIMm.mjs';
+import { r as renderComponent } from './entrypoint_DGDZclkY.mjs';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { useState, useEffect, useRef } from 'react';
 import { Sun, Moon, Check, X, Info, Zap, Brush, Wind, Sparkles, Scissors, Clock, Loader2, Calendar, ChevronLeft, AlertCircle, User, ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';

@@ -1,7 +1,7 @@
 import { c as createComponent } from './astro-component_DIAFUT9k.mjs';
 import { V as renderTemplate, C as maybeRenderHead } from './sequence_krGa48tk.mjs';
-import { r as renderComponent } from './entrypoint_CrODMIMm.mjs';
-import { $ as $$Layout } from './Layout_DxOM2QhA.mjs';
+import { r as renderComponent } from './entrypoint_DGDZclkY.mjs';
+import { $ as $$Layout } from './Layout_RTe7k9Oi.mjs';
 import { c as createSupabaseClient } from './supabase_CNNSamdl.mjs';
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useState, useEffect } from 'react';

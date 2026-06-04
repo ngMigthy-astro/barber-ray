@@ -1,6 +1,6 @@
 import { c as createComponent } from './astro-component_DIAFUT9k.mjs';
 import { V as renderTemplate, G as renderSlot, a6 as addAttribute, bb as renderHead } from './sequence_krGa48tk.mjs';
-import { r as renderComponent } from './entrypoint_CrODMIMm.mjs';
+import { r as renderComponent } from './entrypoint_DGDZclkY.mjs';
 /* empty css                 */
 import { LogOut, LayoutDashboard, Calendar, Home, Scissors, Package, Image, Users, MessageSquare, Phone, Link } from 'lucide-react';
 
