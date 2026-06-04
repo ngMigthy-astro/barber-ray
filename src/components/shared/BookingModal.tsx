@@ -20,7 +20,6 @@ import type { AppUser } from "../../interfaces/auth/user.interface";
 import type { Service } from "../../interfaces/public/service.interface";
 import type { TeamMember } from "../../interfaces/public/team.interface";
 
-// Browser client that inherits the session from Astro/SSR cookies
 const supabase = createBrowserClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
   import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
@@ -31,7 +30,6 @@ interface DBService extends Service {
   readonly icon_name: string;
 }
 
-// Mapa de iconos para convertir string a componente
 const IconMap: Record<string, any> = {
   Scissors,
   Sparkles,
@@ -55,9 +53,9 @@ function getBusinessHours(dateStr: string) {
   if (!dateStr) return { startHour: 9, endHour: 20 };
   const date = new Date(`${dateStr}T12:00:00`);
   const day = date.getDay();
-  if (day === 0) return { startHour: 10, endHour: 15 }; // Domingo
-  if (day === 6) return { startHour: 9, endHour: 18 };  // Sábado
-  return { startHour: 9, endHour: 20 }; // Lunes a Viernes
+  if (day === 0) return { startHour: 10, endHour: 15 }; 
+  if (day === 6) return { startHour: 9, endHour: 18 }; 
+  return { startHour: 9, endHour: 20 };
 }
 
 function generateTimeSlots(dateStr: string, serviceDuration: number) {
@@ -65,7 +63,6 @@ function generateTimeSlots(dateStr: string, serviceDuration: number) {
   const slots: string[] = [];
   
   let currentMins = startHour * 60;
-  // Duración del servicio + 5 minutos de colchón
   const totalDuration = serviceDuration + 5;
   const endMins = endHour * 60 - totalDuration;
   
@@ -75,7 +72,7 @@ function generateTimeSlots(dateStr: string, serviceDuration: number) {
     slots.push(
       h.toString().padStart(2, "0") + ":" + m.toString().padStart(2, "0")
     );
-    currentMins += 15; // Intervalos de 15 minutos
+    currentMins += 15;
   }
   return slots;
 }
@@ -89,7 +86,6 @@ function isSlotOccupied(
   const proposedStart = new Date(`${selectedDate}T${slotTime}:00Z`).getTime();
   const proposedEnd = proposedStart + (serviceDuration + 5) * 60 * 1000;
   
-  // Si el slot ya pasó en tiempo real, lo marcamos como ocupado/deshabilitado
   const now = Date.now();
   if (proposedStart < now) {
     return true;
@@ -99,7 +95,6 @@ function isSlotOccupied(
     const existingStart = app.date.getTime();
     const existingEnd = existingStart + (app.duration + 5) * 60 * 1000;
     
-    // Condición de solape de intervalos
     return proposedStart < existingEnd && existingStart < proposedEnd;
   });
 }
@@ -124,10 +119,8 @@ export default function BookingModal({
   const [fetchingSlots, setFetchingSlots] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Activamos el focus trap cuando el modal de reserva está abierto
   const bookingModalRef = useFocusTrap(isOpen);
 
-  // Cerrar modal al presionar la tecla Escape
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (e: KeyboardEvent) => {
@@ -149,7 +142,6 @@ export default function BookingModal({
 
 
 
-  // Effect to fetch occupied appointments
   useEffect(() => {
     if (selectedBarber && selectedDate && isOpen) {
       checkAvailability();
@@ -231,7 +223,6 @@ export default function BookingModal({
     onClose();
   };
 
-  // Human-friendly formatting helpers
   const getFriendlyDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(`${dateStr}T12:00:00`);

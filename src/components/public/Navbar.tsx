@@ -29,10 +29,8 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [navbarImageError, setNavbarImageError] = useState(false);
 
-  // Activamos el focus trap cuando el modal de login está abierto
   const loginModalRef = useFocusTrap(isLoginModalOpen);
 
-  // Cerrar modal de login con la tecla Escape
   useEffect(() => {
     if (!isLoginModalOpen) return;
     const handleEscape = (e: KeyboardEvent) => {
@@ -130,8 +128,8 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 aria-label="Opciones de usuario"
                 className={`absolute right-0 mt-2 w-48 bg-surface border border-surface shadow-xl rounded-2xl py-2 z-60 transition-all transform origin-top-right ${userMenuOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
               >
-                <div className="px-4 py-2 border-b border-bg/50 mb-1" role="presentation">
-                  <p className="text-2xs text-text/40 font-medium uppercase tracking-ultra">
+                <div className="px-4 py-2 border-b border-bg/50 mb-1">
+                  <p className="text-2xs text-text-muted font-medium uppercase tracking-ultra">
                     Cuenta
                   </p>
                 </div>
@@ -156,13 +154,12 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                   </a>
                 )}
 
-                <div className="my-1 border-t border-bg/50" role="presentation"></div>
+                <hr className="my-1 border-t border-bg/50" aria-hidden="true" />
 
                 <form
                   action="/api/auth/signout"
                   method="post"
                   className="w-full"
-                  role="none"
                 >
                   <button
                     type="submit"
@@ -287,7 +284,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
             title="Cerrar modal"
           />
 
-          <div 
+          <dialog 
             role="dialog"
             aria-modal="true"
             aria-labelledby="login-modal-title"
@@ -350,7 +347,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 Estilo • Tradición • Excelencia
               </p>
             </div>
-          </div>
+          </dialog>
         </div>
       )}
       <BookingModal

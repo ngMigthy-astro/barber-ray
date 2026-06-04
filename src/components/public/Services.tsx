@@ -1,7 +1,6 @@
 import SectionHeader from "../shared/ui/SectionHeader";
 import { Scissors, Brush, Sparkles, Wind } from "lucide-react";
 
-// Mapeo de iconos para servicios dinámicos
 const ICON_MAP = {
   Scissors: Scissors,
   Brush: Brush,
@@ -10,7 +9,7 @@ const ICON_MAP = {
 };
 
 interface Props {
-  initialData: {
+ readonly initialData: {
     title: string;
     subtitle: string;
     services: any[];
@@ -33,7 +32,6 @@ export default function Services({ initialData }: Props) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {initialData.services.map((service) => {
-            // Determinar qué icono usar
             const IconComponent =
               typeof service.icon === "function"
                 ? service.icon
@@ -60,7 +58,7 @@ export default function Services({ initialData }: Props) {
 
                 <div className="flex items-center justify-between pt-6 border-t border-glass-border">
                   <span className="text-primary font-black text-2xl tracking-tighter">
-                    ${String(service.price).replace(/[^0-9]/g, "")}
+                    ${String(service.price).replaceAll(/\D/g, "")}
                   </span>
                   <span className="text-2xs text-text-muted font-bold uppercase tracking-ultra">
                     {String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`}

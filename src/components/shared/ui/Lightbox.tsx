@@ -10,10 +10,8 @@ interface LightboxProps {
 }
 
 export default function Lightbox({ isOpen, onClose, imageUrl, alt }: LightboxProps) {
-  // Activamos el focus trap cuando el lightbox está abierto
   const lightboxRef = useFocusTrap(isOpen);
 
-  // Cerrar lightbox al presionar la tecla Escape
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (e: KeyboardEvent) => {

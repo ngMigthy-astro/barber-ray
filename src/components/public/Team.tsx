@@ -14,10 +14,10 @@ interface TeamMember {
 }
 
 interface TeamProps {
-  members: TeamMember[];
-  config: {
-    title: string;
-    subtitle: string;
+  readonly members: TeamMember[];
+  readonly config: {
+    readonly title: string;
+    readonly subtitle: string;
   };
 }
 
