@@ -2,7 +2,7 @@
 // src/pages/admin/agenda.astro
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createSupabaseClient } from "../../lib/supabase";
-import type { AgendaAppointment } from "../../interfaces/admin/agenda.interface";
+import type { AgendaAppointment, AppointmentStatus } from "../../interfaces/admin/agenda.interface";
 
 // 1. Validamos que solo los admins vean esto (Astro Middleware debería atraparlo, pero por si acaso)
 const { user } = Astro.locals;
@@ -11,9 +11,30 @@ if (!user) return Astro.redirect("/admin");
 // 2. Instanciamos Supabase con el entorno del request
 const supabase = createSupabaseClient(Astro.request, Astro.cookies);
 
+// Manejo de acciones POST para cambiar estado de citas (PRG Pattern)
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const appointmentId = formData.get("appointmentId") as string;
+    const newStatus = formData.get("status") as AppointmentStatus;
+
+    if (appointmentId && newStatus) {
+      const { error: updateError } = await supabase
+        .from("appointments")
+        .update({ status: newStatus })
+        .eq("id", appointmentId);
+
+      if (updateError) throw updateError;
+    }
+  } catch (err) {
+    console.error("Error updating appointment:", err);
+  }
+  return Astro.redirect(Astro.url.pathname);
+}
+
 // 3. Traemos las citas. 
-// Aquí ocurre la magia de Clean Architecture: el inner join nos trae los datos relacionales
-// desde la nueva tabla 'profiles' de forma segura y tipada.
+// Traemos citas futuras y citas pasadas no resueltas (pending o confirmed)
+const todayStr = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
 const { data: rawAppointments, error } = await supabase
   .from("appointments")
   .select(`
@@ -21,20 +42,22 @@ const { data: rawAppointments, error } = await supabase
     user_id,
     appointment_date,
     status,
+    client_name,
+    client_phone,
     profiles:user_id(full_name, email),
     service:service_id(name, duration, price),
     barber:barber_id(name)
   `)
-  .order("appointment_date", { ascending: true })
-  .gte("appointment_date", new Date().toISOString());
-
+  .or(`appointment_date.gte.${todayStr},status.in.(pending,confirmed)`)
+  .order("appointment_date", { ascending: true });
 
 // 4. Transformamos (Mapeo) el objeto crudo de DB a nuestra Interfaz limpia (SRP)
 const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any) => ({
   id: app.id,
   user_id: app.user_id,
-  client_name: app.profiles?.full_name || "Cliente Desconocido",
+  client_name: app.client_name || app.profiles?.full_name || "Cliente Desconocido",
   client_email: app.profiles?.email,
+  client_phone: app.client_phone,
   service: app.service,
   barber: app.barber,
   appointment_date: app.appointment_date,
@@ -53,6 +76,15 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
           Administra las reservaciones de tus clientes
         </p>
       </div>
+      <div>
+        <a
+          href="/admin/book"
+          class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs px-5 py-3 rounded-xl transition-all cursor-pointer shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 uppercase tracking-wider"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          Agendar Cita Manual
+        </a>
+      </div>
     </div>
 
     <div class="bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden shadow-2xl relative">
@@ -65,12 +97,13 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
               <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra">Servicio</th>
               <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra">Barbero</th>
               <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra whitespace-nowrap">Estado</th>
+              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra text-right">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-stone-800/50">
             {appointments.length === 0 ? (
               <tr>
-                <td colspan="5" class="px-6 py-16 text-center text-stone-500">
+                <td colspan="6" class="px-6 py-16 text-center text-stone-500">
                   <div class="flex flex-col items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-stone-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                     <p class="font-medium">No hay citas agendadas próximamente.</p>
@@ -82,6 +115,9 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
                 const dateObj = new Date(app.appointment_date);
                 const dateStr = dateObj.toLocaleDateString("es-MX", { weekday: 'short', day: '2-digit', month: 'short' });
                 const timeStr = dateObj.toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit' });
+                
+                const isPast = dateObj < new Date();
+                const needsAction = isPast && (app.status === 'pending' || app.status === 'confirmed');
                 
                 let badgeClass = "bg-stone-800 text-stone-400 border border-stone-700";
                 // statusText es la etiqueta visual (español), distinta al valor de dominio (inglés)
@@ -102,7 +138,7 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
                 }
 
                 return (
-                  <tr class="hover:bg-stone-800/40 transition-colors group">
+                  <tr class={`hover:bg-stone-800/40 transition-colors group ${needsAction ? "bg-red-500/[0.02]" : ""}`}>
                     <td class="px-6 py-5 whitespace-nowrap">
                       <div class="flex flex-col">
                         <span class="font-bold text-white capitalize text-sm">{dateStr}</span>
@@ -112,7 +148,10 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
                     <td class="px-6 py-5">
                       <div class="flex flex-col">
                         <span class="font-bold text-white text-sm">{app.client_name}</span>
-                        <span class="text-xs text-stone-500 mt-0.5">{app.client_email || "Sin email registrado"}</span>
+                        <span class="text-xs text-stone-500 mt-0.5">
+                          {app.client_email || "Sin email registrado"}
+                          {app.client_phone && <span class="text-stone-600 ml-1.5">• {app.client_phone}</span>}
+                        </span>
                       </div>
                     </td>
                     <td class="px-6 py-5">
@@ -135,10 +174,57 @@ const appointments: AgendaAppointment[] = (rawAppointments || []).map((app: any)
                       </div>
                     </td>
                     <td class="px-6 py-5 whitespace-nowrap">
-                      <span class={`px-3 py-1.5 text-2xs font-black uppercase tracking-ultra rounded-lg inline-flex items-center gap-2 ${badgeClass}`}>
-                        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-                        {statusText}
-                      </span>
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span class={`px-3 py-1.5 text-2xs font-black uppercase tracking-ultra rounded-lg inline-flex items-center gap-2 ${badgeClass}`}>
+                          <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                          {statusText}
+                        </span>
+                        {needsAction && (
+                          <span class="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-black uppercase tracking-wider rounded-md animate-pulse">
+                            ⚠️ Resolver cita
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap text-right">
+                      {app.status === 'pending' || app.status === 'confirmed' ? (
+                        <form method="POST" class="inline-flex gap-2 justify-end">
+                          <input type="hidden" name="appointmentId" value={app.id} />
+                          
+                          {app.status === 'pending' && (
+                            <button
+                              type="submit"
+                              name="status"
+                              value="confirmed"
+                              class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg bg-amber-500 hover:bg-amber-600 text-stone-950 transition-colors shadow-md hover:shadow-amber-500/10 cursor-pointer"
+                            >
+                              Confirmar
+                            </button>
+                          )}
+                          
+                          <button
+                            type="submit"
+                            name="status"
+                            value="completed"
+                            class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg bg-emerald-500 hover:bg-emerald-600 text-stone-950 transition-colors shadow-md hover:shadow-emerald-500/10 cursor-pointer"
+                          >
+                            Completar
+                          </button>
+                          
+                          <button
+                            type="submit"
+                            name="status"
+                            value="cancelled"
+                            class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg bg-stone-900 hover:bg-red-500/20 text-stone-400 hover:text-red-400 border border-stone-800 hover:border-red-500/30 transition-all cursor-pointer"
+                          >
+                            {isPast ? "Inasistencia" : "Cancelar"}
+                          </button>
+                        </form>
+                      ) : (
+                        <span class="text-xs text-stone-600 font-bold uppercase tracking-wider italic">
+                          Cerrada
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

@@ -12,6 +12,7 @@ import {
   Phone,
   Link,
   Calendar,
+  History,
 } from "lucide-react";
 
 interface Props {
@@ -29,6 +30,7 @@ const fullName = user?.user_metadata?.full_name || userEmail.split("@")[0];
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/agenda", label: "Agenda Semanal", icon: Calendar },
+  { href: "/admin/history", label: "Historial de Citas", icon: History },
   { href: "/admin/hero", label: "Hero (Inicio)", icon: Home },
   { href: "/admin/services", label: "Servicios", icon: Scissors },
   { href: "/admin/products", label: "Productos", icon: Package },

@@ -1,0 +1,554 @@
+---
+// src/pages/admin/book.astro
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createSupabaseClient } from "../../lib/supabase";
+
+// 1. Session and Admin validation
+const { user } = Astro.locals;
+if (!user || !user.isAdmin) {
+  return Astro.redirect("/admin");
+}
+
+const supabase = createSupabaseClient(Astro.request, Astro.cookies);
+let errorMessage: string | null = null;
+
+// 2. Handle POST Request to create the appointment
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const clientType = formData.get("clientType") as string;
+    let userId = formData.get("userId") as string;
+    let clientName: string | null = null;
+    let clientPhone: string | null = null;
+
+    const serviceId = formData.get("serviceId") as string;
+    const barberId = formData.get("barberId") as string;
+    const date = formData.get("date") as string;
+    const time = formData.get("time") as string;
+
+    if (clientType === "manual") {
+      userId = "00000000-0000-0000-0000-000000000000"; // Walk-in dummy user ID
+      clientName = formData.get("clientName") as string;
+      clientPhone = formData.get("clientPhone") as string || null;
+      if (!clientName) {
+        throw new Error("El nombre del cliente es obligatorio para registro manual.");
+      }
+    } else {
+      if (!userId) {
+        throw new Error("Debe seleccionar un cliente registrado.");
+      }
+    }
+
+    if (!serviceId || !barberId || !date || !time) {
+      throw new Error("El servicio, barbero, fecha y hora son obligatorios.");
+    }
+
+    const appointmentDate = `${date}T${time}:00Z`;
+
+    const { error: insertError } = await supabase
+      .from("appointments")
+      .insert([
+        {
+          user_id: userId,
+          service_id: serviceId,
+          barber_id: barberId,
+          appointment_date: appointmentDate,
+          status: "confirmed", // Pre-confirmed by the admin
+          client_name: clientName,
+          client_phone: clientPhone
+        }
+      ]);
+
+    if (insertError) throw insertError;
+
+    return Astro.redirect("/admin/agenda");
+  } catch (err: any) {
+    console.error("Error creating manual appointment:", err);
+    errorMessage = err.message || "Ocurrió un error inesperado al agendar.";
+  }
+}
+
+// 3. Fetch data for the selectors (Clients, Services, Barbers)
+const { data: clients } = await supabase
+  .from("profiles")
+  .select("id, full_name, email")
+  .order("full_name", { ascending: true });
+
+const { data: services } = await supabase
+  .from("services")
+  .select("id, name, duration, price")
+  .order("sort_order", { ascending: true });
+
+const { data: barbers } = await supabase
+  .from("team_members")
+  .select("id, name, role")
+  .order("sort_order", { ascending: true });
+
+// Generate 15-minute intervals from 09:00 to 20:00 (Business hours)
+const timeSlots = [];
+for (let hour = 9; hour <= 20; hour++) {
+  for (let minute = 0; minute < 60; minute += 15) {
+    if (hour === 20 && minute > 0) break;
+    
+    const hh = hour.toString().padStart(2, "0");
+    const mm = minute.toString().padStart(2, "0");
+    const slot = `${hh}:${mm}`;
+    
+    const h = parseInt(hh, 10);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 || 12;
+    const timeLabel = `${h12}:${mm} ${ampm}`;
+    
+    timeSlots.push({ value: slot, label: timeLabel });
+  }
+}
+
+// Generate the next 14 days list for premium selector
+const days = [];
+for (let i = 0; i < 14; i++) {
+  const d = new Date();
+  d.setDate(d.getDate() + i);
+  days.push({
+    value: d.toISOString().split("T")[0],
+    dayName: d.toLocaleDateString("es-ES", { weekday: "short" }),
+    dayNumber: d.getDate(),
+    monthName: d.toLocaleDateString("es-ES", { month: "short" }),
+  });
+}
+---
+
+<AdminLayout title="Agendar Cita Manual">
+  <div class="max-w-xl mx-auto space-y-8 text-stone-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-800 pb-6 gap-4">
+      <div>
+        <h2 class="text-2xl font-black text-white uppercase tracking-tight">Agendar Cita Manual</h2>
+        <p class="text-stone-500 text-sm mt-1 font-medium italic">Registra una reservación desde el mostrador</p>
+      </div>
+      <a href="/admin/agenda" class="bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center">
+        Volver a la Agenda
+      </a>
+    </div>
+
+    {errorMessage && (
+      <div class="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        {errorMessage}
+      </div>
+    )}
+
+    <!-- Formulario de Registro -->
+    <form method="POST" class="bg-stone-900 border border-stone-800 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6">
+      
+      <!-- Tipo de Cliente -->
+      <div class="flex flex-col gap-2">
+        <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Tipo de Cliente</label>
+        <div class="flex items-center gap-6 bg-stone-950 p-4 rounded-xl border border-stone-850">
+          <label class="flex items-center gap-2 text-sm text-stone-300 cursor-pointer">
+            <input type="radio" name="clientType" value="registered" checked class="text-amber-500 focus:ring-0 cursor-pointer" />
+            Cliente Registrado
+          </label>
+          <label class="flex items-center gap-2 text-sm text-stone-300 cursor-pointer">
+            <input type="radio" name="clientType" value="manual" class="text-amber-500 focus:ring-0 cursor-pointer" />
+            Sin Cuenta (Walk-in)
+          </label>
+        </div>
+      </div>
+
+      <!-- Cliente Registrado (Dropdown) -->
+      <div id="registeredClientContainer" class="flex flex-col gap-2">
+        <label for="userId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Seleccionar Cliente</label>
+        <select
+          id="userId"
+          name="userId"
+          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+        >
+          <option value="" disabled selected>-- Elige un cliente registrado --</option>
+          {clients?.map((client: any) => (
+            <option value={client.id}>
+              {client.full_name} ({client.email || "Sin email"})
+            </option>
+          ))}
+        </select>
+        <p class="text-3xs text-stone-600 italic">Nota: El listado muestra los clientes que han iniciado sesión con Google en la web.</p>
+      </div>
+
+      <!-- Cliente Manual (Campos de entrada) -->
+      <div id="manualClientContainer" class="hidden flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <label for="clientName" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Nombre del Cliente</label>
+          <input
+            type="text"
+            id="clientName"
+            name="clientName"
+            placeholder="Escribe el nombre completo..."
+            class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-600 w-full"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="clientPhone" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Teléfono de Contacto (Opcional)</label>
+          <input
+            type="text"
+            id="clientPhone"
+            name="clientPhone"
+            placeholder="Ej: +52 55 1234 5678"
+            class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-600 w-full"
+          />
+        </div>
+      </div>
+
+      <!-- Servicio -->
+      <div class="flex flex-col gap-2">
+        <label for="serviceId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Servicio solicitado</label>
+        <select
+          id="serviceId"
+          name="serviceId"
+          required
+          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+        >
+          <option value="" disabled selected>-- Elige un servicio --</option>
+          {services?.map((service: any) => {
+            const price = String(service.price).startsWith("$") ? service.price : `$${service.price}`;
+            const duration = String(service.duration).toLowerCase().includes("min") ? service.duration : `${service.duration} min`;
+            return (
+              <option value={service.id} data-duration={service.duration}>
+                {service.name} • {duration} • {price}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      <!-- Barbero -->
+      <div class="flex flex-col gap-2">
+        <label for="barberId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Barbero asignado</label>
+        <select
+          id="barberId"
+          name="barberId"
+          required
+          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+        >
+          <option value="" disabled selected>-- Elige un barbero --</option>
+          {barbers?.map((barber: any) => (
+            <option value={barber.id} data-name={barber.name} data-role={barber.role}>
+              {barber.name} ({barber.role})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <!-- Seleccionar Día (Premium Cards) -->
+      <div class="flex flex-col gap-2">
+        <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Selecciona el Día</label>
+        <input type="hidden" name="date" id="selectedDateInput" required />
+        
+        <div class="flex overflow-x-auto pb-4 gap-2 snap-x no-scrollbar sm:grid sm:grid-cols-7 sm:overflow-visible sm:pb-0">
+          {days.map((day) => (
+            <button
+              type="button"
+              data-date={day.value}
+              class="date-card shrink-0 snap-start min-w-[75px] sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border border-stone-850 bg-stone-950 hover:border-amber-500/50 transition-all cursor-pointer group"
+            >
+              <span class="text-[10px] font-black uppercase tracking-tighter text-stone-500 day-name-label transition-colors">
+                {day.dayName}
+              </span>
+              <span class="text-lg font-black text-white leading-none my-1">
+                {day.dayNumber}
+              </span>
+              <span class="text-[10px] font-bold uppercase text-stone-500 tracking-tighter month-name-label transition-colors">
+                {day.monthName}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Hora -->
+      <div class="flex flex-col gap-2">
+        <label for="time" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Hora de la cita</label>
+        <select
+          id="time"
+          name="time"
+          required
+          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+        >
+          <option value="" disabled selected>-- Elige horario --</option>
+          {timeSlots.map((slot) => (
+            <option value={slot.value}>{slot.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-sm py-4 px-6 rounded-2xl transition-all cursor-pointer shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 text-center uppercase tracking-wider block"
+      >
+        Agendar y Confirmar Cita
+      </button>
+
+    </form>
+  </div>
+
+  <script is:inline>
+    function initClientToggle() {
+      const registeredRadio = document.querySelector('input[name="clientType"][value="registered"]');
+      const manualRadio = document.querySelector('input[name="clientType"][value="manual"]');
+      const registeredContainer = document.getElementById('registeredClientContainer');
+      const manualContainer = document.getElementById('manualClientContainer');
+      const userIdSelect = document.getElementById('userId');
+      const clientNameInput = document.getElementById('clientName');
+
+      function toggleContainers() {
+        if (!registeredRadio || !manualRadio || !registeredContainer || !manualContainer) return;
+        
+        if (registeredRadio.checked) {
+          registeredContainer.style.display = 'flex';
+          manualContainer.style.display = 'none';
+          if (userIdSelect) userIdSelect.required = true;
+          if (clientNameInput) clientNameInput.required = false;
+        } else {
+          registeredContainer.style.display = 'none';
+          manualContainer.style.display = 'flex';
+          if (userIdSelect) userIdSelect.required = false;
+          if (clientNameInput) clientNameInput.required = true;
+        }
+      }
+
+      registeredRadio?.addEventListener('change', toggleContainers);
+      manualRadio?.addEventListener('change', toggleContainers);
+
+      toggleContainers();
+    }
+
+    let dayAppointments = [];
+
+    async function fetchDayAvailability(date) {
+      if (!date) {
+        dayAppointments = [];
+        updateTimeSlots();
+        updateBarbers();
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/availability?date=${date}`);
+        const data = await response.json();
+        dayAppointments = (data.appointments || []).map(app => ({
+          date: new Date(app.date),
+          duration: app.duration,
+          barberId: app.barberId
+        }));
+      } catch (err) {
+        console.error("Error fetching day availability:", err);
+        dayAppointments = [];
+      }
+
+      updateTimeSlots();
+      updateBarbers();
+    }
+
+    function updateTimeSlots() {
+      const timeSelect = document.getElementById('time');
+      const serviceSelect = document.getElementById('serviceId');
+      const selectedDateInput = document.getElementById('selectedDateInput');
+      const barberSelect = document.getElementById('barberId');
+
+      if (!timeSelect || !serviceSelect || !selectedDateInput || !barberSelect) return;
+
+      const selectedDate = selectedDateInput.value;
+      if (!selectedDate) return;
+
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      const rawDuration = selectedOption ? selectedOption.getAttribute('data-duration') : '30';
+      const serviceDuration = parseInt((rawDuration || '30').replace(/\D/g, ""), 10) || 30;
+
+      // Get all active barbers in the select (except placeholder)
+      const barberOptions = Array.from(barberSelect.options).filter(o => o.value && !o.disabled);
+      const totalBarbers = barberOptions.length;
+
+      const options = Array.from(timeSelect.options);
+      
+      options.forEach(option => {
+        if (option.disabled && !option.value) return; // Skip placeholder
+
+        const slotTime = option.value;
+        if (!slotTime) return;
+
+        // Check if slot is in the past
+        const proposedStart = new Date(`${selectedDate}T${slotTime}:00Z`).getTime();
+        const proposedEnd = proposedStart + (serviceDuration + 5) * 60 * 1000;
+        const localNow = new Date();
+        const now = Date.UTC(
+          localNow.getFullYear(),
+          localNow.getMonth(),
+          localNow.getDate(),
+          localNow.getHours(),
+          localNow.getMinutes()
+        );
+
+        let label = option.text.replace(/ \((Ocupado|Pasado)\)/g, "");
+
+        if (proposedStart < now) {
+          option.disabled = true;
+          option.text = `${label} (Pasado)`;
+        } else {
+          // Check how many barbers are occupied at this slot
+          const occupiedBarbersCount = barberOptions.filter(barberOpt => {
+            const barberId = barberOpt.value;
+            return dayAppointments.some(app => {
+              if (app.barberId !== barberId) return false;
+              const existingStart = app.date.getTime();
+              const existingEnd = existingStart + (app.duration + 5) * 60 * 1000;
+              return proposedStart < existingEnd && existingStart < proposedEnd;
+            });
+          }).length;
+
+          // If ALL barbers are occupied, disable the slot!
+          if (occupiedBarbersCount >= totalBarbers) {
+            option.disabled = true;
+            option.text = `${label} (Ocupado)`;
+          } else {
+            option.disabled = false;
+            option.text = label;
+          }
+        }
+      });
+    }
+
+    function updateBarbers() {
+      const barberSelect = document.getElementById('barberId');
+      const serviceSelect = document.getElementById('serviceId');
+      const selectedDateInput = document.getElementById('selectedDateInput');
+      const timeSelect = document.getElementById('time');
+
+      if (!barberSelect || !serviceSelect || !selectedDateInput || !timeSelect) return;
+
+      const selectedDate = selectedDateInput.value;
+      const slotTime = timeSelect.value;
+      
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      const rawDuration = selectedOption ? selectedOption.getAttribute('data-duration') : '30';
+      const serviceDuration = parseInt((rawDuration || '30').replace(/\D/g, ""), 10) || 30;
+
+      const options = Array.from(barberSelect.options);
+
+      options.forEach(option => {
+        if (option.disabled && !option.value) return; // Skip placeholder
+
+        const barberId = option.value;
+        if (!barberId) return;
+
+        const originalName = option.getAttribute('data-name');
+        const originalRole = option.getAttribute('data-role');
+        const defaultText = `${originalName} (${originalRole})`;
+
+        if (!selectedDate || !slotTime) {
+          // If date or time is not selected yet, keep barber enabled
+          option.disabled = false;
+          option.text = defaultText;
+          return;
+        }
+
+        const proposedStart = new Date(`${selectedDate}T${slotTime}:00Z`).getTime();
+        const proposedEnd = proposedStart + (serviceDuration + 5) * 60 * 1000;
+
+        // Check if this specific barber is occupied
+        const isOccupied = dayAppointments.some(app => {
+          if (app.barberId !== barberId) return false;
+          const existingStart = app.date.getTime();
+          const existingEnd = existingStart + (app.duration + 5) * 60 * 1000;
+          return proposedStart < existingEnd && existingStart < proposedEnd;
+        });
+
+        if (isOccupied) {
+          option.disabled = true;
+          option.text = `${originalName} (Ocupado)`;
+          
+          // If this barber was currently selected, reset selection
+          if (barberSelect.value === barberId) {
+            barberSelect.value = "";
+          }
+        } else {
+          option.disabled = false;
+          option.text = defaultText;
+        }
+      });
+    }
+
+    function initDatePicker() {
+      const dateCards = document.querySelectorAll('.date-card');
+      const selectedDateInput = document.getElementById('selectedDateInput');
+
+      if (!dateCards.length || !selectedDateInput) return;
+
+      dateCards.forEach(card => {
+        card.addEventListener('click', () => {
+          // Clear active styles from all cards
+          dateCards.forEach(c => {
+            c.classList.remove('border-amber-500', 'bg-amber-500/10', 'scale-105');
+            c.classList.add('border-stone-850', 'bg-stone-950');
+            
+            const dayName = c.querySelector('.day-name-label');
+            const monthName = c.querySelector('.month-name-label');
+            if (dayName) {
+              dayName.classList.remove('text-amber-500');
+              dayName.classList.add('text-stone-500');
+            }
+            if (monthName) {
+              monthName.classList.remove('text-amber-500');
+              monthName.classList.add('text-stone-500');
+            }
+          });
+
+          // Add active styles to clicked card
+          card.classList.add('border-amber-500', 'bg-amber-500/10', 'scale-105');
+          card.classList.remove('border-stone-850', 'bg-stone-950');
+
+          const dayName = card.querySelector('.day-name-label');
+          const monthName = card.querySelector('.month-name-label');
+          if (dayName) {
+            dayName.classList.remove('text-stone-500');
+            dayName.classList.add('text-amber-500');
+          }
+          if (monthName) {
+            monthName.classList.remove('text-stone-500');
+            monthName.classList.add('text-amber-500');
+          }
+
+          // Update input value
+          selectedDateInput.value = card.getAttribute('data-date');
+          
+          // Fetch availability for the new date
+          fetchDayAvailability(selectedDateInput.value);
+        });
+      });
+    }
+
+    function initEventListeners() {
+      const serviceSelect = document.getElementById('serviceId');
+      const timeSelect = document.getElementById('time');
+
+      serviceSelect?.addEventListener('change', () => {
+        updateTimeSlots();
+        updateBarbers();
+      });
+
+      timeSelect?.addEventListener('change', () => {
+        updateBarbers();
+      });
+    }
+
+    // Run immediately
+    initClientToggle();
+    initDatePicker();
+    initEventListeners();
+
+    // Re-run on View Transitions (Astro)
+    document.addEventListener("astro:page-load", () => {
+      initClientToggle();
+      initDatePicker();
+      initEventListeners();
+    });
+  </script>
+</AdminLayout>

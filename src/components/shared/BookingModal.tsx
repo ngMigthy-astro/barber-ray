@@ -256,7 +256,8 @@ export default function BookingModal({
         aria-label="Cerrar modal"
       />
 
-      <dialog 
+      <div 
+        role="dialog"
         aria-modal="true"
         aria-labelledby="booking-modal-title"
         className="relative bg-surface border border-glass-border w-full max-w-2xl max-h-[85vh] rounded-5xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-300"
@@ -575,7 +576,7 @@ export default function BookingModal({
             </div>
           </>
         )}
-      </dialog>
+      </div>
     </div>
   );
 }

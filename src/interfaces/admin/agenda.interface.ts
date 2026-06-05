@@ -5,6 +5,7 @@ export interface AgendaAppointment {
   user_id: string;
   client_name?: string; 
   client_email?: string;
+  client_phone?: string;
   service: {
     name: string;
     duration: string;
