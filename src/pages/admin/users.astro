@@ -44,150 +44,191 @@ const currentUserEmail = currentUser.email?.toLowerCase();
 ---
 
 <AdminLayout title="Gestión de Usuarios">
-  <div class="max-w-6xl mx-auto space-y-8 text-stone-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
-    
-    <!-- Encabezado -->
-    <div>
-      <h2 class="text-2xl font-black text-white uppercase tracking-tight">
-        Gestión de Usuarios
-      </h2>
-      <p class="text-stone-500 text-sm mt-1 font-medium italic">
-        Administra los accesos al panel, pre-autoriza nuevos administradores y audita los usuarios registrados.
-      </p>
-    </div>
+  <div class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
-
-    <!-- Pestañas de Control -->
-    <div class="flex border-b border-glass-border">
-      <button
-        id="tab-btn-clients"
-        class="tab-btn px-6 py-3 text-sm font-black uppercase tracking-wider border-b-2 border-primary text-primary transition-colors"
-      >
-        <span class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+    <!-- ══════════════════════════════════════
+         HEADER: Título + Stat Chips
+    ══════════════════════════════════════ -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <!-- Línea decorativa indigo -->
+        <div class="w-1 h-10 rounded-full bg-gradient-to-b from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/20 flex-shrink-0"></div>
+        <div>
+          <h2 class="text-2xl font-black text-zinc-950 dark:text-white uppercase tracking-tight leading-none font-display">
+            Gestión de Usuarios
+          </h2>
+          <p class="text-zinc-500 dark:text-zinc-400 text-xs mt-1 font-medium">
+            Administra accesos, pre-autoriza admins y audita usuarios.
+          </p>
+        </div>
+      </div>
+      <!-- Stat chips -->
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2 shadow-2xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-455 dark:text-zinc-400">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          Clientes Registrados ({managedUsers.length})
-        </span>
-      </button>
-      <button
-        id="tab-btn-admins"
-        class="tab-btn px-6 py-3 text-sm font-black uppercase tracking-wider border-b-2 border-transparent text-text-muted hover:text-text transition-colors"
-      >
-        <span class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+          <span class="text-xs font-black text-zinc-800 dark:text-zinc-200">{managedUsers.length}</span>
+          <span class="text-2xs text-zinc-500 font-semibold uppercase tracking-wide">Clientes</span>
+        </div>
+        <div class="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl px-3.5 py-2 shadow-2xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600 dark:text-indigo-400">
             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path>
             <path d="m9 12 2 2 4-4"></path>
           </svg>
-          Administradores (<span id="total-admins-count">{allowedAdmins.length}</span>)
-        </span>
+          <span class="text-xs font-black text-indigo-700 dark:text-indigo-300">{allowedAdmins.length}</span>
+          <span class="text-2xs text-indigo-600 dark:text-indigo-400/85 font-semibold uppercase tracking-wide">Admins</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         TABS: Pill style
+    ══════════════════════════════════════ -->
+    <div class="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-1.5 inline-flex gap-1 shadow-2xs">
+      <button
+        id="tab-btn-clients"
+        class="tab-btn cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 border-b-2 border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Clientes
+        <span class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 text-2xs px-1.5 py-0.5 rounded-md font-black">{managedUsers.length}</span>
+      </button>
+      <button
+        id="tab-btn-admins"
+        class="tab-btn cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 border-b-2 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        Admins
+        <span class="bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 text-2xs px-1.5 py-0.5 rounded-md font-black"><span id="total-admins-count">{allowedAdmins.length}</span></span>
       </button>
     </div>
 
-    <!-- PESTAÑA 1: CLIENTES REGISTRADOS -->
-    <div id="tab-content-clients" class="space-y-6">
-      <!-- Filtro y Buscador -->
-      <div class="flex flex-col sm:flex-row gap-4 bg-surface border border-glass-border p-6 rounded-2xl shadow-md justify-between items-center">
-        <div class="relative w-full sm:max-w-md flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 w-4 h-4 text-text-muted/65 z-10 pointer-events-none">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </svg>
-          <input
-            type="text"
-            id="client-search"
-            placeholder="Buscar por nombre o correo..."
-            class="w-full bg-bg border border-glass-border rounded-xl pl-11 pr-4 py-2.5 text-sm text-text focus:outline-none focus:border-primary transition-colors placeholder:text-text-muted/40"
-          />
-        </div>
-        <div class="text-xs text-text-muted font-medium w-full sm:w-auto text-right">
-          Mostrando <span id="visible-clients-count" class="text-text font-bold">{managedUsers.length}</span> usuarios
+    <!-- ══════════════════════════════════════
+         TAB 1: CLIENTES REGISTRADOS
+    ══════════════════════════════════════ -->
+    <div id="tab-content-clients" class="space-y-5">
+
+      <!-- Buscador -->
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs">
+        <div class="flex flex-col sm:flex-row items-center gap-4 justify-between">
+          <div class="relative w-full sm:max-w-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none z-10">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <input
+              type="text"
+              id="client-search"
+              placeholder="Buscar por nombre o correo..."
+              class="w-full bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+            />
+          </div>
+          <div class="text-xs text-zinc-500 font-semibold whitespace-nowrap">
+            Mostrando
+            <span id="visible-clients-count" class="text-indigo-600 dark:text-indigo-400 font-black mx-1">{managedUsers.length}</span>
+            usuarios
+          </div>
         </div>
       </div>
 
-      <!-- Tabla de Clientes Premium -->
-      <div class="bg-surface border border-glass-border rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+      <!-- Tabla de Clientes -->
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-2xl shadow-zinc-200/10 dark:shadow-zinc-950/20">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-bg/60 border-b border-glass-border">
-                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Usuario</th>
-                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Correo Electrónico</th>
-                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Fecha de Registro</th>
-                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Rol</th>
-                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest text-right">Acciones</th>
+              <tr class="bg-zinc-50 dark:bg-zinc-900/60 border-b border-zinc-200 dark:border-zinc-800/60">
+                <th class="px-6 py-4 text-2xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Usuario</th>
+                <th class="px-6 py-4 text-2xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Correo</th>
+                <th class="px-6 py-4 text-2xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Registro</th>
+                <th class="px-6 py-4 text-2xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Rol</th>
+                <th class="px-6 py-4 text-2xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody id="clients-table-body" class="divide-y divide-glass-border/40">
+            <tbody id="clients-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/40">
               {managedUsers.map((client) => {
                 const isSelf = client.email.toLowerCase() === currentUserEmail;
-                const registerDate = client.created_at ? new Date(client.created_at).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' }) : "Desconocido";
+                const registerDate = client.created_at
+                  ? new Date(client.created_at).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' })
+                  : "Desconocido";
 
                 return (
-                  <tr class="client-row hover:bg-surface-hover/40 border-b border-glass-border/20 transition-all duration-300 group" data-name={client.full_name} data-email={client.email}>
-                    <td class="px-6 py-4.5 whitespace-nowrap">
-                      <div class="flex items-center gap-3.5">
-                        <div class="relative flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <tr
+                    class="client-row hover:bg-indigo-500/[0.02] dark:hover:bg-indigo-500/[0.02] transition-all duration-200 group"
+                    data-name={client.full_name}
+                    data-email={client.email}
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center gap-3">
+                        <div class="relative flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
                           {client.avatar_url ? (
                             <img
                               src={client.avatar_url}
                               alt={client.full_name || "Usuario"}
-                              class="w-10 h-10 rounded-full object-cover border border-glass-border ring-2 ring-transparent group-hover:ring-amber-500/20"
+                              class="w-9 h-9 rounded-full object-cover border border-zinc-700 ring-2 ring-transparent group-hover:ring-indigo-500/25"
                               referrerpolicy="no-referrer"
                             />
                           ) : (
-                            <div class="w-10 h-10 rounded-full bg-bg border border-glass-border flex items-center justify-center text-sm font-black text-amber-600 dark:text-amber-500 shadow-inner">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-800 flex items-center justify-center text-sm font-black text-white shadow-md shadow-indigo-900/40">
                               {(client.full_name || client.email).charAt(0).toUpperCase()}
                             </div>
                           )}
                         </div>
-                        <span class="font-black text-text text-sm tracking-tight">{client.full_name || "Sin Nombre"}</span>
+                        <span class="font-bold text-zinc-900 dark:text-white text-sm tracking-tight">{client.full_name || "Sin Nombre"}</span>
                       </div>
                     </td>
-                    <td class="px-6 py-4.5 text-sm font-semibold text-text-muted whitespace-nowrap">{client.email}</td>
-                    <td class="px-6 py-4.5 text-xs text-text-muted/80 whitespace-nowrap">{registerDate}</td>
-                    <td class="px-6 py-4.5 whitespace-nowrap">
+                    <td class="px-6 py-4 text-sm font-medium text-zinc-600 dark:text-zinc-400 whitespace-nowrap">{client.email}</td>
+                    <td class="px-6 py-4 text-xs text-zinc-500 whitespace-nowrap">{registerDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                       {client.isAdmin ? (
-                        <span class="px-3 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-3xs font-black uppercase tracking-widest rounded-lg inline-flex items-center gap-1 shadow-sm shadow-amber-500/5">
-                          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span class="inline-flex items-center gap-1.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-lg px-2.5 py-1 text-3xs font-black uppercase tracking-widest">
+                          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
                           Admin
                         </span>
                       ) : (
-                        <span class="px-3 py-1 bg-bg text-text-muted border border-glass-border text-3xs font-black uppercase tracking-widest rounded-lg">
+                        <span class="inline-flex items-center bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-750 rounded-lg px-2.5 py-1 text-3xs font-black uppercase tracking-widest">
                           Cliente
                         </span>
                       )}
                     </td>
-                    <td class="px-6 py-4.5 text-right whitespace-nowrap">
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
                       {isSelf ? (
-                        <span class="text-xs text-text-muted/80 font-bold italic tracking-wide">Tú (Actual)</span>
+                        <span class="text-xs text-zinc-500 font-bold italic">Tú (Actual)</span>
                       ) : client.isAdmin ? (
                         <button
-                          class="action-demote-btn inline-flex items-center gap-2 bg-surface border border-accent/20 hover:border-accent hover:bg-accent/10 text-accent px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                          class="action-demote-btn inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-red-500/40 hover:bg-red-500/10 text-zinc-500 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-450 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                           data-email={client.email}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>
                             <line x1="22" x2="16" y1="11" y2="11"></line>
                           </svg>
-                          Remover Admin
+                          Remover
                         </button>
                       ) : (
                         <button
-                          class="action-promote-btn inline-flex items-center gap-2 bg-surface border border-glass-border hover:border-primary hover:bg-primary/5 text-text-muted hover:text-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                          class="action-promote-btn inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-indigo-500/40 hover:bg-indigo-500/10 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                           data-email={client.email}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>
                             <line x1="19" x2="19" y1="8" y2="14"></line>
                             <line x1="22" x2="16" y1="11" y2="11"></line>
                           </svg>
-                          Hacer Admin
+                          Promover
                         </button>
                       )}
                     </td>
@@ -196,15 +237,15 @@ const currentUserEmail = currentUser.email?.toLowerCase();
               })}
               {managedUsers.length === 0 && (
                 <tr>
-                  <td colspan="5" class="px-6 py-16 text-center text-text-muted">
-                    <div class="flex flex-col items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-text-muted/40">
+                  <td colspan="5" class="px-6 py-20 text-center">
+                    <div class="flex flex-col items-center gap-3 text-zinc-400 dark:text-zinc-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                       </svg>
-                      <p class="font-medium text-sm">No hay usuarios registrados en el sistema.</p>
+                      <p class="text-sm font-semibold">No hay usuarios registrados en el sistema.</p>
                     </div>
                   </td>
                 </tr>
@@ -215,38 +256,46 @@ const currentUserEmail = currentUser.email?.toLowerCase();
       </div>
     </div>
 
-    <!-- PESTAÑA 2: ADMINISTRADORES AUTORIZADOS -->
     <div id="tab-content-admins" class="hidden space-y-6">
-      <!-- Formulario para Pre-autorizar Admin -->
-      <div class="bg-surface border border-glass-border p-6 rounded-2xl shadow-md space-y-4">
-        <div>
-          <h3 class="text-sm font-black text-text uppercase tracking-wider">
-            Pre-autorizar Nuevo Administrador
-          </h3>
-          <p class="text-xs text-text-muted mt-1 font-medium">
-            Permite el acceso a un correo electrónico. El usuario obtendrá privilegios automáticamente en su primer inicio de sesión.
-          </p>
+
+      <!-- Formulario Pre-autorizar -->
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600 dark:text-indigo-400">
+              <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider leading-none font-display">
+              Pre-autorizar Nuevo Administrador
+            </h3>
+            <p class="text-xs text-zinc-500 mt-1">
+              El usuario obtendrá privilegios automáticamente en su primer inicio de sesión.
+            </p>
+          </div>
         </div>
         <form id="pre-auth-form" class="flex flex-col sm:flex-row gap-3">
           <div class="relative flex-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none z-10">
               <rect width="20" height="16" x="2" y="4" rx="2"></rect>
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
             </svg>
             <input
               type="email"
               id="pre-auth-email"
-              placeholder="correo_electronico@gmail.com"
+              placeholder="correo@ejemplo.com"
               required
-              class="w-full bg-bg border border-glass-border rounded-xl pl-11 pr-4 py-2.5 text-sm text-text focus:outline-none focus:border-primary transition-colors placeholder:text-text-muted/40"
+              class="w-full bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
             />
           </div>
           <button
             type="submit"
-            class="bg-primary hover:bg-primary-hover dark:text-stone-950 font-black text-sm px-6 py-2.5 rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 uppercase tracking-wider"
-            style="color: #ffffff !important;"
+            class="w-full sm:w-auto cursor-pointer inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-550 text-white font-bold text-xs px-6 py-3 sm:py-2.5 rounded-xl transition-all duration-200 shadow-md shadow-indigo-600/10 uppercase tracking-wider flex-shrink-0 font-display"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5v14"></path>
             </svg>
@@ -255,48 +304,52 @@ const currentUserEmail = currentUser.email?.toLowerCase();
         </form>
       </div>
 
-      <!-- Grid de Administradores Autorizados -->
+      <!-- Grid de Admins -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <!-- Admins Registrados -->
-        <div class="bg-surface border border-glass-border rounded-2xl p-6 shadow-md space-y-4">
-          <h3 class="text-sm font-black text-text uppercase tracking-wider pb-2 border-b border-glass-border flex items-center justify-between">
-            <span>Registrados en el Sistema</span>
-            <span id="registered-admins-count" class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-5 rounded-full bg-gradient-to-b from-indigo-400 to-indigo-600"></div>
+              <h3 class="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider font-display">Registrados</h3>
+            </div>
+            <span id="registered-admins-count" class="text-xs font-black text-indigo-700 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg">
               {allowedAdmins.length - preAuthorizedAdmins.length}
             </span>
-          </h3>
-          <div id="registered-admins-list" class="space-y-4 divide-y divide-glass-border/30">
+          </div>
+          <div id="registered-admins-list" class="space-y-3">
             {managedUsers.filter(u => u.isAdmin).map((admin) => {
               const isSelf = admin.email.toLowerCase() === currentUserEmail;
               return (
-                <div class="flex items-center justify-between pt-4 first:pt-0 admin-registered-row" data-admin-email={admin.email.toLowerCase()}>
+                <div class="flex items-center justify-between py-2.5 admin-registered-row border-b border-zinc-100 dark:border-zinc-800/40 last:border-0" data-admin-email={admin.email.toLowerCase()}>
                   <div class="flex items-center gap-3">
                     {admin.avatar_url ? (
                       <img
                         src={admin.avatar_url}
                         alt={admin.full_name || "Admin"}
-                        class="w-9 h-9 rounded-full object-cover border border-glass-border"
+                        class="w-9 h-9 rounded-full object-cover border border-zinc-250 dark:border-zinc-700"
                         referrerpolicy="no-referrer"
                       />
                     ) : (
-                      <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-xs font-bold text-primary">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-sm font-black text-white shadow-md shadow-indigo-900/30">
                         {(admin.full_name || admin.email).charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div>
-                      <h4 class="text-sm font-bold text-text leading-none">{admin.full_name || "Sin Nombre"}</h4>
-                      <p class="text-3xs text-text-muted mt-1">{admin.email}</p>
+                      <h4 class="text-sm font-bold text-zinc-900 dark:text-white leading-none">{admin.full_name || "Sin Nombre"}</h4>
+                      <p class="text-3xs text-zinc-500 mt-0.5 truncate max-w-[160px]">{admin.email}</p>
                     </div>
                   </div>
                   {isSelf ? (
-                    <span class="text-2xs text-text-muted/80 font-bold italic">Tú (Actual)</span>
+                    <span class="text-2xs text-indigo-750 dark:text-indigo-400/90 font-black italic bg-indigo-500/10 px-2 py-1 rounded-lg">Tú</span>
                   ) : (
                     <button
-                      class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+                      class="action-demote-btn p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-500/20"
                       data-email={admin.email}
                       title="Quitar permisos de administrador"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -311,35 +364,41 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           </div>
         </div>
 
-        <!-- Admins Pre-autorizados (Aún no registrados) -->
-        <div class="bg-surface border border-glass-border rounded-2xl p-6 shadow-md space-y-4">
-          <h3 class="text-sm font-black text-text uppercase tracking-wider pb-2 border-b border-glass-border flex items-center justify-between">
-            <span>Pre-autorizados (No registrados)</span>
-            <span id="pre-auth-count" class="text-xs font-bold text-text-muted bg-bg px-2 py-0.5 rounded-md">
+        <!-- Pre-autorizados -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-5 rounded-full bg-gradient-to-b from-zinc-400 to-zinc-600 dark:from-zinc-500 dark:to-zinc-700"></div>
+              <h3 class="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider font-display">Pre-autorizados</h3>
+            </div>
+            <span id="pre-auth-count" class="text-xs font-black text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-750 px-2.5 py-1 rounded-lg">
               {preAuthorizedAdmins.length}
             </span>
-          </h3>
-          <div id="pre-auth-list" class="space-y-4 divide-y divide-glass-border/30">
+          </div>
+          <div id="pre-auth-list" class="space-y-3">
             {preAuthorizedAdmins.map((admin) => (
-              <div class="flex items-center justify-between pt-4 first:pt-0 pre-auth-row" data-email={admin.email}>
+              <div class="flex items-center justify-between py-2.5 pre-auth-row border-b border-zinc-100 dark:border-zinc-800/30 last:border-0" data-email={admin.email}>
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-text-muted/60">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
+                  <div class="w-9 h-9 rounded-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                   </div>
                   <div>
-                    <h4 class="text-sm font-bold text-text/80 leading-none">Invitación Pendiente</h4>
-                    <p class="text-3xs text-text-muted mt-1">{admin.email}</p>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-bold text-zinc-800 dark:text-zinc-300 leading-none">Pendiente</h4>
+                      <span class="text-2xs bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-750 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">Invitación</span>
+                    </div>
+                    <p class="text-3xs text-zinc-500 mt-0.5 truncate max-w-[160px]">{admin.email}</p>
                   </div>
                 </div>
                 <button
-                  class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+                  class="action-demote-btn p-2 text-zinc-450 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-500/20"
                   data-email={admin.email}
                   title="Cancelar pre-autorización"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 6h18"></path>
                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -350,51 +409,63 @@ const currentUserEmail = currentUser.email?.toLowerCase();
               </div>
             ))}
             {preAuthorizedAdmins.length === 0 && (
-              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
-                No hay invitaciones o pre-autorizaciones pendientes.
+              <div id="no-pre-auth" class="py-10 text-center">
+                <div class="flex flex-col items-center gap-2 text-zinc-400 dark:text-zinc-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" x2="12" y1="8" y2="12"></line>
+                    <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                  </svg>
+                  <p class="text-xs font-semibold">No hay administradores pre-autorizados.</p>
+                </div>
               </div>
             )}
           </div>
         </div>
+
       </div>
     </div>
-  </div>
 
-  <!-- Modal de Confirmación Premium -->
+  <!-- ══════════════════════════════════════
+       MODAL DE CONFIRMACIÓN
+  ══════════════════════════════════════ -->
   <div
     id="confirm-modal"
-    class="fixed inset-0 z-200 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
+    class="fixed inset-0 z-200 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
   >
     <div
       id="confirm-modal-box"
-      class="bg-surface border border-glass-border max-w-sm w-full rounded-2xl p-6 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 space-y-5"
+      class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-sm w-full rounded-3xl p-8 shadow-2xl shadow-zinc-200/5 dark:shadow-zinc-950/60 transform scale-95 opacity-0 transition-all duration-300 space-y-6"
     >
-      <div class="flex flex-col items-center text-center space-y-3">
-        <div class="w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+      <!-- Ícono de advertencia -->
+      <div class="flex flex-col items-center text-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-655 dark:text-red-400">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
             <line x1="12" x2="12" y1="9" y2="13"></line>
             <line x1="12" x2="12.01" y1="17" y2="17"></line>
           </svg>
         </div>
-        <h3 id="confirm-modal-title" class="text-base font-black text-text uppercase tracking-wider">
-          ¿Confirmar Acción?
-        </h3>
-        <p id="confirm-modal-message" class="text-xs text-text-muted font-medium">
-          ¿Estás seguro de que deseas realizar esta acción?
-        </p>
+        <div>
+          <h3 id="confirm-modal-title" class="text-base font-black text-zinc-900 dark:text-white uppercase tracking-wider font-display">
+            ¿Confirmar Acción?
+          </h3>
+          <p id="confirm-modal-message" class="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-1.5 leading-relaxed">
+            ¿Estás seguro de que deseas realizar esta acción?
+          </p>
+        </div>
       </div>
+      <!-- Botones -->
       <div class="flex gap-3">
         <button
           id="confirm-modal-cancel"
-          class="flex-1 bg-surface-hover hover:bg-surface-hover/80 text-text-muted hover:text-text border border-glass-border py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer text-center"
+          class="flex-1 bg-transparent hover:bg-zinc-150 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700 hover:border-zinc-350 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer"
         >
           Cancelar
         </button>
         <button
           id="confirm-modal-submit"
-          class="flex-1 bg-accent hover:bg-accent/90 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer text-center"
-          style="color: #ffffff !important;"
+          class="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-lg shadow-red-900/10"
         >
           Confirmar
         </button>
@@ -402,10 +473,12 @@ const currentUserEmail = currentUser.email?.toLowerCase();
     </div>
   </div>
 
-  <!-- Toast de Notificaciones -->
+  <!-- ══════════════════════════════════════
+       TOAST DE NOTIFICACIONES
+  ══════════════════════════════════════ -->
   <div
     id="toast-notification"
-    class="fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-stone-900 border text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3"
+    class="fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-sm font-bold text-zinc-900 dark:text-white px-6 py-4 rounded-2xl shadow-2xl shadow-zinc-200/5 dark:shadow-zinc-950/40 transition-all duration-300 flex items-center gap-3"
   >
     <span id="toast-message"></span>
   </div>
@@ -426,23 +499,26 @@ const currentUserEmail = currentUser.email?.toLowerCase();
       const newTabAdmins = tabAdmins.cloneNode(true);
       tabAdmins.parentNode.replaceChild(newTabAdmins, tabAdmins);
 
+      const activeClasses = ["border-indigo-600", "dark:border-indigo-500", "text-indigo-600", "dark:text-indigo-400"];
+      const inactiveClasses = ["border-transparent", "text-zinc-500", "dark:text-zinc-400"];
+
       newTabClients.addEventListener("click", () => {
-        newTabClients.classList.remove("border-transparent", "text-text-muted");
-        newTabClients.classList.add("border-primary", "text-primary");
+        newTabClients.classList.remove(...inactiveClasses);
+        newTabClients.classList.add(...activeClasses);
         
-        newTabAdmins.classList.remove("border-primary", "text-primary");
-        newTabAdmins.classList.add("border-transparent", "text-text-muted");
+        newTabAdmins.classList.remove(...activeClasses);
+        newTabAdmins.classList.add(...inactiveClasses);
 
         contentClients.classList.remove("hidden");
         contentAdmins.classList.add("hidden");
       });
 
       newTabAdmins.addEventListener("click", () => {
-        newTabAdmins.classList.remove("border-transparent", "text-text-muted");
-        newTabAdmins.classList.add("border-primary", "text-primary");
+        newTabAdmins.classList.remove(...inactiveClasses);
+        newTabAdmins.classList.add(...activeClasses);
         
-        newTabClients.classList.remove("border-primary", "text-primary");
-        newTabClients.classList.add("border-transparent", "text-text-muted");
+        newTabClients.classList.remove(...activeClasses);
+        newTabClients.classList.add(...inactiveClasses);
 
         contentAdmins.classList.remove("hidden");
         contentClients.classList.add("hidden");
@@ -490,13 +566,13 @@ const currentUserEmail = currentUser.email?.toLowerCase();
 
       toastMsg.textContent = message;
       if (isError) {
-        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-red-500/10 border-red-500/20 text-red-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
       } else {
-        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-emerald-500/10 border-emerald-500/20 text-emerald-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
       }
 
       setTimeout(() => {
-        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-stone-900 border text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-zinc-900 border border-zinc-800 text-zinc-900 dark:text-white text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
       }, 4000);
     }
 
@@ -585,25 +661,25 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           // Cambiar badge a Admin
           if (roleCell) {
             roleCell.innerHTML = `
-              <span class="px-3 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-3xs font-black uppercase tracking-widest rounded-lg inline-flex items-center gap-1 shadow-sm shadow-amber-500/5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+              <span class="inline-flex items-center gap-1.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-lg px-2.5 py-1 text-3xs font-black uppercase tracking-widest">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse"></span>
                 Admin
               </span>
             `;
           }
-          // Cambiar botón a Remover Admin (y forzar texto blanco por el hack del layout)
+          // Cambiar botón a Remover
           if (actionCell) {
             actionCell.innerHTML = `
               <button
-                class="action-demote-btn inline-flex items-center gap-2 bg-surface border border-accent/20 hover:border-accent hover:bg-accent/10 text-accent px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                class="action-demote-btn inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-red-500/40 hover:bg-red-500/10 text-zinc-500 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-450 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                 data-email="${emailLower}"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <line x1="22" x2="16" y1="11" y2="11"></line>
                 </svg>
-                Remover Admin
+                Remover
               </button>
             `;
           }
@@ -613,25 +689,25 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           // Cambiar badge a Cliente
           if (roleCell) {
             roleCell.innerHTML = `
-              <span class="px-3 py-1 bg-bg text-text-muted border border-glass-border text-3xs font-black uppercase tracking-widest rounded-lg">
+              <span class="inline-flex items-center bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-750 rounded-lg px-2.5 py-1 text-3xs font-black uppercase tracking-widest">
                 Cliente
               </span>
             `;
           }
-          // Cambiar botón a Hacer Admin
+          // Cambiar botón a Promover
           if (actionCell) {
             actionCell.innerHTML = `
               <button
-                class="action-promote-btn inline-flex items-center gap-2 bg-surface border border-glass-border hover:border-primary hover:bg-primary/5 text-text-muted hover:text-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                class="action-promote-btn inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-indigo-500/40 hover:bg-indigo-500/10 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs"
                 data-email="${emailLower}"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <line x1="19" x2="19" y1="8" y2="14"></line>
                   <line x1="22" x2="16" y1="11" y2="11"></line>
                 </svg>
-                Hacer Admin
+                Promover
               </button>
             `;
           }
@@ -660,8 +736,14 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           if (preAuthCountSpan) preAuthCountSpan.textContent = preAuthCount.toString();
           if (preAuthCount === 0 && preAuthList) {
             preAuthList.innerHTML = `
-              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
-                No hay invitaciones o pre-autorizaciones pendientes.
+              <div id="no-pre-auth" class="py-10 text-center">
+                <div class="flex flex-col items-center gap-2 text-zinc-400 dark:text-zinc-550">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <p class="text-xs font-medium italic text-zinc-500 dark:text-zinc-455">Sin invitaciones pendientes.</p>
+                </div>
               </div>
             `;
           }
@@ -669,29 +751,30 @@ const currentUserEmail = currentUser.email?.toLowerCase();
 
         // Si el usuario ya está registrado en el sistema, lo movemos a la lista de registrados
         if (clientRow && !existsInRegistered && registeredList) {
+          const fallbackAvatar = `
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-sm font-black text-white shadow-md shadow-indigo-900/30">
+              ${(fullName || emailLower).charAt(0).toUpperCase()}
+            </div>
+          `;
           const newAdminRow = document.createElement("div");
-          newAdminRow.className = "flex items-center justify-between pt-4 first:pt-0 admin-registered-row border-t border-glass-border/30 first:border-t-0";
+          newAdminRow.className = "flex items-center justify-between py-2.5 admin-registered-row border-b border-zinc-100 dark:border-zinc-800/40 last:border-0";
           newAdminRow.setAttribute("data-admin-email", emailLower);
           newAdminRow.innerHTML = `
             <div class="flex items-center gap-3">
               <div class="relative flex-shrink-0">
-                ${avatarHtml || `
-                  <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-xs font-bold text-primary">
-                    ${(fullName || emailLower).charAt(0).toUpperCase()}
-                  </div>
-                `}
+                ${avatarHtml || fallbackAvatar}
               </div>
               <div>
-                <h4 class="text-sm font-bold text-text leading-none">${fullName}</h4>
-                <p class="text-3xs text-text-muted mt-1">${emailLower}</p>
+                <h4 class="text-sm font-bold text-zinc-900 dark:text-white leading-none">${fullName}</h4>
+                <p class="text-3xs text-zinc-550 mt-1">${emailLower}</p>
               </div>
             </div>
             <button
-              class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+              class="action-demote-btn p-2 text-zinc-455 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-500/20"
               data-email="${emailLower}"
               title="Quitar permisos de administrador"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 6h18"></path>
                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -709,27 +792,27 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           if (noPreAuthDiv) noPreAuthDiv.remove();
 
           const newPreAuthRow = document.createElement("div");
-          newPreAuthRow.className = "flex items-center justify-between pt-4 first:pt-0 pre-auth-row border-t border-glass-border/30 first:border-t-0";
+          newPreAuthRow.className = "flex items-center justify-between py-2.5 pre-auth-row border-b border-zinc-100 dark:border-zinc-800/30 last:border-0";
           newPreAuthRow.setAttribute("data-email", emailLower);
           newPreAuthRow.innerHTML = `
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-text-muted/60">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
+              <div class="w-9 h-9 rounded-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
               </div>
               <div>
-                <h4 class="text-sm font-bold text-text/80 leading-none">Invitación Pendiente</h4>
-                <p class="text-3xs text-text-muted mt-1">${emailLower}</p>
+                <h4 class="text-sm font-bold text-zinc-800 dark:text-zinc-300 leading-none">Pendiente</h4>
+                <p class="text-3xs text-zinc-550 mt-1">${emailLower}</p>
               </div>
             </div>
             <button
-              class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+              class="action-demote-btn p-2 text-zinc-455 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-500/20"
               data-email="${emailLower}"
               title="Cancelar pre-autorización"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 6h18"></path>
                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -762,8 +845,14 @@ const currentUserEmail = currentUser.email?.toLowerCase();
           if (preAuthCountSpan) preAuthCountSpan.textContent = preAuthCount.toString();
           if (preAuthCount === 0 && preAuthList) {
             preAuthList.innerHTML = `
-              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
-                No hay invitaciones o pre-autorizaciones pendientes.
+              <div id="no-pre-auth" class="py-10 text-center">
+                <div class="flex flex-col items-center gap-2 text-zinc-400 dark:text-zinc-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <p class="text-xs font-medium italic text-zinc-500 dark:text-zinc-450">Sin invitaciones pendientes.</p>
+                </div>
               </div>
             `;
           }

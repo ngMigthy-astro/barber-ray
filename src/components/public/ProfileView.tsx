@@ -89,6 +89,13 @@ export default function ProfileView({ user, initialAppointments, initialReservat
     setIsCancelling(id);
     setShowConfirmModal(null);
 
+    // Optimistic update: actualizamos el estado local primero para respuesta inmediata
+    setAppointments(
+      appointments.map((app) =>
+        app.id === id ? { ...app, status: "cancelled" } : app,
+      ),
+    );
+
     try {
       const { error } = await supabase
         .from("appointments")
@@ -96,12 +103,15 @@ export default function ProfileView({ user, initialAppointments, initialReservat
         .eq("id", id);
 
       if (error) throw error;
-
+    } catch (err) {
+      console.error("Error al cancelar cita:", err);
+      // Revertimos el estado optimista si el DB falla
       setAppointments(
         appointments.map((app) =>
-          app.id === id ? { ...app, status: "cancelled" } : app,
+          app.id === id ? { ...app, status: "pending" } : app,
         ),
       );
+      alert("No se pudo cancelar la cita. Por favor intenta de nuevo.");
     } finally {
       setIsCancelling(null);
     }
@@ -522,6 +532,8 @@ export default function ProfileView({ user, initialAppointments, initialReservat
                         <button
                           key={app.id}
                           onClick={() => {
+                            // Guard: citas canceladas no pueden recibir reseñas
+                            if (isCancelled) return;
                             setReviewingAppointment(app);
                             const existing = reviews[app.id];
                             if (existing) {
@@ -532,7 +544,8 @@ export default function ProfileView({ user, initialAppointments, initialReservat
                               setComment("");
                             }
                           }}
-                          className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${buttonOpacityClass}`}
+                          disabled={isCancelled}
+                          className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${buttonOpacityClass} ${isCancelled ? "cursor-default" : "cursor-pointer"}`}
                         >
                           <div className="flex items-center gap-4">
                             <div
@@ -566,7 +579,7 @@ export default function ProfileView({ user, initialAppointments, initialReservat
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {!isLoadingReviews && !reviews[app.id] && (
+                            {!isLoadingReviews && !reviews[app.id] && !isCancelled && (
                               <span className="text-2xs font-black text-amber-500 uppercase tracking-tight hidden md:block">
                                 Dejar Reseña
                               </span>

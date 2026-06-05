@@ -79,7 +79,7 @@ const currentPath = url.pathname;
     </script>
   </head>
   <body
-    class="bg-stone-950 text-stone-300 font-sans antialiased min-h-screen flex"
+    class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans antialiased min-h-screen flex transition-colors duration-300"
   >
     <!-- Overlay para móvil -->
     <div
@@ -90,20 +90,20 @@ const currentPath = url.pathname;
 
     <aside
       id="admin-sidebar"
-      class="w-64 bg-stone-900 border-r border-stone-800 flex flex-col fixed h-full z-50 transform transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
+      class="w-64 bg-white/95 dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex flex-col fixed h-full z-50 transform transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 backdrop-blur-md"
     >
       <div
-        class="p-6 border-b border-stone-800 flex justify-between items-center"
+        class="p-6 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center"
       >
         <div>
-          <h2 class="text-xl font-bold text-white tracking-wider uppercase">
-            Barber Ray<span class="text-amber-500">.</span>
+          <h2 class="text-xl font-bold text-zinc-950 dark:text-white tracking-wider uppercase font-display">
+            Barber Ray<span class="text-indigo-600 dark:text-indigo-400">.</span>
           </h2>
-          <p class="text-xs text-stone-500 mt-1">Panel de Control</p>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold mt-1 uppercase tracking-wider">Panel de Control</p>
         </div>
         <button
           id="close-sidebar-btn"
-          class="lg:hidden p-2 text-stone-400 hover:text-white rounded-md"
+          class="lg:hidden p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white rounded-md transition-colors"
         >
           <svg
             class="w-5 h-5"
@@ -132,10 +132,10 @@ const currentPath = url.pathname;
                 <li>
                   <a
                     href={item.href}
-                    class={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                    class={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all border-l-2 ${
                       isActive
-                        ? "bg-amber-500/10 text-amber-500 font-medium"
-                        : "text-stone-400 hover:text-white hover:bg-stone-800/50"
+                        ? "bg-indigo-50/80 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 font-semibold border-indigo-600 dark:border-indigo-400"
+                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 border-transparent"
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -148,32 +148,32 @@ const currentPath = url.pathname;
         </ul>
       </nav>
 
-      <div class="p-4 border-t border-stone-800">
+      <div class="p-4 border-t border-zinc-200 dark:border-zinc-800">
         <div class="flex items-center gap-3 px-3 py-2 mb-2">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={fullName}
-              class="w-8 h-8 rounded-full object-cover border border-stone-800"
+              class="w-8 h-8 rounded-full object-cover border border-zinc-200 dark:border-zinc-800"
               referrerpolicy="no-referrer"
             />
           ) : (
             <div
-              class="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center text-sm font-bold text-stone-300"
+              class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-650 dark:text-zinc-300"
             >
               {userEmail.charAt(0).toUpperCase()}
             </div>
           )}
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-white truncate">{fullName}</p>
-            <p class="text-3xs text-stone-500 truncate">{userEmail}</p>
+            <p class="text-sm font-medium text-zinc-950 dark:text-white truncate">{fullName}</p>
+            <p class="text-3xs text-zinc-500 dark:text-zinc-400 truncate">{userEmail}</p>
           </div>
         </div>
 
         <form action="/api/auth/signout" method="post">
           <button
             type="submit"
-            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-zinc-550 dark:text-zinc-400 hover:text-red-650 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span>Cerrar Sesión</span>
@@ -186,12 +186,12 @@ const currentPath = url.pathname;
       class="flex-1 lg:ml-64 flex flex-col min-h-screen w-full transition-all duration-300"
     >
       <header
-        class="h-16 border-b border-stone-800 bg-stone-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8"
+        class="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 transition-colors duration-300"
       >
         <div class="flex items-center gap-3">
           <button
             id="mobile-menu-btn"
-            class="lg:hidden p-2 -ml-2 text-stone-400 hover:text-white rounded-md"
+            class="lg:hidden p-2 -ml-2 text-zinc-550 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white rounded-md transition-colors"
           >
             <svg
               class="w-6 h-6"
@@ -206,7 +206,7 @@ const currentPath = url.pathname;
             >
           </button>
           <h1
-            class="text-lg font-medium text-white truncate max-w-50 sm:max-w-none"
+            class="text-lg font-bold text-zinc-950 dark:text-white truncate max-w-50 sm:max-w-none font-display uppercase tracking-wider"
           >
             {title}
           </h1>
@@ -215,7 +215,7 @@ const currentPath = url.pathname;
           <button
             id="admin-theme-toggle"
             aria-label="Cambiar tema"
-            class="p-2 rounded-full border border-stone-300 dark:border-stone-800 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer flex items-center justify-center focus:outline-none"
+            class="p-2 rounded-full border border-zinc-200 dark:border-zinc-850 text-zinc-550 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 bg-zinc-50 dark:bg-zinc-900 transition-colors cursor-pointer flex items-center justify-center focus:outline-none"
           >
             <!-- Icono Sol -->
             <svg
@@ -251,10 +251,10 @@ const currentPath = url.pathname;
           <a
             href="/"
             target="_blank"
-            class="text-sm text-stone-400 hover:text-amber-500 transition-colors flex items-center gap-2 whitespace-nowrap"
+            class="text-sm text-zinc-550 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
-            <span class="hidden sm:inline">Ver sitio en vivo</span>
-            <span class="sm:hidden">Ver sitio</span>
+            <span class="hidden sm:inline font-medium">Ver sitio en vivo</span>
+            <span class="sm:hidden font-medium">Ver sitio</span>
             <svg
               class="w-4 h-4"
               fill="none"
@@ -349,118 +349,5 @@ const currentPath = url.pathname;
       // Por si se usa Astro View Transitions
       document.addEventListener("astro:page-load", initAdminDashboard);
     </script>
-
-    <style is:global>
-      /* --- Tema Claro Suave para el Panel de Admin (Activo solo si no existe la clase .dark en el html) --- */
-      
-      /* Fondo general y texto base */
-      html:not(.dark) body {
-        background-color: #f5f5f4 !important; /* stone-100 (gris suave, no quema ojos) */
-        color: #44403c !important; /* stone-700 */
-      }
-
-      /* Encabezados y títulos */
-      html:not(.dark) h1, 
-      html:not(.dark) h2, 
-      html:not(.dark) h3, 
-      html:not(.dark) h4, 
-      html:not(.dark) h5, 
-      html:not(.dark) h6, 
-      html:not(.dark) .text-white {
-        color: #1c1917 !important; /* stone-900 */
-      }
-
-      /* Sidebar y Header superior */
-      html:not(.dark) #admin-sidebar {
-        background-color: #ffffff !important;
-        border-right: 1px solid #e7e5e4 !important; /* stone-200 */
-      }
-
-      html:not(.dark) header {
-        background-color: rgba(255, 255, 255, 0.8) !important;
-        border-bottom: 1px solid #e7e5e4 !important;
-      }
-
-      /* Tarjetas y Contenedores (bg-stone-900) */
-      html:not(.dark) .bg-stone-900 {
-        background-color: #ffffff !important;
-        border: 1px solid #e7e5e4 !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-      }
-
-      /* Elementos secundarios o contenedores oscuros (bg-stone-950) */
-      html:not(.dark) .bg-stone-950 {
-        background-color: #fafaf9 !important; /* stone-50 */
-        border-color: #e7e5e4 !important;
-      }
-
-      /* Inputs, Selects y Textareas */
-      html:not(.dark) input, 
-      html:not(.dark) select, 
-      html:not(.dark) textarea, 
-      html:not(.dark) .bg-stone-950\/50 {
-        background-color: #fafaf9 !important;
-        border: 1px solid #e7e5e4 !important;
-        color: #1c1917 !important;
-      }
-
-      html:not(.dark) input:focus, 
-      html:not(.dark) select:focus, 
-      html:not(.dark) textarea:focus {
-        border-color: #d97706 !important; /* amber-600 */
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1) !important;
-      }
-
-      /* Textos mutados y stone */
-      html:not(.dark) .text-stone-300 {
-        color: #44403c !important; /* stone-700 */
-      }
-      html:not(.dark) .text-stone-400 {
-        color: #57534e !important; /* stone-600 */
-      }
-      html:not(.dark) .text-stone-500 {
-        color: #78716c !important; /* stone-500 */
-      }
-
-      /* Hover de enlaces inactivos en el Sidebar */
-      html:not(.dark) .text-stone-400.hover\:text-white:hover {
-        color: #1c1917 !important;
-        background-color: #f5f5f4 !important;
-      }
-
-      /* Enlaces activos en el Sidebar */
-      html:not(.dark) #admin-sidebar a.text-amber-500 {
-        background-color: #fef3c7 !important; /* amber-100 */
-        color: #b45309 !important; /* amber-700 */
-      }
-
-      /* Alertas */
-      html:not(.dark) .bg-emerald-500\/10 {
-        background-color: #d1fae5 !important;
-        color: #065f46 !important;
-        border-color: #a7f3d0 !important;
-      }
-      
-      html:not(.dark) .bg-red-500\/10 {
-        background-color: #fee2e2 !important;
-        color: #991b1b !important;
-        border-color: #fca5a5 !important;
-      }
-      
-      /* Botones de acción */
-      html:not(.dark) .bg-emerald-500 {
-        background-color: #10b981 !important;
-        color: #ffffff !important;
-      }
-      html:not(.dark) .bg-emerald-500:hover {
-        background-color: #059669 !important;
-      }
-
-      /* Elementos específicos de listas */
-      html:not(.dark) .bg-stone-900\/40, 
-      html:not(.dark) .bg-stone-900\/60 {
-        background-color: #ffffff !important;
-      }
-    </style>
   </body>
 </html>

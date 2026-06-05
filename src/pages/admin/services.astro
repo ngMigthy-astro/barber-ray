@@ -98,7 +98,7 @@ const availableIcons = [
 ---
 
 <AdminLayout title="Gestión de Servicios">
-  <div class="max-w-5xl">
+  <div class="w-full">
     {
       isSuccess && (
         <div
@@ -144,11 +144,11 @@ const availableIcons = [
       <!-- Configuración de la Sección -->
       <div class="lg:col-span-1 space-y-6">
         <div
-          class="bg-stone-900 border border-stone-800 rounded-3xl p-6 shadow-xl"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs"
         >
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-1.5 h-6 bg-primary rounded-full"></div>
-            <h3 class="text-sm font-black text-white uppercase tracking-widest">
+            <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+            <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
               Textos de Sección
             </h3>
           </div>
@@ -157,31 +157,31 @@ const availableIcons = [
             <input type="hidden" name="action" value="update_config" />
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Título Principal</label
               >
               <input
                 type="text"
                 name="title"
                 value={config.title}
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all text-sm"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-zinc-900 dark:text-white focus:border-indigo-650 dark:focus:border-indigo-500 outline-none transition-all text-sm shadow-2xs"
               />
             </div>
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Subtítulo</label
               >
               <input
                 type="text"
                 name="subtitle"
                 value={config.subtitle}
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all text-sm"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-zinc-900 dark:text-white focus:border-indigo-650 dark:focus:border-indigo-500 outline-none transition-all text-sm shadow-2xs"
               />
             </div>
             <button
               type="submit"
-              class="w-full btn-premium py-3 flex items-center justify-center gap-2 cursor-pointer"
+              class="w-full bg-indigo-600 hover:bg-indigo-750 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all cursor-pointer shadow-xs"
             >
               <Save className="w-4 h-4" />
               Guardar Sección
@@ -191,11 +191,11 @@ const availableIcons = [
 
         <!-- Agregar Nuevo Servicio -->
         <div
-          class="bg-stone-900 border border-stone-800 rounded-3xl p-6 shadow-xl"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs"
         >
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
-            <h3 class="text-sm font-black text-white uppercase tracking-widest">
+            <div class="w-1.5 h-6 bg-indigo-650 dark:bg-indigo-500 rounded-full"></div>
+            <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
               Nuevo Servicio
             </h3>
           </div>
@@ -205,19 +205,19 @@ const availableIcons = [
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-2">
                 <label
-                  class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                  class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                   >Nombre</label
                 >
                 <input
                   type="text"
                   name="name"
                   required
-                  class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-emerald-500"
+                  class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-650 dark:focus:border-indigo-500 shadow-2xs"
                 />
               </div>
               <div class="space-y-2">
                 <label
-                  class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                  class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                   >Icono</label
                 >
                 <input type="hidden" name="icon_name" id="new-service-icon" value="Scissors" />
@@ -230,7 +230,7 @@ const availableIcons = [
                           type="button"
                           data-icon={icon.name}
                           title={icon.name}
-                          class="w-10 h-10 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-center text-stone-500 hover:text-white hover:border-stone-600 transition-colors focus:outline-none cursor-pointer"
+                          class="w-10 h-10 rounded-xl bg-zinc-55 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-350 dark:hover:border-zinc-700 transition-colors focus:outline-none cursor-pointer"
                         >
                           <IconComponent className="w-5 h-5" />
                         </button>
@@ -242,37 +242,37 @@ const availableIcons = [
             </div>
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Descripción Corta</label
               >
               <textarea
                 name="description"
                 rows="2"
                 required
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-emerald-500 resize-none"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-650 dark:focus:border-indigo-500 resize-none shadow-2xs"
               ></textarea>
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-2">
                 <label
-                  class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                  class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                   >Precio</label
                 >
                 <div class="relative">
-                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 text-sm font-bold">$</span>
+                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-sm font-bold">$</span>
                   <input
                     type="number"
                     name="price"
                     placeholder="00"
                     min="0"
                     required
-                    class="w-full bg-stone-950 border border-stone-800 rounded-xl pl-8 pr-3 py-2 text-white text-sm outline-none focus:border-emerald-500"
+                    class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-8 pr-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-650 dark:focus:border-indigo-500 shadow-2xs"
                   />
                 </div>
               </div>
               <div class="space-y-2">
                 <label
-                  class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                  class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                   >Duración</label
                 >
                 <div class="relative">
@@ -282,15 +282,15 @@ const availableIcons = [
                     placeholder="30"
                     min="1"
                     required
-                    class="w-full bg-stone-950 border border-stone-800 rounded-xl pl-3 pr-12 py-2 text-white text-sm outline-none focus:border-emerald-500"
+                    class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3 pr-12 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-650 dark:focus:border-indigo-500 shadow-2xs"
                   />
-                  <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold uppercase tracking-widest pointer-events-none">MIN</span>
+                  <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-450 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest pointer-events-none">MIN</span>
                 </div>
               </div>
             </div>
             <button
               type="submit"
-              class="w-full bg-emerald-500 hover:bg-emerald-600 text-stone-950 font-black py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all cursor-pointer"
+              class="w-full bg-indigo-600 hover:bg-indigo-750 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all cursor-pointer shadow-xs"
             >
               <Plus className="w-4 h-4" />
               Crear Servicio
@@ -302,9 +302,9 @@ const availableIcons = [
       <!-- Lista de Servicios Actuales -->
       <div class="lg:col-span-2 space-y-6">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-xl font-bold text-white">Servicios Activos</h3>
+          <h3 class="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight font-display">Servicios Activos</h3>
           <span
-            class="px-3 py-1 bg-stone-900 border border-stone-800 rounded-full text-2xs font-black text-stone-500 uppercase"
+            class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest"
             >{services.length} servicios</span
           >
         </div>
@@ -312,7 +312,7 @@ const availableIcons = [
         <div class="grid grid-cols-1 gap-4">
           {
             services.map((service, index) => (
-              <div class="bg-stone-900 border border-stone-800 rounded-4xl p-6 hover:border-primary/50 transition-all group">
+              <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 hover:border-indigo-650 dark:hover:border-indigo-500 hover:shadow-xs transition-all duration-300 group">
                 <form method="POST" class="flex flex-col md:flex-row gap-6">
                   <input type="hidden" name="action" value="upsert_service" />
                   <input type="hidden" name="id" value={service.id} />
@@ -321,7 +321,7 @@ const availableIcons = [
                   <div class="flex flex-col items-center gap-3">
                     <div 
                       id={`icon-preview-${service.id}`}
-                      class="w-16 h-16 rounded-2xl bg-stone-950 flex items-center justify-center text-primary border border-stone-800"
+                      class="w-16 h-16 rounded-xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-zinc-200 dark:border-zinc-800 shadow-2xs"
                     >
                       {(() => {
                         const iconEntry = availableIcons.find(
@@ -343,8 +343,8 @@ const availableIcons = [
                             title={icon.name}
                             class={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
                               isSelected
-                                ? "bg-primary/20 border-primary text-primary"
-                                : "bg-stone-950 border-stone-800 text-stone-500 hover:text-stone-300 hover:border-stone-700"
+                                ? "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                                : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-350 dark:hover:border-zinc-700"
                             }`}
                           >
                             <IconComponent className="w-3.5 h-3.5" />
@@ -360,17 +360,17 @@ const availableIcons = [
                         type="text"
                         name="name"
                         value={service.name}
-                        class="w-full bg-transparent text-xl font-bold text-white outline-none focus:text-primary transition-colors"
+                        class="w-full bg-transparent text-lg font-black text-zinc-900 dark:text-white outline-none focus:text-indigo-650 dark:focus:text-indigo-500 transition-colors font-display"
                       />
                       <div class="flex gap-2">
                         <div class="relative w-24 shrink-0">
-                          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary font-black text-xs">$</span>
+                          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-600 dark:text-indigo-400 font-black text-xs">$</span>
                           <input
                             type="number"
                             name="price"
                             min="0"
                             value={String(service.price).replace(/[^0-9]/g, "")}
-                            class="w-full bg-stone-950 border border-stone-800 rounded-lg pl-7 pr-2 py-1 text-primary font-black text-center text-sm outline-none focus:border-emerald-500"
+                            class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-7 pr-2 py-1.5 text-indigo-600 dark:text-indigo-400 font-black text-center text-sm outline-none focus:border-indigo-650 dark:focus:border-indigo-500 shadow-2xs"
                           />
                         </div>
                         <div class="relative flex-1 w-full min-w-0">
@@ -379,32 +379,32 @@ const availableIcons = [
                             name="duration"
                             min="1"
                             value={String(service.duration).replace(/[^0-9]/g, "")}
-                            class="w-full bg-stone-950 border border-stone-800 rounded-lg pl-3 pr-10 py-1 text-2xs text-stone-300 font-bold text-center outline-none focus:border-emerald-500"
+                            class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-3 pr-10 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-bold text-center outline-none focus:border-indigo-650 dark:focus:border-indigo-500 shadow-2xs"
                           />
-                          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 text-3xs font-bold uppercase pointer-events-none">MIN</span>
+                          <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-[9px] font-black uppercase pointer-events-none tracking-wider">MIN</span>
                         </div>
                       </div>
                     </div>
                     <textarea
                       name="description"
                       rows="2"
-                      class="w-full bg-transparent text-stone-400 text-sm outline-none focus:text-stone-200 transition-colors resize-none"
+                      class="w-full bg-transparent text-zinc-600 dark:text-zinc-400 text-sm outline-none focus:text-zinc-900 dark:focus:text-zinc-200 transition-colors resize-none mt-1"
                     >{service.description.trim()}</textarea>
 
-                    <div class="flex items-center justify-end gap-3 pt-2 border-t border-stone-800/50">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
                       <button
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-emerald-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-indigo-600 sm:bg-transparent dark:bg-indigo-500 text-white sm:text-zinc-400 dark:sm:text-zinc-500 hover:bg-indigo-750 dark:hover:bg-indigo-600 sm:hover:bg-transparent dark:sm:hover:bg-transparent hover:text-white sm:hover:text-indigo-600 dark:sm:hover:text-indigo-400 border border-transparent sm:border-none rounded-xl sm:rounded-none transition-colors uppercase tracking-widest cursor-pointer shadow-xs sm:shadow-none"
                       >
-                        <Save className="w-3 h-3" />
-                        Guardar
+                        <Save className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
+                        Guardar Cambios
                       </button>
                       <button
                         form={`delete-${service.id}`}
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-red-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-red-500/10 sm:bg-transparent text-red-650 dark:text-red-500 sm:text-zinc-400 dark:sm:text-zinc-500 hover:bg-red-650 sm:hover:bg-transparent hover:text-white sm:hover:text-red-600 dark:sm:hover:text-red-400 border border-transparent sm:border-none rounded-xl sm:rounded-none transition-colors uppercase tracking-widest cursor-pointer"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
                         Eliminar
                       </button>
                     </div>
@@ -434,8 +434,8 @@ const availableIcons = [
     // Activar visualmente el icono por defecto
     buttons.forEach((btn) => {
       if (btn.getAttribute("data-icon") === newServiceInput.value) {
-        btn.classList.add("border-emerald-500", "text-emerald-500", "bg-emerald-500/10");
-        btn.classList.remove("border-stone-800", "text-stone-500");
+        btn.classList.add("border-indigo-650", "text-indigo-650", "bg-indigo-50", "dark:border-indigo-500", "dark:text-indigo-400", "dark:bg-indigo-500/10");
+        btn.classList.remove("border-zinc-200", "dark:border-zinc-800", "text-zinc-400", "dark:text-zinc-500", "bg-zinc-55");
       }
       
       btn.addEventListener("click", () => {
@@ -443,12 +443,12 @@ const availableIcons = [
         newServiceInput.value = selectedIcon;
         
         buttons.forEach((b) => {
-          b.classList.remove("border-emerald-500", "text-emerald-500", "bg-emerald-500/10");
-          b.classList.add("border-stone-800", "text-stone-500");
+          b.classList.remove("border-indigo-655", "border-indigo-650", "text-indigo-650", "bg-indigo-50", "dark:border-indigo-500", "dark:text-indigo-400", "dark:bg-indigo-500/10");
+          b.classList.add("border-zinc-200", "dark:border-zinc-800", "text-zinc-400", "dark:text-zinc-500");
         });
         
-        btn.classList.add("border-emerald-500", "text-emerald-500", "bg-emerald-500/10");
-        btn.classList.remove("border-stone-800", "text-stone-500");
+        btn.classList.add("border-indigo-600", "text-indigo-600", "bg-indigo-50", "dark:border-indigo-500", "dark:text-indigo-400", "dark:bg-indigo-500/10");
+        btn.classList.remove("border-zinc-200", "dark:border-zinc-800", "text-zinc-400", "dark:text-zinc-500");
       });
     });
   }
@@ -469,12 +469,12 @@ const availableIcons = [
           
           // Actualizar clases de los botones del selector
           buttons.forEach((b) => {
-            b.classList.remove("bg-primary/20", "border-primary", "text-primary");
-            b.classList.add("bg-stone-950", "border-stone-800", "text-stone-500");
+            b.classList.remove("bg-indigo-50", "dark:bg-indigo-500/10", "border-indigo-600", "dark:border-indigo-500", "text-indigo-600", "dark:text-indigo-400");
+            b.classList.add("bg-zinc-50", "dark:bg-zinc-950", "border-zinc-200", "dark:border-zinc-800", "text-zinc-400", "dark:text-zinc-500");
           });
           
-          btn.classList.add("bg-primary/20", "border-primary", "text-primary");
-          btn.classList.remove("bg-stone-950", "border-stone-800", "text-stone-500");
+          btn.classList.add("bg-indigo-50", "dark:bg-indigo-500/10", "border-indigo-600", "dark:border-indigo-500", "text-indigo-600", "dark:text-indigo-400");
+          btn.classList.remove("bg-zinc-50", "dark:bg-zinc-950", "border-zinc-200", "dark:border-zinc-800", "text-zinc-400", "dark:text-zinc-500");
           
           // Copiar el SVG al contenedor de preview grande
           previewContainer.innerHTML = btn.innerHTML;

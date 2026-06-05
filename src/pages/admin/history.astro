@@ -102,41 +102,67 @@ const getPageUrl = (p: number) => {
 ---
 
 <AdminLayout title="Historial de Citas">
-  <div class="max-w-6xl mx-auto space-y-8 text-stone-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
-    <!-- Encabezado de la página -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-black text-white uppercase tracking-tight">
-          Historial de Citas
-        </h2>
-        <p class="text-stone-500 text-sm mt-1 font-medium italic">
-          Busca, filtra y audita el registro de citas de Barber Ray
+  <div class="w-full space-y-8 text-zinc-700 dark:text-zinc-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+    <!-- ══════════════ HEADER ══════════════ -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div class="space-y-1.5">
+        <!-- Línea decorativa indigo -->
+        <div class="flex items-center gap-3">
+          <div class="w-1 h-7 rounded-full bg-indigo-600 dark:bg-indigo-400 shadow-md shadow-indigo-500/20"></div>
+          <h2 class="text-2xl font-black text-zinc-950 dark:text-white uppercase tracking-tight font-display">
+            Historial de Citas
+          </h2>
+        </div>
+        <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium pl-4">
+          Busca, filtra y audita el registro completo de Barber Ray
         </p>
+      </div>
+      <!-- Contador total -->
+      <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl px-4 py-2.5 self-start sm:self-auto shadow-xs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+          <line x1="16" x2="16" y1="2" y2="6"/>
+          <line x1="8" x2="8" y1="2" y2="6"/>
+          <line x1="3" x2="21" y1="10" y2="10"/>
+        </svg>
+        <span class="text-sm font-black text-zinc-950 dark:text-white">{totalCount}</span>
+        <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">citas en total</span>
       </div>
     </div>
 
-    <!-- Sección de Filtros -->
-    <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-stone-900 border border-stone-800 p-6 rounded-3xl shadow-xl">
+    <!-- ══════════════ PANEL DE FILTROS ══════════════ -->
+    <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs">
+
       <!-- Búsqueda -->
       <div class="flex flex-col gap-1.5">
-        <label for="search" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Buscar Cliente</label>
-        <input
-          type="text"
-          id="search"
-          name="search"
-          value={search}
-          placeholder="Nombre o email..."
-          class="bg-stone-950 border border-stone-850 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-600"
-        />
+        <label for="search" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5 block">
+          Buscar Cliente
+        </label>
+        <div class="relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input
+            type="text"
+            id="search"
+            name="search"
+            value={search}
+            placeholder="Nombre o email..."
+            class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl pl-9 pr-4 py-2.5 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/60 transition-all w-full placeholder:text-zinc-400"
+          />
+        </div>
       </div>
 
       <!-- Estado -->
       <div class="flex flex-col gap-1.5">
-        <label for="status" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Estado</label>
+        <label for="status" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5 block">
+          Estado
+        </label>
         <select
           id="status"
           name="status"
-          class="bg-stone-950 border border-stone-850 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/60 transition-all w-full appearance-none cursor-pointer"
         >
           <option value="all" selected={status === "all"}>Todos los Estados</option>
           <option value="pending" selected={status === "pending"}>Pendiente</option>
@@ -148,11 +174,13 @@ const getPageUrl = (p: number) => {
 
       <!-- Barbero -->
       <div class="flex flex-col gap-1.5">
-        <label for="barberId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Barbero</label>
+        <label for="barberId" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5 block">
+          Barbero
+        </label>
         <select
           id="barberId"
           name="barberId"
-          class="bg-stone-950 border border-stone-850 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/60 transition-all w-full appearance-none cursor-pointer"
         >
           <option value="all" selected={barberId === "all"}>Todos los Barberos</option>
           {barbers?.map((barber: any) => (
@@ -161,43 +189,56 @@ const getPageUrl = (p: number) => {
         </select>
       </div>
 
-      <!-- Botones de Acción de Filtros -->
+      <!-- Botones de Acción -->
       <div class="flex items-end gap-2">
         <button
           type="submit"
-          class="flex-1 bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-sm py-2.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 text-center uppercase tracking-wider"
+          class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs py-3 rounded-xl transition-all cursor-pointer shadow-xs text-center uppercase tracking-wider"
         >
           Filtrar
         </button>
         <a
           href="/admin/history"
-          class="bg-stone-800 hover:bg-stone-750 text-stone-300 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center border border-stone-700"
+          class="bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-bold text-xs px-4 py-3 rounded-xl transition-all text-center border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 whitespace-nowrap"
         >
           Limpiar
         </a>
       </div>
     </form>
 
-    <div class="bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden shadow-2xl relative">
+    <!-- ══════════════ TABLA + CARDS ══════════════ -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-xs relative">
+
       <!-- Vista Escritorio (Tabla) -->
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-stone-950/50 border-b border-stone-800">
-              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra whitespace-nowrap">Fecha & Hora</th>
-              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra">Cliente</th>
-              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra">Servicio</th>
-              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra">Barbero</th>
-              <th class="px-6 py-5 text-2xs font-black text-stone-500 uppercase tracking-ultra whitespace-nowrap">Estado</th>
+            <tr class="bg-zinc-50 dark:bg-zinc-950/40 border-b border-zinc-200 dark:border-zinc-800/80">
+              <th class="px-6 py-5 text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider whitespace-nowrap">Fecha & Hora</th>
+              <th class="px-6 py-5 text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Cliente</th>
+              <th class="px-6 py-5 text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Servicio</th>
+              <th class="px-6 py-5 text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Barbero</th>
+              <th class="px-6 py-5 text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider whitespace-nowrap">Estado</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-stone-800/50">
+          <tbody class="divide-y divide-zinc-200/60 dark:divide-zinc-800/40">
             {appointments.length === 0 ? (
               <tr>
-                <td colspan="5" class="px-6 py-16 text-center text-stone-500">
-                  <div class="flex flex-col items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-stone-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                    <p class="font-medium">No se encontraron citas con los filtros seleccionados.</p>
+                <td colspan="5" class="px-6 py-20 text-center">
+                  <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                        <line x1="16" x2="16" y1="2" y2="6"/>
+                        <line x1="8" x2="8" y1="2" y2="6"/>
+                        <line x1="3" x2="21" y1="10" y2="10"/>
+                        <path d="m9 16 2 2 4-4"/>
+                      </svg>
+                    </div>
+                    <div class="space-y-1">
+                      <p class="font-bold text-zinc-800 dark:text-zinc-200 text-sm uppercase tracking-wider">Sin resultados</p>
+                      <p class="text-zinc-500 dark:text-zinc-500 text-xs">No hay citas que coincidan con los filtros aplicados.</p>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -206,63 +247,71 @@ const getPageUrl = (p: number) => {
                 const dateObj = new Date(app.appointment_date);
                 const dateStr = dateObj.toLocaleDateString("es-MX", { weekday: 'short', day: '2-digit', month: 'short' });
                 const timeStr = dateObj.toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit' });
-                
-                let badgeClass = "bg-stone-800 text-stone-400 border border-stone-700";
+
+                let badgeClass = "bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60";
                 let statusText: string = app.status;
-                
+
                 if (app.status === 'pending') {
-                  badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";
+                  badgeClass = "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/20";
                   statusText = "Pendiente";
                 } else if (app.status === 'confirmed') {
-                  badgeClass = "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20";
+                  badgeClass = "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20";
                   statusText = "Confirmada";
                 } else if (app.status === 'cancelled') {
-                  badgeClass = "bg-red-500/10 text-red-500 border border-red-500/20";
+                  badgeClass = "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/60 dark:border-red-500/20";
                   statusText = "Cancelada";
                 } else if (app.status === 'completed') {
-                  badgeClass = "bg-blue-500/10 text-blue-500 border border-blue-500/20";
+                  badgeClass = "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/20";
                   statusText = "Completada";
                 }
 
                 return (
-                  <tr class="hover:bg-stone-800/40 transition-colors group">
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <div class="flex flex-col">
-                        <span class="font-bold text-white capitalize text-sm">{dateStr}</span>
-                        <span class="text-xs text-amber-500 font-bold mt-0.5">{timeStr}</span>
+                  <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors duration-150 group">
+                    <!-- Fecha -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="inline-flex flex-col bg-indigo-50 dark:bg-indigo-500/10 rounded-lg px-2.5 py-1.5">
+                        <span class="font-bold text-zinc-900 dark:text-white capitalize text-xs leading-tight">{dateStr}</span>
+                        <span class="text-2xs text-indigo-600 dark:text-indigo-400 font-extrabold mt-0.5">{timeStr}</span>
                       </div>
                     </td>
-                    <td class="px-6 py-5">
+                    <!-- Cliente -->
+                    <td class="px-6 py-4">
                       <div class="flex flex-col">
-                        <span class="font-bold text-white text-sm">{app.client_name}</span>
-                        <span class="text-xs text-stone-500 mt-0.5">
+                        <span class="font-bold text-zinc-900 dark:text-white text-sm leading-tight">{app.client_name}</span>
+                        <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[200px]">
                           {app.client_email || "Sin email registrado"}
-                          {app.client_phone && <span class="text-stone-600 ml-1.5">• {app.client_phone}</span>}
                         </span>
+                        {app.client_phone && (
+                          <span class="text-2xs text-zinc-400 dark:text-zinc-500 mt-0.5">• {app.client_phone}</span>
+                        )}
                       </div>
                     </td>
-                    <td class="px-6 py-5">
+                    <!-- Servicio -->
+                    <td class="px-6 py-4">
                       <div class="flex flex-col">
-                        <span class="font-medium text-stone-300 text-sm">{app.service?.name || "N/A"}</span>
-                        <span class="text-xs text-stone-500 mt-0.5">
-                          {app.service?.duration ? (String(app.service.duration).toLowerCase().includes("min") ? app.service.duration : `${app.service.duration} min`) : "-"} • 
-                          <span class="font-bold">
+                        <span class="font-semibold text-zinc-850 dark:text-zinc-200 text-sm">{app.service?.name || "N/A"}</span>
+                        <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                          {app.service?.duration ? (String(app.service.duration).toLowerCase().includes("min") ? app.service.duration : `${app.service.duration} min`) : "—"}
+                          {" · "}
+                          <span class="font-bold text-zinc-900 dark:text-indigo-450">
                             {app.service?.price ? (String(app.service.price).startsWith("$") ? app.service.price : `$${app.service.price}`) : "$0"}
                           </span>
                         </span>
                       </div>
                     </td>
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-center text-xs font-black text-amber-500 shadow-inner">
-                          {app.barber?.name?.charAt(0) || "?"}
+                    <!-- Barbero -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-150 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-700 dark:text-zinc-300 shrink-0">
+                          {app.barber?.name?.charAt(0).toUpperCase() || "?"}
                         </div>
-                        <span class="text-sm font-medium text-stone-300">{app.barber?.name || "Sin Asignar"}</span>
+                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-350">{app.barber?.name || "Sin Asignar"}</span>
                       </div>
                     </td>
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <span class={`px-3 py-1.5 text-2xs font-black uppercase tracking-ultra rounded-lg inline-flex items-center gap-2 ${badgeClass}`}>
-                        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                    <!-- Estado -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class={`px-3 py-1.5 text-2xs font-bold uppercase tracking-wider rounded-lg inline-flex items-center gap-1.5 ${badgeClass}`}>
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                         {statusText}
                       </span>
                     </td>
@@ -274,13 +323,24 @@ const getPageUrl = (p: number) => {
         </table>
       </div>
 
-      <!-- Vista Móvil (Tarjetas) -->
-      <div class="block md:hidden divide-y divide-stone-850">
+      <!-- Vista Móvil (Cards) -->
+      <div class="block md:hidden divide-y divide-zinc-200/60 dark:divide-zinc-800/40">
         {appointments.length === 0 ? (
-          <div class="px-6 py-16 text-center text-stone-500">
-            <div class="flex flex-col items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-stone-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-              <p class="font-medium">No se encontraron citas con los filtros seleccionados.</p>
+          <div class="px-6 py-20 text-center">
+            <div class="flex flex-col items-center gap-4">
+              <div class="w-16 h-16 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                  <path d="m9 16 2 2 4-4"/>
+                </svg>
+              </div>
+              <div class="space-y-1">
+                <p class="font-bold text-zinc-850 dark:text-zinc-200 text-sm uppercase tracking-wider">Sin resultados</p>
+                <p class="text-zinc-500 dark:text-zinc-500 text-xs">No hay citas que coincidan con los filtros aplicados.</p>
+              </div>
             </div>
           </div>
         ) : (
@@ -288,65 +348,68 @@ const getPageUrl = (p: number) => {
             const dateObj = new Date(app.appointment_date);
             const dateStr = dateObj.toLocaleDateString("es-MX", { weekday: 'short', day: '2-digit', month: 'short' });
             const timeStr = dateObj.toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit' });
-            
-            let badgeClass = "bg-stone-800 text-stone-400 border border-stone-700";
+
+            let badgeClass = "bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60";
             let statusText: string = app.status;
-            
+
             if (app.status === 'pending') {
-              badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";
+              badgeClass = "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/20";
               statusText = "Pendiente";
             } else if (app.status === 'confirmed') {
-              badgeClass = "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20";
+              badgeClass = "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20";
               statusText = "Confirmada";
             } else if (app.status === 'cancelled') {
-              badgeClass = "bg-red-500/10 text-red-500 border border-red-500/20";
+              badgeClass = "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200/60 dark:border-red-500/20";
               statusText = "Cancelada";
             } else if (app.status === 'completed') {
-              badgeClass = "bg-blue-500/10 text-blue-500 border border-blue-500/20";
+              badgeClass = "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/20";
               statusText = "Completada";
             }
 
             return (
-              <div class="p-6 space-y-4">
-                {/* Cabecera Tarjeta: Fecha & Estado */}
-                <div class="flex items-start justify-between gap-4">
-                  <div class="flex flex-col">
-                    <span class="font-bold text-white capitalize text-sm">{dateStr}</span>
-                    <span class="text-xs text-amber-500 font-bold mt-0.5">{timeStr}</span>
+              <div class="border-b border-zinc-200 dark:border-zinc-800/40 p-5 space-y-3.5">
+                {/* Header: Fecha chip + Badge status */}
+                <div class="flex items-start justify-between gap-3">
+                  <div class="inline-flex flex-col bg-indigo-50 dark:bg-indigo-500/10 rounded-lg px-2.5 py-1.5">
+                    <span class="font-bold text-zinc-900 dark:text-white capitalize text-xs leading-tight">{dateStr}</span>
+                    <span class="text-2xs text-indigo-600 dark:text-indigo-400 font-extrabold mt-0.5">{timeStr}</span>
                   </div>
-                  <div>
-                    <span class={`px-2.5 py-1 text-3xs font-black uppercase tracking-ultra rounded-lg inline-flex items-center gap-1.5 ${badgeClass}`}>
-                      <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span>
-                      {statusText}
-                    </span>
-                  </div>
+                  <span class={`px-2.5 py-1 text-2xs font-bold uppercase tracking-wider rounded-lg inline-flex items-center gap-1.5 shrink-0 ${badgeClass}`}>
+                    <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                    {statusText}
+                  </span>
                 </div>
 
-                {/* Detalles de la cita */}
-                <div class="space-y-3 text-xs">
+                {/* Cliente */}
+                <div>
+                  <span class="text-3xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Cliente</span>
+                  <span class="font-bold text-zinc-900 dark:text-zinc-150 text-sm block">{app.client_name}</span>
+                  <span class="text-zinc-550 dark:text-zinc-400 text-xs block mt-0.5 truncate">
+                    {app.client_email || "Sin email registrado"}
+                    {app.client_phone && <span class="text-zinc-400 dark:text-zinc-650 ml-1.5">• {app.client_phone}</span>}
+                  </span>
+                </div>
+
+                {/* Servicio + Barbero */}
+                <div class="grid grid-cols-2 gap-4 pt-3.5 border-t border-zinc-200 dark:border-zinc-800/40">
                   <div>
-                    <span class="text-3xs font-black text-stone-500 uppercase tracking-ultra block">Cliente</span>
-                    <span class="font-bold text-stone-200 block mt-0.5">{app.client_name}</span>
-                    <span class="text-stone-500 text-3xs block mt-0.5 truncate max-w-xs">
-                      {app.client_email || "Sin email registrado"}
-                      {app.client_phone && <span class="text-stone-600 ml-1.5">• {app.client_phone}</span>}
+                    <span class="text-3xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Servicio</span>
+                    <span class="font-bold text-zinc-800 dark:text-zinc-250 text-xs block">{app.service?.name || "N/A"}</span>
+                    <span class="text-zinc-500 dark:text-zinc-400 text-2xs block mt-0.5">
+                      {app.service?.duration ? (String(app.service.duration).toLowerCase().includes("min") ? app.service.duration : `${app.service.duration} min`) : "—"}
+                      {" · "}
+                      <span class="font-bold text-indigo-600 dark:text-indigo-400">
+                        {app.service?.price ? (String(app.service.price).startsWith("$") ? app.service.price : `$${app.service.price}`) : "$0"}
+                      </span>
                     </span>
                   </div>
-
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <span class="text-3xs font-black text-stone-500 uppercase tracking-ultra block">Servicio</span>
-                      <span class="font-bold text-stone-200 block mt-0.5">{app.service?.name || "N/A"}</span>
-                      <span class="text-stone-500 text-3xs block mt-0.5">
-                        {app.service?.duration ? (String(app.service.duration).toLowerCase().includes("min") ? app.service.duration : `${app.service.duration} min`) : "-"} • 
-                        <span class="font-bold text-amber-500">
-                          {app.service?.price ? (String(app.service.price).startsWith("$") ? app.service.price : `$${app.service.price}`) : "$0"}
-                        </span>
-                      </span>
-                    </div>
-                    <div>
-                      <span class="text-3xs font-black text-stone-500 uppercase tracking-ultra block">Barbero</span>
-                      <span class="font-bold text-stone-200 block mt-0.5">{app.barber?.name || "Sin Asignar"}</span>
+                  <div>
+                    <span class="text-3xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Barbero</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <div class="w-6 h-6 rounded-lg bg-zinc-150 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/60 flex items-center justify-center text-2xs font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
+                        {app.barber?.name?.charAt(0).toUpperCase() || "?"}
+                      </div>
+                      <span class="font-bold text-zinc-800 dark:text-zinc-250 text-xs">{app.barber?.name || "Sin Asignar"}</span>
                     </div>
                   </div>
                 </div>
@@ -356,30 +419,31 @@ const getPageUrl = (p: number) => {
         )}
       </div>
 
-      <!-- Paginación -->
+      <!-- ══════════════ PAGINACIÓN ══════════════ -->
       {totalPages > 1 && (
-        <div class="px-6 py-5 bg-stone-950/30 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-xs text-stone-500 font-medium">
-            Página <span class="text-stone-300 font-bold">{page}</span> de <span class="text-stone-300 font-bold">{totalPages}</span> 
-            <span class="mx-1.5">•</span> 
-            <span class="text-stone-400 font-semibold">{totalCount}</span> citas encontradas
+        <div class="px-6 py-5 bg-zinc-50/50 dark:bg-zinc-950/40 border-t border-zinc-200 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p class="text-xs text-zinc-550 dark:text-zinc-400 font-medium">
+            Página <span class="text-zinc-900 dark:text-zinc-300 font-extrabold">{page}</span> de <span class="text-zinc-900 dark:text-zinc-300 font-extrabold">{totalPages}</span>
+            <span class="mx-2 text-zinc-200 dark:text-zinc-800">•</span>
+            <span class="text-indigo-600 dark:text-indigo-400 font-extrabold">{totalCount}</span> citas encontradas
           </p>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
+            <!-- Anterior -->
             <a
               href={page > 1 ? getPageUrl(page - 1) : "#"}
-              class={`px-4 py-2 rounded-xl text-xs font-bold border border-stone-800 transition-colors select-none ${page > 1 ? "bg-stone-900 hover:bg-stone-850 text-white cursor-pointer" : "text-stone-650 border-stone-900 pointer-events-none"}`}
+              class={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all select-none ${page > 1 ? "bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-350 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer" : "text-zinc-300 dark:text-zinc-800/40 border-zinc-200 dark:border-zinc-800/40 pointer-events-none"}`}
             >
-              Anterior
+              ← Anterior
             </a>
-            
+
+            <!-- Páginas -->
             <div class="flex items-center gap-1">
               {Array.from({ length: totalPages }).map((_, idx) => {
                 const targetPage = idx + 1;
-                // Mostrar un rango limitado si hay muchas páginas
                 if (totalPages > 5 && Math.abs(page - targetPage) > 1 && targetPage !== 1 && targetPage !== totalPages) {
                   if (targetPage === 2 || targetPage === totalPages - 1) {
-                    return <span class="px-1 text-stone-650 font-bold text-xs select-none">...</span>;
+                    return <span class="px-1.5 text-zinc-400 dark:text-zinc-600 font-bold text-xs select-none">…</span>;
                   }
                   return null;
                 }
@@ -387,7 +451,7 @@ const getPageUrl = (p: number) => {
                 return (
                   <a
                     href={getPageUrl(targetPage)}
-                    class={`w-8 h-8 rounded-lg text-xs font-black flex items-center justify-center transition-all ${isCurrent ? "bg-amber-500 text-stone-950" : "bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-white border border-stone-800"}`}
+                    class={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${isCurrent ? "bg-indigo-650 text-white shadow-xs shadow-indigo-500/20" : "bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white border border-zinc-200 dark:border-zinc-800/80"}`}
                   >
                     {targetPage}
                   </a>
@@ -395,11 +459,12 @@ const getPageUrl = (p: number) => {
               })}
             </div>
 
+            <!-- Siguiente -->
             <a
               href={page < totalPages ? getPageUrl(page + 1) : "#"}
-              class={`px-4 py-2 rounded-xl text-xs font-bold border border-stone-800 transition-colors select-none ${page < totalPages ? "bg-stone-900 hover:bg-stone-850 text-white cursor-pointer" : "text-stone-650 border-stone-900 pointer-events-none"}`}
+              class={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all select-none ${page < totalPages ? "bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-350 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer" : "text-zinc-300 dark:text-zinc-800/40 border-zinc-200 dark:border-zinc-800/40 pointer-events-none"}`}
             >
-              Siguiente
+              Siguiente →
             </a>
           </div>
         </div>

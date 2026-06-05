@@ -90,12 +90,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
 ---
 
 <AdminLayout title="Editar Hero Section">
-  <div class="max-w-4xl">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-2">Configuración del Hero</h2>
-      <p class="text-stone-400 text-sm">
-        Personaliza el mensaje principal que ven tus clientes al entrar al
-        sitio.
+  <div class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="border-b border-zinc-200 dark:border-zinc-800 pb-6">
+      <h2 class="text-2xl font-black text-zinc-950 dark:text-white uppercase tracking-tight font-display">Configuración del Hero</h2>
+      <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1 font-medium">
+        Personaliza el mensaje principal que ven tus clientes al entrar al sitio.
       </p>
     </div>
 
@@ -103,11 +102,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       isSuccess && (
         <div
           id="success-notification"
-          class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+          class="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-250 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 shadow-2xs"
         >
           <div class="flex items-center gap-3">
             <svg
-              class="w-5 h-5"
+              class="w-5 h-5 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -115,11 +114,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="2.5"
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            <span class="font-medium">
+            <span class="font-medium text-sm">
               Los cambios se han guardado correctamente.
             </span>
           </div>
@@ -137,11 +136,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       errorMessage && (
         <div
           id="error-notification"
-          class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4"
+          class="p-4 bg-red-50 dark:bg-red-500/10 border border-red-250 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 shadow-2xs"
         >
           <div class="flex items-center gap-3">
             <svg
-              class="w-5 h-5"
+              class="w-5 h-5 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -149,11 +148,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="2.5"
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span class="font-medium">{errorMessage}</span>
+            <span class="font-medium text-sm">{errorMessage}</span>
           </div>
           <button
             onclick="document.getElementById('error-notification').style.display='none'"
@@ -170,11 +169,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
 
       <!-- Imagen de Fondo -->
       <div
-        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+        class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xs"
       >
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
+        <div class="flex items-center gap-3">
+          <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+          <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
             Imagen de Fondo (Hero Background)
           </h3>
         </div>
@@ -182,7 +181,7 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div class="md:col-span-1">
             <div
-              class="relative group aspect-video md:aspect-square bg-stone-950 border-2 border-dashed border-stone-800 rounded-2xl overflow-hidden flex items-center justify-center hover:border-amber-500/50 transition-all cursor-pointer"
+              class="relative group aspect-video md:aspect-square bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden flex items-center justify-center hover:border-indigo-600 dark:hover:border-indigo-500 transition-all cursor-pointer shadow-inner"
             >
               <img
                 id="hero-preview"
@@ -190,10 +189,10 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
                 class="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:opacity-30 transition-opacity duration-300"
               />
               <div
-                class="relative z-10 flex flex-col items-center gap-2 text-stone-500 group-hover:text-amber-500 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
+                class="relative z-10 flex flex-col items-center gap-2 text-zinc-400 dark:text-zinc-600 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
               >
                 <Upload className="w-8 h-8" />
-                <span class="text-2xs font-black uppercase tracking-widest"
+                <span class="text-[10px] font-black uppercase tracking-widest"
                   >Cambiar Imagen</span
                 >
               </div>
@@ -208,25 +207,25 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
           </div>
           <div class="md:col-span-2 space-y-4">
             <div
-              class="p-4 bg-stone-950/50 rounded-xl border border-stone-800/50"
+              class="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800/60 shadow-2xs"
             >
-              <p class="text-xs text-stone-400 leading-relaxed">
-                <strong class="text-amber-500">Tip </strong> Para el Hero, usa imágenes
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <span class="text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider text-2xs mr-1">Tip</span> Para el Hero, usa imágenes
                 horizontales (landscape) de alta resolución (mínimo 1920x1080). Las
-                imágenes con tonos oscuros funcionan mejor con el diseño "Blood &
-                Steel".
+                imágenes con tonos oscuros funcionan mejor con el diseño de branding "Indigo & Zinc".
               </p>
             </div>
           </div>
         </div>
       </div>
+
       <!-- Textos Principales -->
       <div
-        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+        class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xs"
       >
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
+        <div class="flex items-center gap-3">
+          <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+          <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
             Textos Principales
           </h3>
         </div>
@@ -234,27 +233,27 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-2">
             <label
-              class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+              class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
               >Título</label
             >
             <input
               type="text"
               name="title"
               value={hero.title}
-              class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
+              class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-zinc-900 dark:text-white focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all text-sm shadow-2xs"
               required
             />
           </div>
           <div class="space-y-2">
             <label
-              class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+              class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
               >Subtítulo</label
             >
             <input
               type="text"
               name="subtitle"
               value={hero.subtitle}
-              class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
+              class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-zinc-900 dark:text-white focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all text-sm shadow-2xs"
               required
             />
           </div>
@@ -262,13 +261,13 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
 
         <div class="space-y-2">
           <label
-            class="text-2xs font-black text-text-muted uppercase tracking-ultra px-1"
+            class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
             >Descripción</label
           >
           <textarea
             name="description"
             rows="3"
-            class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all resize-none"
+            class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-zinc-900 dark:text-white focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all text-sm resize-none shadow-2xs"
             required>{hero.description}</textarea
           >
         </div>
@@ -278,11 +277,11 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
 
       <!-- Stats -->
       <div
-        class="bg-stone-900 border border-stone-800 rounded-3xl p-8 space-y-6"
+        class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xs"
       >
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
-          <h3 class="font-black text-white uppercase tracking-ultra text-2xs">
+        <div class="flex items-center gap-3">
+          <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+          <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
             Estadísticas (Stats)
           </h3>
         </div>
@@ -290,20 +289,20 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           {
             hero.stats.map((stat, index) => (
-              <div class="p-6 bg-stone-950 rounded-2xl border border-stone-800 space-y-3">
+              <div class="p-6 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-3 shadow-2xs">
                 <input
                   type="text"
                   name={`stat${index + 1}_value`}
                   placeholder="Valor (ej: 10+)"
                   value={stat.value}
-                  class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-lg font-bold text-white text-center focus:border-amber-500 outline-none"
+                  class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-lg font-black text-zinc-900 dark:text-white text-center focus:border-indigo-600 dark:focus:border-indigo-500 outline-none shadow-2xs font-display"
                 />
                 <input
                   type="text"
                   name={`stat${index + 1}_label`}
                   placeholder="Etiqueta"
                   value={stat.label}
-                  class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-2 text-xs text-stone-500 text-center focus:border-amber-500 outline-none"
+                  class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-600 dark:text-zinc-400 text-center focus:border-indigo-600 dark:focus:border-indigo-500 outline-none shadow-2xs"
                 />
               </div>
             ))
@@ -312,10 +311,10 @@ const isSuccess = Astro.url.searchParams.get("success") === "true";
       </div>
 
       <!-- Submit -->
-      <div class="flex justify-end">
+      <div class="flex justify-end w-full">
         <button
           type="submit"
-          class="bg-amber-500 hover:bg-amber-600 text-stone-950 font-black py-4 px-10 rounded-2xl transition-all shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-95 cursor-pointer"
+          class="w-full sm:w-auto justify-center bg-indigo-600 hover:bg-indigo-750 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-xs hover:shadow-md active:scale-98 cursor-pointer text-sm uppercase tracking-wider font-display"
         >
           Guardar Cambios
         </button>

@@ -67,58 +67,57 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
 ---
 
 <AdminLayout title="Moderación de Testimonios">
-  <div class="max-w-6xl mx-auto space-y-8">
-    
-    <!-- Header de Stats -->
+  <div class="w-full space-y-8">
+        <!-- Header de Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-stone-900 border border-stone-800 p-6 rounded-4xl flex items-center gap-4">
-        <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex items-center gap-4 shadow-xs animate-in fade-in duration-500">
+        <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 shadow-2xs">
           <MessageSquare className="w-6 h-6" />
         </div>
         <div>
-          <p class="text-2xs font-black text-stone-500 uppercase tracking-widest">Total Reseñas</p>
-          <p class="text-2xl font-black text-white">{allReviews.length}</p>
+          <p class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Total Reseñas</p>
+          <p class="text-2xl font-black text-zinc-900 dark:text-white font-display">{allReviews.length}</p>
         </div>
       </div>
-      <div class="bg-stone-900 border border-stone-800 p-6 rounded-4xl flex items-center gap-4">
-        <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex items-center gap-4 shadow-xs animate-in fade-in duration-500 delay-100">
+        <div class="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 shadow-2xs">
           <Star className="w-6 h-6 fill-current" />
         </div>
         <div>
-          <p class="text-2xs font-black text-stone-500 uppercase tracking-widest">Destacadas (Live)</p>
-          <p class="text-2xl font-black text-white">{featuredCount}</p>
+          <p class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Destacadas (Live)</p>
+          <p class="text-2xl font-black text-zinc-900 dark:text-white font-display">{featuredCount}</p>
         </div>
       </div>
-      <div class="bg-stone-900 border border-stone-800 p-6 rounded-4xl flex items-center gap-4">
-        <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex items-center gap-4 shadow-xs animate-in fade-in duration-500 delay-200">
+        <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 shadow-2xs">
           <CheckCircle2 className="w-6 h-6" />
         </div>
         <div>
-          <p class="text-2xs font-black text-stone-500 uppercase tracking-widest">Estado Sistema</p>
-          <p class="text-xs font-bold text-emerald-500 uppercase">Activo</p>
+          <p class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Estado Sistema</p>
+          <p class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest font-display">Activo</p>
         </div>
       </div>
     </div>
 
     {isSuccess && (
-      <div id="success-notification" class="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+      <div id="success-notification" class="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 shadow-2xs">
         <div class="flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5" />
-          <span class="font-medium text-sm">Actualizado correctamente.</span>
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span class="font-medium text-sm">Cambios de testimonios guardados correctamente.</span>
         </div>
-        <button onclick="document.getElementById('success-notification').style.display='none'" class="cursor-pointer p-1 hover:bg-emerald-500/10 rounded-lg transition-colors">
+        <button onclick="document.getElementById('success-notification').style.display='none'" class="cursor-pointer p-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 rounded-lg transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
     )}
 
     {errorMessage && (
-      <div id="error-notification" class="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+      <div id="error-notification" class="p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 shadow-2xs">
         <div class="flex items-center gap-3">
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 shrink-0" />
           <span class="font-medium text-sm">Error: {errorMessage}</span>
         </div>
-        <button onclick="document.getElementById('error-notification').style.display='none'" class="cursor-pointer p-1 hover:bg-red-500/10 rounded-lg transition-colors">
+        <button onclick="document.getElementById('error-notification').style.display='none'" class="cursor-pointer p-1.5 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -127,16 +126,16 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
     <!-- Lista de Reseñas -->
     <div class="space-y-4">
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-1.5 h-6 bg-primary rounded-full"></div>
-        <h2 class="text-xl font-black text-white uppercase tracking-widest">Feed de Reseñas Reales</h2>
+        <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+        <h2 class="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight font-display">Feed de Reseñas Reales</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {allReviews.map((review) => (
-          <div class={`bg-stone-900 border ${review.is_featured ? 'border-amber-500/50 shadow-lg shadow-amber-500/5' : 'border-stone-800'} rounded-5xl p-8 transition-all relative group overflow-hidden`}>
+          <div class={`bg-white dark:bg-zinc-900 border ${review.is_featured ? 'border-amber-400 dark:border-amber-500/60 shadow-md shadow-amber-500/5' : 'border-zinc-200 dark:border-zinc-800'} rounded-2xl p-6 hover:shadow-xs transition-all duration-300 relative group overflow-hidden`}>
             
             {review.is_featured && (
-              <div class="absolute top-0 right-0 bg-amber-500 text-stone-950 px-4 py-1 text-3xs font-black uppercase tracking-widest rounded-bl-2xl">
+              <div class="absolute top-0 right-0 bg-amber-500 text-zinc-950 px-4 py-1 text-[9px] font-black uppercase tracking-widest rounded-bl-xl font-display">
                 Destacado
               </div>
             )}
@@ -146,32 +145,32 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
               <div class="flex justify-between items-center">
                 <div class="flex gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star className={`w-4 h-4 ${i < review.rating ? 'fill-amber-500 text-amber-500' : 'text-stone-800'}`} />
+                    <Star className={`w-4 h-4 ${i < review.rating ? 'fill-amber-500 text-amber-500 dark:fill-amber-405 dark:text-amber-400' : 'text-zinc-200 dark:text-zinc-800'}`} />
                   ))}
                 </div>
-                <span class="text-2xs font-bold text-stone-500 uppercase tracking-tighter">
+                <span class="text-3xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   {new Date(review.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
 
               <!-- Comentario -->
               <div class="relative">
-                <span class="absolute -top-4 -left-2 text-4xl text-primary/20 font-serif italic">"</span>
-                <p class="text-stone-300 text-base italic leading-relaxed relative z-10 px-2">
+                <span class="absolute -top-4 -left-2 text-4xl text-indigo-600/10 dark:text-indigo-400/10 font-serif italic font-black">"</span>
+                <p class="text-zinc-700 dark:text-zinc-300 text-sm italic leading-relaxed relative z-10 px-2">
                   {review.comment || "Sin comentarios."}
                 </p>
-                <span class="absolute -bottom-6 -right-2 text-4xl text-primary/20 font-serif italic">"</span>
+                <span class="absolute -bottom-6 -right-2 text-4xl text-indigo-600/10 dark:text-indigo-400/10 font-serif italic font-black">"</span>
               </div>
 
               <!-- Info de la Cita -->
-              <div class="pt-6 border-t border-stone-800/50 flex items-center justify-between">
+              <div class="pt-5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-stone-950 flex items-center justify-center text-stone-500">
+                  <div class="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 shadow-2xs">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <p class="text-2xs font-black text-stone-600 uppercase tracking-widest">Atendido por</p>
-                    <p class="text-xs font-bold text-stone-400">{review.appointments?.barber?.name || 'Staff'}</p>
+                    <p class="text-3xs font-black text-zinc-450 dark:text-zinc-500 uppercase tracking-wider">Atendido por</p>
+                    <p class="text-xs font-bold text-zinc-700 dark:text-zinc-400">{review.appointments?.barber?.name || 'Staff'}</p>
                   </div>
                 </div>
                 
@@ -186,8 +185,8 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
                       title={review.is_featured ? "Quitar de destacados" : "Marcar como destacado"}
                       class={`cursor-pointer w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                         review.is_featured 
-                          ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20' 
-                          : 'bg-stone-950 text-stone-600 hover:text-amber-500 border border-stone-800'
+                          ? 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-md shadow-amber-500/20' 
+                          : 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-600 hover:text-amber-500 dark:hover:text-amber-400 border border-zinc-200 dark:border-zinc-800'
                       }`}
                     >
                       {review.is_featured ? <ShieldX className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
@@ -200,7 +199,7 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
                     <input type="hidden" name="id" value={review.id} />
                     <button 
                       type="submit" 
-                      class="cursor-pointer w-10 h-10 rounded-xl bg-stone-950 text-stone-600 hover:text-red-500 border border-stone-800 flex items-center justify-center transition-all"
+                      class="cursor-pointer w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-600 hover:text-red-650 dark:hover:text-red-500 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center transition-all"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -213,10 +212,10 @@ const featuredCount = allReviews.filter(r => r.is_featured).length;
       </div>
 
       {allReviews.length === 0 && (
-        <div class="bg-stone-900/50 border border-dashed border-stone-800 rounded-6xl p-20 text-center">
-          <MessageSquare className="w-12 h-12 text-stone-800 mx-auto mb-4" />
-          <h3 class="text-xl font-black text-stone-600 uppercase tracking-widest">Sin reseñas registradas</h3>
-          <p class="text-stone-500 text-sm mt-2">No se han encontrado reseñas de clientes en el sistema para moderar.</p>
+        <div class="bg-white dark:bg-zinc-900/50 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-16 text-center shadow-xs">
+          <MessageSquare className="w-12 h-12 text-zinc-300 dark:text-zinc-800 mx-auto mb-4" />
+          <h3 class="text-base font-black text-zinc-400 dark:text-zinc-600 uppercase tracking-widest font-display">Sin reseñas registradas</h3>
+          <p class="text-zinc-500 dark:text-zinc-500 text-xs mt-2">No se han encontrado reseñas de clientes en el sistema para moderar.</p>
         </div>
       )}
     </div>

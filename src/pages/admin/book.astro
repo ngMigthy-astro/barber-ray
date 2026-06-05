@@ -116,41 +116,40 @@ for (let i = 0; i < 14; i++) {
   });
 }
 ---
-
 <AdminLayout title="Agendar Cita Manual">
-  <div class="max-w-xl mx-auto space-y-8 text-stone-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <div class="max-w-2xl w-full space-y-8 text-zinc-700 dark:text-zinc-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
     
     <!-- Encabezado -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-800 pb-6 gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-6 gap-4">
       <div>
-        <h2 class="text-2xl font-black text-white uppercase tracking-tight">Agendar Cita Manual</h2>
-        <p class="text-stone-500 text-sm mt-1 font-medium italic">Registra una reservación desde el mostrador</p>
+        <h2 class="text-2xl font-black text-zinc-950 dark:text-white uppercase tracking-tight font-display">Agendar Cita Manual</h2>
+        <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1 font-medium">Registra una reservación desde el mostrador</p>
       </div>
-      <a href="/admin/agenda" class="bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center">
+      <a href="/admin/agenda" class="w-full sm:w-auto flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-350 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center shadow-xs">
         Volver a la Agenda
       </a>
     </div>
 
     {errorMessage && (
-      <div class="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold flex items-center gap-2">
+      <div class="p-4 rounded-2xl bg-red-550/10 border border-red-200 dark:border-red-500/20 text-red-650 dark:text-red-400 text-sm font-semibold flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
         {errorMessage}
       </div>
     )}
 
     <!-- Formulario de Registro -->
-    <form method="POST" class="bg-stone-900 border border-stone-800 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6">
+    <form method="POST" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 p-6 sm:p-8 rounded-2xl shadow-xs space-y-6">
       
       <!-- Tipo de Cliente -->
       <div class="flex flex-col gap-2">
-        <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Tipo de Cliente</label>
-        <div class="flex items-center gap-6 bg-stone-950 p-4 rounded-xl border border-stone-850">
-          <label class="flex items-center gap-2 text-sm text-stone-300 cursor-pointer">
-            <input type="radio" name="clientType" value="registered" checked class="text-amber-500 focus:ring-0 cursor-pointer" />
+        <label class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Tipo de Cliente</label>
+        <div class="flex items-center gap-6 bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <label class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer">
+            <input type="radio" name="clientType" value="registered" checked class="text-indigo-600 focus:ring-0 cursor-pointer" />
             Cliente Registrado
           </label>
-          <label class="flex items-center gap-2 text-sm text-stone-300 cursor-pointer">
-            <input type="radio" name="clientType" value="manual" class="text-amber-500 focus:ring-0 cursor-pointer" />
+          <label class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer">
+            <input type="radio" name="clientType" value="manual" class="text-indigo-600 focus:ring-0 cursor-pointer" />
             Sin Cuenta (Walk-in)
           </label>
         </div>
@@ -158,11 +157,11 @@ for (let i = 0; i < 14; i++) {
 
       <!-- Cliente Registrado (Dropdown) -->
       <div id="registeredClientContainer" class="flex flex-col gap-2">
-        <label for="userId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Seleccionar Cliente</label>
+        <label for="userId" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Seleccionar Cliente</label>
         <select
           id="userId"
           name="userId"
-          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors w-full cursor-pointer"
         >
           <option value="" disabled selected>-- Elige un cliente registrado --</option>
           {clients?.map((client: any) => (
@@ -171,41 +170,41 @@ for (let i = 0; i < 14; i++) {
             </option>
           ))}
         </select>
-        <p class="text-3xs text-stone-600 italic">Nota: El listado muestra los clientes que han iniciado sesión con Google en la web.</p>
+        <p class="text-3xs text-zinc-450 dark:text-zinc-500 italic">Nota: El listado muestra los clientes que han iniciado sesión con Google en la web.</p>
       </div>
 
       <!-- Cliente Manual (Campos de entrada) -->
       <div id="manualClientContainer" class="hidden flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <label for="clientName" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Nombre del Cliente</label>
+          <label for="clientName" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Nombre del Cliente</label>
           <input
             type="text"
             id="clientName"
             name="clientName"
             placeholder="Escribe el nombre completo..."
-            class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-600 w-full"
+            class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors placeholder:text-zinc-400 w-full"
           />
         </div>
         <div class="flex flex-col gap-2">
-          <label for="clientPhone" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Teléfono de Contacto (Opcional)</label>
+          <label for="clientPhone" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Teléfono de Contacto (Opcional)</label>
           <input
             type="text"
             id="clientPhone"
             name="clientPhone"
             placeholder="Ej: +52 55 1234 5678"
-            class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-600 w-full"
+            class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors placeholder:text-zinc-400 w-full"
           />
         </div>
       </div>
 
       <!-- Servicio -->
       <div class="flex flex-col gap-2">
-        <label for="serviceId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Servicio solicitado</label>
+        <label for="serviceId" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Servicio solicitado</label>
         <select
           id="serviceId"
           name="serviceId"
           required
-          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors w-full cursor-pointer"
         >
           <option value="" disabled selected>-- Elige un servicio --</option>
           {services?.map((service: any) => {
@@ -222,12 +221,12 @@ for (let i = 0; i < 14; i++) {
 
       <!-- Barbero -->
       <div class="flex flex-col gap-2">
-        <label for="barberId" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Barbero asignado</label>
+        <label for="barberId" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Barbero asignado</label>
         <select
           id="barberId"
           name="barberId"
           required
-          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors w-full cursor-pointer"
         >
           <option value="" disabled selected>-- Elige un barbero --</option>
           {barbers?.map((barber: any) => (
@@ -240,7 +239,7 @@ for (let i = 0; i < 14; i++) {
 
       <!-- Seleccionar Día (Premium Cards) -->
       <div class="flex flex-col gap-2">
-        <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Selecciona el Día</label>
+        <label class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Selecciona el Día</label>
         <input type="hidden" name="date" id="selectedDateInput" required />
         
         <div class="flex overflow-x-auto pb-4 gap-2 snap-x no-scrollbar sm:grid sm:grid-cols-7 sm:overflow-visible sm:pb-0">
@@ -248,15 +247,15 @@ for (let i = 0; i < 14; i++) {
             <button
               type="button"
               data-date={day.value}
-              class="date-card shrink-0 snap-start min-w-[75px] sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border border-stone-850 bg-stone-950 hover:border-amber-500/50 transition-all cursor-pointer group"
+              class="date-card shrink-0 snap-start min-w-[75px] sm:min-w-0 p-3 flex flex-col items-center justify-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:border-indigo-500/50 transition-all cursor-pointer group"
             >
-              <span class="text-[10px] font-black uppercase tracking-tighter text-stone-500 day-name-label transition-colors">
+              <span class="text-[10px] font-bold uppercase tracking-tight text-zinc-400 dark:text-zinc-500 day-name-label transition-colors">
                 {day.dayName}
               </span>
-              <span class="text-lg font-black text-white leading-none my-1">
+              <span class="text-lg font-black text-zinc-900 dark:text-white leading-none my-1">
                 {day.dayNumber}
               </span>
-              <span class="text-[10px] font-bold uppercase text-stone-500 tracking-tighter month-name-label transition-colors">
+              <span class="text-[10px] font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-tight month-name-label transition-colors">
                 {day.monthName}
               </span>
             </button>
@@ -266,12 +265,12 @@ for (let i = 0; i < 14; i++) {
 
       <!-- Hora -->
       <div class="flex flex-col gap-2">
-        <label for="time" class="text-2xs font-black text-stone-500 uppercase tracking-ultra">Hora de la cita</label>
+        <label for="time" class="text-2xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Hora de la cita</label>
         <select
           id="time"
           name="time"
           required
-          class="bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors w-full cursor-pointer"
+          class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 transition-colors w-full cursor-pointer"
         >
           <option value="" disabled selected>-- Elige horario --</option>
           {timeSlots.map((slot) => (
@@ -282,7 +281,7 @@ for (let i = 0; i < 14; i++) {
 
       <button
         type="submit"
-        class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-sm py-4 px-6 rounded-2xl transition-all cursor-pointer shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 text-center uppercase tracking-wider block"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm py-4 px-6 rounded-2xl transition-all cursor-pointer shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 text-center uppercase tracking-wider block"
       >
         Agendar y Confirmar Cita
       </button>
@@ -486,34 +485,34 @@ for (let i = 0; i < 14; i++) {
         card.addEventListener('click', () => {
           // Clear active styles from all cards
           dateCards.forEach(c => {
-            c.classList.remove('border-amber-500', 'bg-amber-500/10', 'scale-105');
-            c.classList.add('border-stone-850', 'bg-stone-950');
+            c.classList.remove('border-indigo-600', 'dark:border-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-500/10', 'scale-105');
+            c.classList.add('border-zinc-200', 'dark:border-zinc-800/80', 'bg-zinc-50', 'dark:bg-zinc-950');
             
             const dayName = c.querySelector('.day-name-label');
             const monthName = c.querySelector('.month-name-label');
             if (dayName) {
-              dayName.classList.remove('text-amber-500');
-              dayName.classList.add('text-stone-500');
+              dayName.classList.remove('text-indigo-600', 'dark:text-indigo-400');
+              dayName.classList.add('text-zinc-400', 'dark:text-zinc-500');
             }
             if (monthName) {
-              monthName.classList.remove('text-amber-500');
-              monthName.classList.add('text-stone-500');
+              monthName.classList.remove('text-indigo-600', 'dark:text-indigo-400');
+              monthName.classList.add('text-zinc-400', 'dark:text-zinc-500');
             }
           });
 
           // Add active styles to clicked card
-          card.classList.add('border-amber-500', 'bg-amber-500/10', 'scale-105');
-          card.classList.remove('border-stone-850', 'bg-stone-950');
+          card.classList.add('border-indigo-600', 'dark:border-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-500/10', 'scale-105');
+          card.classList.remove('border-zinc-200', 'dark:border-zinc-800/80', 'bg-zinc-50', 'dark:bg-zinc-950');
 
           const dayName = card.querySelector('.day-name-label');
           const monthName = card.querySelector('.month-name-label');
           if (dayName) {
-            dayName.classList.remove('text-stone-500');
-            dayName.classList.add('text-amber-500');
+            dayName.classList.remove('text-zinc-400', 'dark:text-zinc-500');
+            dayName.classList.add('text-indigo-600', 'dark:text-indigo-400');
           }
           if (monthName) {
-            monthName.classList.remove('text-stone-500');
-            monthName.classList.add('text-amber-500');
+            monthName.classList.remove('text-zinc-400', 'dark:text-zinc-500');
+            monthName.classList.add('text-indigo-600', 'dark:text-indigo-400');
           }
 
           // Update input value

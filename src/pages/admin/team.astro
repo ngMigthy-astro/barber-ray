@@ -74,7 +74,7 @@ const team = dbTeam || [];
 ---
 
 <AdminLayout title="Gestión de Equipo">
-  <div class="max-w-5xl mx-auto">
+  <div class="w-full">
     {
       isSuccess && (
         <div
@@ -120,11 +120,11 @@ const team = dbTeam || [];
       <!-- Formulario para agregar miembro -->
       <div class="lg:col-span-1 space-y-6">
         <div
-          class="bg-stone-900 border border-stone-800 rounded-3xl p-6 shadow-xl sticky top-8"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs sticky top-8"
         >
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
-            <h3 class="text-sm font-black text-white uppercase tracking-widest">
+            <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+            <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
               Nuevo Barbero
             </h3>
           </div>
@@ -135,7 +135,7 @@ const team = dbTeam || [];
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Foto de Perfil</label
               >
               <div class="relative group cursor-pointer">
@@ -148,7 +148,7 @@ const team = dbTeam || [];
                 />
                 <div
                   id="new-team-preview-container"
-                  class="w-full h-32 bg-stone-950 border border-dashed border-stone-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-stone-500 group-hover:border-amber-500 group-hover:text-amber-500 transition-colors"
+                  class="w-full h-32 bg-zinc-50 dark:bg-zinc-950 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 group-hover:border-indigo-600 dark:group-hover:border-indigo-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
                 >
                   <div
                     id="new-team-upload-ui"
@@ -156,7 +156,7 @@ const team = dbTeam || [];
                   >
                     <Upload className="w-6 h-6 mb-2" />
                     <span
-                      class="text-xs font-bold uppercase tracking-widest text-center"
+                      class="text-[10px] font-black uppercase tracking-widest text-center"
                       >Subir Imagen</span
                     >
                   </div>
@@ -170,20 +170,20 @@ const team = dbTeam || [];
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Nombre</label
               >
               <input
                 type="text"
                 name="name"
                 required
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 shadow-2xs"
               />
             </div>
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Rol / Puesto</label
               >
               <input
@@ -191,39 +191,39 @@ const team = dbTeam || [];
                 name="role"
                 placeholder="Ej: Master Barber"
                 required
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 shadow-2xs"
               />
             </div>
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Instagram (@)</label
               >
               <input
                 type="text"
                 name="instagram"
                 placeholder="barber_ray"
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 shadow-2xs"
               />
             </div>
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Especialidades (separadas por coma)</label
               >
               <textarea
                 name="specialties"
                 rows="2"
                 placeholder="Cortes Clásicos, Fade, Barba..."
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500 resize-none"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 resize-none shadow-2xs"
               ></textarea>
             </div>
 
             <button
               type="submit"
-              class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-black py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all cursor-pointer"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all cursor-pointer shadow-xs"
             >
               <Plus className="w-4 h-4" />
               Agregar Barbero
@@ -235,9 +235,9 @@ const team = dbTeam || [];
       <!-- Lista del Equipo Actual -->
       <div class="lg:col-span-2 space-y-6">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-xl font-bold text-white">Equipo Actual</h3>
+          <h3 class="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight font-display">Equipo Actual</h3>
           <span
-            class="px-3 py-1 bg-stone-900 border border-stone-800 rounded-full text-2xs font-black text-stone-500 uppercase"
+            class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest"
             >{team.length} items</span
           >
         </div>
@@ -245,7 +245,7 @@ const team = dbTeam || [];
         <div class="grid grid-cols-1 gap-4">
           {
             team.map((member, index) => (
-              <div class="bg-stone-900 border border-stone-800 rounded-4xl p-6 hover:border-amber-500/50 transition-all group">
+              <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 hover:border-indigo-600 dark:hover:border-indigo-500 hover:shadow-xs transition-all duration-300 group">
                 <form
                   method="POST"
                   enctype="multipart/form-data"
@@ -260,9 +260,9 @@ const team = dbTeam || [];
                     value={member.image_url}
                   />
                   <input type="hidden" name="rating" value={member.rating} />
-
+ 
                   <div class="flex flex-col items-center gap-4">
-                    <div class="w-24 h-24 rounded-2xl bg-stone-950 border border-stone-800 overflow-hidden relative">
+                    <div class="w-24 h-24 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 overflow-hidden relative flex items-center justify-center shadow-2xs">
                       {member.image_url ? (
                         <img
                           id={`edit-team-preview-${member.id}`}
@@ -271,7 +271,7 @@ const team = dbTeam || [];
                           class="w-full h-full object-cover"
                         />
                       ) : (
-                        <div class="w-full h-full flex items-center justify-center text-stone-700 relative">
+                        <div class="w-full h-full flex items-center justify-center text-zinc-300 dark:text-zinc-750 relative">
                           <Users className="w-8 h-8" />
                           <img
                             id={`edit-team-preview-${member.id}`}
@@ -291,12 +291,12 @@ const team = dbTeam || [];
                         />
                       </div>
                     </div>
-                    <div class="flex items-center gap-1 text-amber-500 text-xs font-bold">
-                      <Star className="w-3 h-3 fill-amber-500" />
+                    <div class="flex items-center gap-1 text-amber-500 dark:text-amber-400 text-xs font-extrabold font-display">
+                      <Star className="w-3 h-3 fill-amber-500 dark:fill-amber-400" />
                       {member.rating}
                     </div>
                   </div>
-
+ 
                   <div class="flex-1 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
@@ -304,7 +304,7 @@ const team = dbTeam || [];
                         name="name"
                         value={member.name}
                         required
-                        class="bg-transparent text-xl font-bold text-white outline-none focus:text-amber-500 transition-colors"
+                        class="bg-transparent text-lg font-black text-zinc-900 dark:text-white outline-none focus:text-indigo-600 dark:focus:text-indigo-500 transition-colors font-display"
                       />
                       <div class="flex items-center gap-2">
                         <input
@@ -312,53 +312,53 @@ const team = dbTeam || [];
                           name="role"
                           value={member.role}
                           required
-                          class="flex-1 bg-stone-950 border border-stone-800 rounded-lg px-3 py-1 text-stone-400 text-xs font-bold uppercase text-center focus:border-amber-500 outline-none"
+                          class="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-zinc-600 dark:text-zinc-400 text-xs font-bold uppercase text-center focus:border-indigo-600 dark:focus:border-indigo-500 outline-none shadow-2xs"
                         />
                       </div>
                     </div>
-
-                    <div class="flex items-center gap-2 text-stone-400">
+ 
+                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
                       <LuInstagram className="w-4 h-4 text-pink-500" />
                       <input
                         type="text"
                         name="instagram"
                         value={member.instagram}
                         placeholder="Usuario IG"
-                        class="bg-transparent border-b border-stone-800 text-sm outline-none focus:border-pink-500 transition-colors"
+                        class="bg-transparent border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm outline-none focus:border-indigo-500 transition-colors py-0.5"
                       />
                     </div>
-
+ 
                     <div>
-                      <label class="text-2xs font-black text-stone-600 uppercase tracking-ultra mb-1 block">
+                      <label class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1 block">
                         Especialidades
                       </label>
                       <textarea
                         name="specialties"
                         rows="2"
-                        class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3 text-stone-400 text-sm outline-none focus:border-amber-500 transition-colors resize-none"
+                        class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-zinc-750 dark:text-zinc-300 text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition-colors resize-none shadow-2xs"
                       >{(member.specialties || []).join(", ").trim()}</textarea>
                     </div>
-
-                    <div class="flex items-center justify-end gap-3 pt-2 border-t border-stone-800/50">
+ 
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
                       <button
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-emerald-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-indigo-600 sm:bg-transparent dark:bg-indigo-500 text-white sm:text-zinc-400 dark:sm:text-zinc-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 sm:hover:bg-transparent dark:sm:hover:bg-transparent hover:text-white sm:hover:text-indigo-600 dark:sm:hover:text-indigo-400 border border-transparent sm:border-none rounded-xl sm:rounded-none transition-colors uppercase tracking-widest cursor-pointer shadow-xs sm:shadow-none"
                       >
-                        <Save className="w-3 h-3" />
-                        Guardar
+                        <Save className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
+                        Guardar Cambios
                       </button>
                       <button
                         form={`delete-${member.id}`}
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-red-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-red-500/10 sm:bg-transparent text-red-650 dark:text-red-500 sm:text-zinc-400 dark:sm:text-zinc-500 hover:bg-red-650 sm:hover:bg-transparent hover:text-white sm:hover:text-red-600 dark:sm:hover:text-red-400 border border-transparent sm:border-none rounded-xl sm:rounded-none transition-colors uppercase tracking-widest cursor-pointer"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
                         Eliminar
                       </button>
                     </div>
                   </div>
                 </form>
-
+ 
                 <form id={`delete-${member.id}`} method="POST" class="hidden">
                   <input type="hidden" name="action" value="delete_team" />
                   <input type="hidden" name="id" value={member.id} />

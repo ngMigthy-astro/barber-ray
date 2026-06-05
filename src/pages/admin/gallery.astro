@@ -107,7 +107,7 @@ const categories = dbCategories || [];
 ---
 
 <AdminLayout title="Gestión de Galería">
-  <div class="max-w-6xl mx-auto">
+  <div class="w-full">
     {
       isSuccess && (
         <div
@@ -153,11 +153,11 @@ const categories = dbCategories || [];
       <!-- Formulario Nueva Imagen -->
       <div class="lg:col-span-1 space-y-6">
         <div
-          class="bg-stone-900 border border-stone-800 rounded-3xl p-6 shadow-xl sticky top-8"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs sticky top-8"
         >
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
-            <h3 class="text-sm font-black text-white uppercase tracking-widest">
+            <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+            <h3 class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-display">
               Subir Foto
             </h3>
           </div>
@@ -167,7 +167,7 @@ const categories = dbCategories || [];
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Archivo de Imagen *</label
               >
               <div class="relative group cursor-pointer">
@@ -181,7 +181,7 @@ const categories = dbCategories || [];
                 />
                 <div
                   id="new-gallery-preview-container"
-                  class="w-full h-32 bg-stone-950 border border-dashed border-stone-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-stone-500 group-hover:border-amber-500 group-hover:text-amber-500 transition-colors"
+                  class="w-full h-32 bg-zinc-50 dark:bg-zinc-950 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 group-hover:border-indigo-600 dark:group-hover:border-indigo-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
                 >
                   <div
                     id="new-gallery-upload-ui"
@@ -189,7 +189,7 @@ const categories = dbCategories || [];
                   >
                     <Upload className="w-6 h-6 mb-2" />
                     <span
-                      class="text-xs font-bold uppercase tracking-widest text-center"
+                      class="text-[10px] font-black uppercase tracking-widest text-center"
                       >Seleccionar</span
                     >
                   </div>
@@ -203,7 +203,7 @@ const categories = dbCategories || [];
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Descripción / Alt</label
               >
               <input
@@ -211,24 +211,24 @@ const categories = dbCategories || [];
                 name="alt"
                 required
                 placeholder="Ej: Fade Clásico con textura"
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 shadow-2xs"
               />
             </div>
 
             <div class="space-y-2">
               <label
-                class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1"
                 >Categoría</label
               >
               <select
                 name="category"
                 required
-                class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500 cursor-pointer"
+                class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 cursor-pointer shadow-2xs"
               >
                 <option value="" disabled selected>Seleccionar...</option>
                 {
                   categories.map((cat) => (
-                    <option value={cat.name} class="bg-stone-900">{cat.name}</option>
+                    <option value={cat.name} class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">{cat.name}</option>
                   ))
                 }
               </select>
@@ -236,7 +236,7 @@ const categories = dbCategories || [];
 
             <button
               type="submit"
-              class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-black py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all mt-4 cursor-pointer"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all mt-4 cursor-pointer shadow-xs"
             >
               <Plus className="w-4 h-4" />
               Subir a Galería
@@ -245,14 +245,14 @@ const categories = dbCategories || [];
         </div>
 
         <!-- Gestión de Categorías de Galería -->
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl p-6 shadow-xl">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs">
           <details class="group select-none">
-            <summary class="flex items-center justify-between font-black text-white text-sm uppercase tracking-widest cursor-pointer list-none">
+            <summary class="flex items-center justify-between font-black text-zinc-900 dark:text-white text-xs uppercase tracking-widest cursor-pointer list-none font-display">
               <div class="flex items-center gap-3">
-                <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                <div class="w-1.5 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
                 <span>Gestionar Categorías</span>
               </div>
-              <span class="transition-transform duration-300 group-open:rotate-180 text-stone-500 group-hover:text-white">
+              <span class="transition-transform duration-300 group-open:rotate-180 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -264,18 +264,18 @@ const categories = dbCategories || [];
               <form method="POST" class="space-y-3">
                 <input type="hidden" name="action" value="add_gallery_category" />
                 <div class="space-y-2">
-                  <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1">Nueva Categoría</label>
+                  <label class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1">Nueva Categoría</label>
                   <div class="flex gap-2">
                     <input
                       type="text"
                       name="name"
                       placeholder="Ej: Color"
                       required
-                      class="flex-1 bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                      class="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm outline-none focus:border-indigo-600 dark:focus:border-indigo-500 shadow-2xs"
                     />
                     <button
                       type="submit"
-                      class="bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl px-3 flex items-center justify-center cursor-pointer transition-all"
+                      class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-xl px-4 flex items-center justify-center cursor-pointer transition-all shadow-2xs"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -285,18 +285,18 @@ const categories = dbCategories || [];
 
               <!-- Lista de Categorías Existentes -->
               <div class="space-y-2">
-                <label class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1">Categorías Actuales</label>
+                <label class="text-3xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1">Categorías Actuales</label>
                 <div class="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                   {
                     categories.map((cat) => (
-                      <div class="flex items-center justify-between bg-stone-950 border border-stone-800 rounded-xl px-3 py-2">
-                        <span class="text-sm font-semibold text-stone-300">{cat.name}</span>
+                      <div class="flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2">
+                        <span class="text-sm font-semibold text-zinc-850 dark:text-zinc-300">{cat.name}</span>
                         <form method="POST" class="inline">
                           <input type="hidden" name="action" value="delete_gallery_category" />
                           <input type="hidden" name="id" value={cat.id} />
                           <button
                             type="submit"
-                            class="text-stone-500 hover:text-red-500 transition-colors cursor-pointer"
+                            class="text-zinc-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-500 transition-colors cursor-pointer"
                             onclick="return confirm('¿Seguro que deseas eliminar esta categoría?')"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -315,9 +315,9 @@ const categories = dbCategories || [];
       <!-- Grid de Galería -->
       <div class="lg:col-span-3">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-white">Fotos en el Portafolio</h3>
+          <h3 class="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight font-display">Fotos en el Portafolio</h3>
           <span
-            class="px-3 py-1 bg-stone-900 border border-stone-800 rounded-full text-2xs font-black text-stone-500 uppercase"
+            class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest"
             >{gallery.length} fotos</span
           >
         </div>
@@ -325,8 +325,8 @@ const categories = dbCategories || [];
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {
             gallery.map((image, index) => (
-              <div class="bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden hover:border-amber-500/50 transition-all group flex flex-col">
-                <div class="relative aspect-4/3 w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+              <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden hover:border-indigo-600 dark:hover:border-indigo-500 hover:shadow-xs transition-all duration-300 group flex flex-col">
+                <div class="relative aspect-[4/3] w-full bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center overflow-hidden border-b border-zinc-100 dark:border-zinc-850 shadow-inner">
                   {image.image_url ? (
                     <img
                       src={image.image_url}
@@ -334,7 +334,7 @@ const categories = dbCategories || [];
                       class="w-full h-full object-cover"
                     />
                   ) : (
-                    <ImageIcon className="w-10 h-10 text-stone-800" />
+                    <ImageIcon className="w-10 h-10 text-zinc-350 dark:text-zinc-700" />
                   )}
 
                   <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer z-10">
@@ -394,18 +394,18 @@ const categories = dbCategories || [];
                       name="alt"
                       value={image.alt}
                       required
-                      class="w-full bg-transparent text-sm font-bold text-white outline-none focus:text-amber-500 transition-colors border-b border-transparent focus:border-stone-700 pb-1"
+                      class="w-full bg-transparent text-sm font-black text-zinc-900 dark:text-white outline-none focus:text-indigo-600 dark:focus:text-indigo-500 transition-colors border-b border-transparent focus:border-zinc-200 dark:focus:border-zinc-800 pb-1 font-display"
                     />
 
                     <div class="flex items-center gap-2">
                       <select
                         name="category"
                         required
-                        class="bg-stone-950 border border-stone-800 rounded-md px-2 py-1 text-stone-400 text-2xs font-bold uppercase tracking-widest outline-none focus:border-amber-500 cursor-pointer"
+                        class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-zinc-500 dark:text-zinc-400 text-3xs font-bold uppercase tracking-widest outline-none focus:border-indigo-600 dark:focus:border-indigo-500 cursor-pointer shadow-2xs"
                       >
                         {
                           !categories.some((cat) => cat.name === image.category) && (
-                            <option value={image.category} selected class="bg-stone-900">
+                            <option value={image.category} selected class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
                               {image.category}
                             </option>
                           )
@@ -415,7 +415,7 @@ const categories = dbCategories || [];
                             <option
                               value={cat.name}
                               selected={image.category === cat.name}
-                              class="bg-stone-900"
+                              class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
                             >
                               {cat.name}
                             </option>
@@ -424,19 +424,23 @@ const categories = dbCategories || [];
                       </select>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 pt-4 mt-auto">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800/80">
                       <button
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-emerald-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-indigo-600 sm:bg-transparent dark:bg-indigo-500 dark:sm:bg-transparent text-white sm:text-indigo-600 dark:sm:text-indigo-400 hover:bg-indigo-700 dark:hover:bg-indigo-600 sm:hover:bg-indigo-50 dark:sm:hover:bg-indigo-500/10 border border-transparent sm:border sm:border-indigo-200 dark:sm:border-indigo-500/20 rounded-xl sm:rounded-lg transition-colors uppercase tracking-widest cursor-pointer shadow-xs sm:shadow-none"
+                        title="Guardar cambios"
                       >
-                        <Save className="w-3 h-3" />
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Guardar</span>
                       </button>
                       <button
                         form={`delete-${image.id}`}
                         type="submit"
-                        class="flex items-center gap-2 text-xs font-black text-stone-500 hover:text-red-500 transition-colors uppercase tracking-widest cursor-pointer"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-1.5 sm:px-3 text-xs sm:text-[10px] font-black bg-red-500/10 sm:bg-transparent text-red-650 dark:text-red-500 sm:text-zinc-405 dark:sm:text-zinc-500 hover:bg-red-650 dark:hover:bg-red-600 sm:hover:bg-red-500/10 hover:text-white sm:hover:text-red-600 dark:sm:hover:text-red-400 border border-transparent sm:border-none rounded-xl sm:rounded-lg transition-colors uppercase tracking-widest cursor-pointer"
+                        title="Eliminar del portafolio"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Eliminar</span>
                       </button>
                     </div>
                   </form>
