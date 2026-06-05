@@ -284,7 +284,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
             title="Cerrar modal"
           />
 
-          <dialog 
+          <div 
             role="dialog"
             aria-modal="true"
             aria-labelledby="login-modal-title"
@@ -347,7 +347,7 @@ export default function Navbar({ user, services, team, navLinks }: Props) {
                 Estilo • Tradición • Excelencia
               </p>
             </div>
-          </dialog>
+          </div>
         </div>
       )}
       <BookingModal
