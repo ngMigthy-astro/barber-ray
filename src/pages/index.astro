@@ -74,7 +74,14 @@ try {
       .order("sort_order", { ascending: true }),
   ]);
 
-  if (errServices || errTeam || errProducts || errConfigs) {
+  const nowIso = new Date().toISOString();
+  const { data: activeReservations, error: errReservations } = await supabase
+    .from("product_reservations")
+    .select("product_id, quantity")
+    .eq("status", "pending")
+    .gt("expires_at", nowIso);
+
+  if (errServices || errTeam || errProducts || errConfigs || errReservations) {
     hasError = true;
   }
 
@@ -90,6 +97,7 @@ try {
     dbSchedule,
     dbSocials,
     dbNavLinks,
+    activeReservations: activeReservations || [],
   };
 } catch (error) {
   hasError = true;
@@ -127,7 +135,15 @@ const contactData = {
   socials: dbData.dbSocials || [],
 };
 
-const products = dbData.dbProducts || [];
+const products = (dbData.dbProducts || []).map((prod: any) => {
+  const reservedQty = (dbData.activeReservations || [])
+    .filter((res: any) => res.product_id === prod.id)
+    .reduce((sum: number, res: any) => sum + res.quantity, 0);
+  return {
+    ...prod,
+    available_stock: Math.max(0, (prod.stock || 0) - reservedQty),
+  };
+});
 const gallery = dbData.dbGallery || [];
 const testimonials = dbData.dbTestimonials || [];
 const navLinks = dbData.dbNavLinks || [];
@@ -174,6 +190,7 @@ const navLinks = dbData.dbNavLinks || [];
             "Nuestros Productos",
             "Calidad Garantizada",
           )}
+          isLoggedIn={isLoggedIn}
           client:visible
         />
       )}

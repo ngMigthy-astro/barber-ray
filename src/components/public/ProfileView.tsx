@@ -8,6 +8,9 @@ import {
   ChevronRight,
   X,
   Star,
+  ShoppingBag,
+  Clock,
+  Trash2,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import type { AppUser } from "../../interfaces/auth/user.interface";
@@ -31,15 +34,36 @@ interface Appointment {
   };
 }
 
+interface Product {
+  id: string;
+  name: string;
+  price: string;
+  category: string;
+  image_url: string;
+}
+
+interface ProductReservation {
+  id: string;
+  quantity: number;
+  reserved_at: string;
+  expires_at: string;
+  status: string;
+  products: Product | null;
+}
+
 interface Props {
   readonly user: AppUser;
   readonly initialAppointments: Appointment[];
+  readonly initialReservations: ProductReservation[];
 }
 
-export default function ProfileView({ user, initialAppointments }: Props) {
+export default function ProfileView({ user, initialAppointments, initialReservations }: Props) {
   const [appointments, setAppointments] = useState(initialAppointments);
+  const [reservations, setReservations] = useState(initialReservations);
   const [isCancelling, setIsCancelling] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState<string | null>(null);
+  const [showConfirmCancelReservation, setShowConfirmCancelReservation] = useState<string | null>(null);
+  const [isCancellingReservation, setIsCancellingReservation] = useState<string | null>(null);
   const [reviewingAppointment, setReviewingAppointment] =
     useState<Appointment | null>(null);
   const [rating, setRating] = useState(5);
@@ -146,6 +170,70 @@ export default function ProfileView({ user, initialAppointments }: Props) {
       new Date(app.appointment_date) <= new Date() ||
       app.status === "cancelled",
   );
+
+  const activeReservations = reservations.filter(
+    (res) => res.status === "pending" && new Date(res.expires_at) > new Date()
+  );
+
+  const pastReservations = reservations.filter(
+    (res) => res.status !== "pending" || new Date(res.expires_at) <= new Date()
+  );
+
+  const formatPrice = (price: string | number): string => {
+    if (price === undefined || price === null) return "$0";
+    const cleanPrice = String(price).trim();
+    return cleanPrice.startsWith("$") ? cleanPrice : `$${cleanPrice}`;
+  };
+
+  const getReservationTotal = (priceStr: string, qty: number): string => {
+    const unitPrice = parseFloat(priceStr.replace(/[^0-9.]/g, "")) || 0;
+    return formatPrice(unitPrice * qty);
+  };
+
+  const getRemainingTime = (expiresAtStr: string) => {
+    const expiresDate = new Date(expiresAtStr);
+    const now = new Date();
+    const timeLeft = expiresDate.getTime() - now.getTime();
+    
+    if (timeLeft <= 0) return "Expirado";
+    
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) {
+      return `Vence en ${days}d y ${hours}h`;
+    }
+    return `Vence en ${hours}h`;
+  };
+
+  const handleCancelReservation = async () => {
+    if (!showConfirmCancelReservation) return;
+    
+    const id = showConfirmCancelReservation;
+    setIsCancellingReservation(id);
+    setShowConfirmCancelReservation(null);
+    
+    try {
+      const { error } = await supabase
+        .from("product_reservations")
+        .update({ status: "cancelled" })
+        .eq("id", id);
+        
+      if (error) throw error;
+      
+      // Mapeamos para actualizar reactivamente en el estado local de React
+      setReservations(
+        reservations.map((res) =>
+          res.id === id ? { ...res, status: "cancelled" } : res
+        )
+      );
+    } catch (err) {
+      console.error("Error al cancelar la reserva de producto:", err);
+      alert("No se pudo cancelar el apartado. Por favor intenta de nuevo.");
+    } finally {
+      setIsCancellingReservation(null);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-16 pb-20">
@@ -285,106 +373,272 @@ export default function ProfileView({ user, initialAppointments }: Props) {
           )}
         </section>
 
-        {pastAppointments.length > 0 && (
-          <section className="space-y-6 pt-8">
+        {/* Productos Apartados Activos */}
+        <section className="space-y-6 pt-6">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+            <h2 className="text-xl font-black text-text uppercase tracking-ultra">
+              Tus Productos Apartados
+            </h2>
+          </div>
+
+          {activeReservations.length > 0 ? (
+            <div className="space-y-4">
+              {activeReservations.map((res) => (
+                <div
+                  key={res.id}
+                  className="group glass rounded-3xl p-6 border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row items-center gap-6 relative overflow-hidden"
+                >
+                  <div className="w-20 h-20 bg-bg border border-primary/10 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
+                    {res.products?.image_url ? (
+                      <img
+                        src={res.products.image_url}
+                        alt={res.products.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ShoppingBag className="w-8 h-8 opacity-25 text-text" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 text-center md:text-left space-y-1.5 w-full">
+                    <span className="text-3xs font-black text-primary uppercase tracking-ultra block">
+                      {res.products?.category || "Producto"}
+                    </span>
+                    <h3 className="text-lg font-black text-text tracking-tight uppercase italic">
+                      {res.products?.name || "Producto Eliminado"}
+                    </h3>
+                    <p className="text-text-muted text-xs font-semibold uppercase">
+                      Cantidad: <span className="text-text font-black">{res.quantity}</span> • Unitario: {formatPrice(res.products?.price || "0")}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-black/5 dark:border-white/5 pt-4 md:pt-0 shrink-0">
+                    <div className="text-right">
+                      <p className="text-2xl font-black text-primary tracking-tighter">
+                        {getReservationTotal(res.products?.price || "0", res.quantity)}
+                      </p>
+                      <p className="text-4xs font-black text-text-muted uppercase tracking-ultra">
+                        Total a pagar en local
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-amber-500 flex items-center gap-1 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                        <Clock className="w-3.5 h-3.5" />
+                        {getRemainingTime(res.expires_at)}
+                      </span>
+                      
+                      <button
+                        onClick={() => setShowConfirmCancelReservation(res.id)}
+                        disabled={isCancellingReservation === res.id}
+                        className="p-3.5 rounded-2xl bg-surface text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-all border border-primary/10 shadow-sm active:scale-95 cursor-pointer"
+                        title="Cancelar Apartado"
+                      >
+                        {isCancellingReservation === res.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="glass rounded-5xl p-12 text-center border border-dashed border-black/10 dark:border-white/10">
+              <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4 text-text-muted/30">
+                <ShoppingBag className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-text uppercase mb-1">
+                Sin productos apartados
+              </h3>
+              <p className="text-text-muted text-xs font-bold uppercase tracking-ultra mb-6">
+                No tienes ningún producto reservado en este momento.
+              </p>
+              <a
+                href="/#products"
+                className="btn-premium px-10 py-3.5 text-xs inline-block uppercase font-black"
+              >
+                Explorar Catálogo
+              </a>
+            </div>
+          )}
+        </section>
+
+        {/* Historial Reciente */}
+        {(pastAppointments.length > 0 || pastReservations.length > 0) && (
+          <section className="space-y-8 pt-8 border-t border-primary/5">
             <h2 className="text-xs font-black text-text-muted uppercase tracking-giga px-2">
               Historial Reciente
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {pastAppointments.map((app) => {
-                const isCancelled = app.status === "cancelled";
-                const isPendingReview =
-                  !isLoadingReviews && !reviews[app.id] && !isCancelled;
 
-                let iconWrapperClass =
-                  "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white";
-                let buttonOpacityClass =
-                  "opacity-70 hover:opacity-100 border-primary/5";
-                let StatusIcon = Scissors;
-                let iconFillClass = "";
-                let titleClass = "text-text";
-                let StatusBadge = null;
+            <div className="space-y-8">
+              {/* Citas Pasadas */}
+              {pastAppointments.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-2xs font-black text-primary uppercase tracking-ultra px-2">
+                    Servicios / Citas Anteriores
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {pastAppointments.map((app) => {
+                      const isCancelled = app.status === "cancelled";
+                      const isPendingReview =
+                        !isLoadingReviews && !reviews[app.id] && !isCancelled;
 
-                if (isCancelled) {
-                  iconWrapperClass = "bg-red-500/10 text-red-500";
-                  StatusIcon = X;
-                  titleClass = "text-text/40 line-through";
-                  StatusBadge = (
-                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 text-4xs font-black uppercase tracking-tighter">
-                      Cancelada
-                    </span>
-                  );
-                } else if (isPendingReview) {
-                  iconWrapperClass = "bg-amber-500 text-white animate-pulse";
-                  buttonOpacityClass =
-                    "opacity-100 border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-500/5";
-                  StatusIcon = Star;
-                  iconFillClass = "fill-current";
-                  StatusBadge = (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500 text-4xs font-black uppercase text-white tracking-tighter">
-                      Pendiente
-                    </span>
-                  );
-                }
+                      let iconWrapperClass =
+                        "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white";
+                      let buttonOpacityClass =
+                        "opacity-70 hover:opacity-100 border-primary/5";
+                      let StatusIcon = Scissors;
+                      let iconFillClass = "";
+                      let titleClass = "text-text";
+                      let StatusBadge = null;
 
-                return (
-                  <button
-                    key={app.id}
-                    onClick={() => {
-                      setReviewingAppointment(app);
-                      const existing = reviews[app.id];
-                      if (existing) {
-                        setRating(existing.rating);
-                        setComment(existing.comment || "");
-                      } else {
-                        setRating(5);
-                        setComment("");
+                      if (isCancelled) {
+                        iconWrapperClass = "bg-red-500/10 text-red-500";
+                        StatusIcon = X;
+                        titleClass = "text-text/40 line-through";
+                        StatusBadge = (
+                          <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 text-4xs font-black uppercase tracking-tighter">
+                            Cancelada
+                          </span>
+                        );
+                      } else if (isPendingReview) {
+                        iconWrapperClass = "bg-amber-500 text-white animate-pulse";
+                        buttonOpacityClass =
+                          "opacity-100 border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-500/5";
+                        StatusIcon = Star;
+                        iconFillClass = "fill-current";
+                        StatusBadge = (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500 text-4xs font-black uppercase text-white tracking-tighter">
+                            Pendiente
+                          </span>
+                        );
                       }
-                    }}
-                    className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${buttonOpacityClass}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${iconWrapperClass}`}
-                      >
-                        <StatusIcon className={`w-6 h-6 ${iconFillClass}`} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className={`font-bold text-sm ${titleClass}`}>
-                            {app.service.name}
-                          </p>
-                          {StatusBadge}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-2xs text-text-muted group-hover:text-text font-bold uppercase tracking-tighter transition-colors">
-                            {new Date(
-                              app.appointment_date,
-                            ).toLocaleDateString()}{" "}
-                            • {app.barber.name}
-                          </p>
-                          {reviews[app.id] && (
-                            <div className="flex items-center gap-0.5 text-amber-500">
-                              <Star className="w-2 h-2 fill-current" />
-                              <span className="text-4xs font-bold">
-                                {reviews[app.id].rating}
-                              </span>
+
+                      return (
+                        <button
+                          key={app.id}
+                          onClick={() => {
+                            setReviewingAppointment(app);
+                            const existing = reviews[app.id];
+                            if (existing) {
+                              setRating(existing.rating);
+                              setComment(existing.comment || "");
+                            } else {
+                              setRating(5);
+                              setComment("");
+                            }
+                          }}
+                          className={`glass rounded-2xl p-4 border flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full ${buttonOpacityClass}`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${iconWrapperClass}`}
+                            >
+                              <StatusIcon className={`w-6 h-6 ${iconFillClass}`} />
                             </div>
-                          )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className={`font-bold text-sm ${titleClass}`}>
+                                  {app.service.name}
+                                </p>
+                                {StatusBadge}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-2xs text-text-muted group-hover:text-text font-bold uppercase tracking-tighter transition-colors">
+                                  {new Date(
+                                    app.appointment_date,
+                                  ).toLocaleDateString()}{" "}
+                                  • {app.barber.name}
+                                </p>
+                                {reviews[app.id] && (
+                                  <div className="flex items-center gap-0.5 text-amber-500">
+                                    <Star className="w-2 h-2 fill-current" />
+                                    <span className="text-4xs font-bold">
+                                      {reviews[app.id].rating}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {!isLoadingReviews && !reviews[app.id] && (
+                              <span className="text-2xs font-black text-amber-500 uppercase tracking-tight hidden md:block">
+                                Dejar Reseña
+                              </span>
+                            )}
+                            <ChevronRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Apartados de Productos Pasados */}
+              {pastReservations.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-2xs font-black text-primary uppercase tracking-ultra px-2">
+                    Apartados de Productos Anteriores
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {pastReservations.map((res) => {
+                      const isCollected = res.status === "collected";
+                      const isCancelled = res.status === "cancelled";
+                      
+                      let statusText = "Expirado";
+                      let badgeClass = "bg-red-500/10 text-red-500 border border-red-500/20";
+                      let Icon = Clock;
+                      let labelClass = "text-text";
+                      
+                      if (isCollected) {
+                        statusText = "Recogido";
+                        badgeClass = "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20";
+                        Icon = ShoppingBag;
+                      } else if (isCancelled) {
+                        statusText = "Cancelado";
+                        badgeClass = "bg-stone-800/50 text-stone-500 border border-stone-800/80";
+                        Icon = X;
+                        labelClass = "text-text/40 line-through";
+                      }
+
+                      return (
+                        <div
+                          key={res.id}
+                          className="glass rounded-2xl p-4 border border-primary/5 flex items-center justify-between group hover:bg-surface-hover transition-all text-left w-full opacity-70 hover:opacity-100"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shadow-sm">
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className={`font-bold text-sm ${labelClass}`}>
+                                  {res.products?.name || "Producto Eliminado"}
+                                </p>
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${badgeClass}`}>
+                                  {statusText}
+                                </span>
+                              </div>
+                              <p className="text-2xs text-text-muted group-hover:text-text font-bold uppercase tracking-tighter transition-colors">
+                                Cant: {res.quantity} • Total: {getReservationTotal(res.products?.price || "0", res.quantity)}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-3xs font-black text-text-muted uppercase tracking-ultra pr-2">
+                            {new Date(res.reserved_at).toLocaleDateString()}
+                          </span>
                         </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {!isLoadingReviews && !reviews[app.id] && (
-                        <span className="text-2xs font-black text-amber-500 uppercase tracking-tight hidden md:block">
-                          Dejar Reseña
-                        </span>
-                      )}
-                      <ChevronRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </button>
-                );
-              })}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -417,13 +671,13 @@ export default function ProfileView({ user, initialAppointments }: Props) {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleCancelAppointment}
-                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-red-600/20 active:scale-95"
+                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-red-600/20 active:scale-95 cursor-pointer"
               >
                 Sí, Cancelar
               </button>
               <button
                 onClick={() => setShowConfirmModal(null)}
-                className="w-full py-4 bg-surface text-text-muted font-bold uppercase tracking-ultra rounded-2xl border border-primary/10 hover:text-text transition-all"
+                className="w-full py-4 bg-surface text-text-muted font-bold uppercase tracking-ultra rounded-2xl border border-primary/10 hover:text-text transition-all cursor-pointer"
               >
                 Volver
               </button>
@@ -431,7 +685,55 @@ export default function ProfileView({ user, initialAppointments }: Props) {
 
             <button
               onClick={() => setShowConfirmModal(null)}
-              className="absolute top-4 right-4 p-2 text-text-muted hover:text-primary transition-colors"
+              className="absolute top-4 right-4 p-2 text-text-muted hover:text-primary transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showConfirmCancelReservation && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 w-full h-full bg-bg/80 backdrop-blur-md animate-in fade-in duration-300 border-none cursor-default"
+            onClick={() => setShowConfirmCancelReservation(null)}
+            aria-label="Cerrar modal"
+          />
+
+          <div className="relative bg-surface border border-white/10 w-full max-w-sm rounded-4xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300 text-center space-y-6">
+            <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto text-red-500 shadow-inner">
+              <Trash2 className="w-10 h-10" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-2xl font-black text-text uppercase tracking-tighter">
+                ¿Cancelar Apartado?
+              </h3>
+              <p className="text-text-muted text-sm font-medium">
+                Esta acción liberará el stock del producto de inmediato. ¿Seguro que quieres cancelar este apartado?
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleCancelReservation}
+                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-red-600/20 active:scale-95 cursor-pointer"
+              >
+                Sí, Cancelar Apartado
+              </button>
+              <button
+                onClick={() => setShowConfirmCancelReservation(null)}
+                className="w-full py-4 bg-surface text-text-muted font-bold uppercase tracking-ultra rounded-2xl border border-primary/10 hover:text-text transition-all cursor-pointer"
+              >
+                Volver
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowConfirmCancelReservation(null)}
+              className="absolute top-4 right-4 p-2 text-text-muted hover:text-primary transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

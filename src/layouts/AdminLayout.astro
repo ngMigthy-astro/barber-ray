@@ -13,6 +13,8 @@ import {
   Link,
   Calendar,
   History,
+  ShoppingBag,
+  UserCheck,
 } from "lucide-react";
 
 interface Props {
@@ -31,9 +33,11 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/agenda", label: "Agenda Semanal", icon: Calendar },
   { href: "/admin/history", label: "Historial de Citas", icon: History },
+  { href: "/admin/users", label: "Usuarios / Admins", icon: UserCheck },
   { href: "/admin/hero", label: "Hero (Inicio)", icon: Home },
   { href: "/admin/services", label: "Servicios", icon: Scissors },
   { href: "/admin/products", label: "Productos", icon: Package },
+  { href: "/admin/reservations", label: "Apartados Productos", icon: ShoppingBag },
   { href: "/admin/gallery", label: "Galería", icon: Image },
   { href: "/admin/team", label: "Equipo", icon: Users },
   { href: "/admin/testimonials", label: "Testimonios", icon: MessageSquare },

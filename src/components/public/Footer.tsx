@@ -37,7 +37,7 @@ export default function Footer({ navLinks, contactData }: FooterProps) {
   return (
     <footer className="bg-surface border-t border-glass-border pt-24 pb-12 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-16 mb-16 md:mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-16 mb-16 md:mb-20">
           <div className="flex flex-col gap-6 md:col-span-1">
             <a
               href="/"

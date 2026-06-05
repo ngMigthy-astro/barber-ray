@@ -1,0 +1,858 @@
+---
+// src/pages/admin/users.astro
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createSupabaseClient } from "../../lib/supabase";
+import type { UserProfile, AllowedAdmin, ManagedUser } from "../../interfaces/admin/users.interface";
+
+// 1. Validaciones de sesión de Administrador
+const { user: currentUser } = Astro.locals;
+if (!currentUser) return Astro.redirect("/admin");
+
+const supabase = createSupabaseClient(Astro.request, Astro.cookies);
+
+// Forzamos al cliente de Supabase a inicializar la sesión y cabeceras de autorización desde las cookies
+await supabase.auth.getUser();
+
+// 2. Obtener usuarios registrados desde la tabla `profiles`
+const { data: rawProfiles, error: profilesError } = await supabase
+  .from("profiles")
+  .select("id, email, full_name, created_at")
+  .order("created_at", { ascending: false });
+
+// 3. Obtener administradores autorizados de la tabla `allowed_admins`
+const { data: rawAdmins, error: adminsError } = await supabase
+  .from("allowed_admins")
+  .select("id, email");
+
+const profiles: UserProfile[] = rawProfiles || [];
+const allowedAdmins: AllowedAdmin[] = rawAdmins || [];
+
+// Map para búsqueda rápida de admins autorizados por su correo
+const adminEmailsSet = new Set(allowedAdmins.map(admin => admin.email.toLowerCase()));
+
+// 4. Crear la lista unificada de usuarios gestionados (con bandera isAdmin)
+const managedUsers: ManagedUser[] = profiles.map(profile => ({
+  ...profile,
+  isAdmin: adminEmailsSet.has(profile.email.toLowerCase())
+}));
+
+// 5. Filtrar aquellos admins que están autorizados pero aún no tienen una cuenta registrada (pre-autorizados)
+const registeredEmailsSet = new Set(profiles.map(p => p.email.toLowerCase()));
+const preAuthorizedAdmins = allowedAdmins.filter(admin => !registeredEmailsSet.has(admin.email.toLowerCase()));
+
+const currentUserEmail = currentUser.email?.toLowerCase();
+---
+
+<AdminLayout title="Gestión de Usuarios">
+  <div class="max-w-6xl mx-auto space-y-8 text-stone-300 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    
+    <!-- Encabezado -->
+    <div>
+      <h2 class="text-2xl font-black text-white uppercase tracking-tight">
+        Gestión de Usuarios
+      </h2>
+      <p class="text-stone-500 text-sm mt-1 font-medium italic">
+        Administra los accesos al panel, pre-autoriza nuevos administradores y audita los usuarios registrados.
+      </p>
+    </div>
+
+
+    <!-- Pestañas de Control -->
+    <div class="flex border-b border-glass-border">
+      <button
+        id="tab-btn-clients"
+        class="tab-btn px-6 py-3 text-sm font-black uppercase tracking-wider border-b-2 border-primary text-primary transition-colors"
+      >
+        <span class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Clientes Registrados ({managedUsers.length})
+        </span>
+      </button>
+      <button
+        id="tab-btn-admins"
+        class="tab-btn px-6 py-3 text-sm font-black uppercase tracking-wider border-b-2 border-transparent text-text-muted hover:text-text transition-colors"
+      >
+        <span class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          Administradores (<span id="total-admins-count">{allowedAdmins.length}</span>)
+        </span>
+      </button>
+    </div>
+
+    <!-- PESTAÑA 1: CLIENTES REGISTRADOS -->
+    <div id="tab-content-clients" class="space-y-6">
+      <!-- Filtro y Buscador -->
+      <div class="flex flex-col sm:flex-row gap-4 bg-surface border border-glass-border p-6 rounded-2xl shadow-md justify-between items-center">
+        <div class="relative w-full sm:max-w-md flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 w-4 h-4 text-text-muted/65 z-10 pointer-events-none">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input
+            type="text"
+            id="client-search"
+            placeholder="Buscar por nombre o correo..."
+            class="w-full bg-bg border border-glass-border rounded-xl pl-11 pr-4 py-2.5 text-sm text-text focus:outline-none focus:border-primary transition-colors placeholder:text-text-muted/40"
+          />
+        </div>
+        <div class="text-xs text-text-muted font-medium w-full sm:w-auto text-right">
+          Mostrando <span id="visible-clients-count" class="text-text font-bold">{managedUsers.length}</span> usuarios
+        </div>
+      </div>
+
+      <!-- Tabla de Clientes Premium -->
+      <div class="bg-surface border border-glass-border rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-bg/60 border-b border-glass-border">
+                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Usuario</th>
+                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Correo Electrónico</th>
+                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Fecha de Registro</th>
+                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest">Rol</th>
+                <th class="px-6 py-4.5 text-2xs font-black text-text-muted uppercase tracking-widest text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="clients-table-body" class="divide-y divide-glass-border/40">
+              {managedUsers.map((client) => {
+                const isSelf = client.email.toLowerCase() === currentUserEmail;
+                const registerDate = client.created_at ? new Date(client.created_at).toLocaleDateString("es-MX", { day: '2-digit', month: 'short', year: 'numeric' }) : "Desconocido";
+
+                return (
+                  <tr class="client-row hover:bg-surface-hover/40 border-b border-glass-border/20 transition-all duration-300 group" data-name={client.full_name} data-email={client.email}>
+                    <td class="px-6 py-4.5 whitespace-nowrap">
+                      <div class="flex items-center gap-3.5">
+                        <div class="relative flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                          {client.avatar_url ? (
+                            <img
+                              src={client.avatar_url}
+                              alt={client.full_name || "Usuario"}
+                              class="w-10 h-10 rounded-full object-cover border border-glass-border ring-2 ring-transparent group-hover:ring-amber-500/20"
+                              referrerpolicy="no-referrer"
+                            />
+                          ) : (
+                            <div class="w-10 h-10 rounded-full bg-bg border border-glass-border flex items-center justify-center text-sm font-black text-amber-600 dark:text-amber-500 shadow-inner">
+                              {(client.full_name || client.email).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <span class="font-black text-text text-sm tracking-tight">{client.full_name || "Sin Nombre"}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4.5 text-sm font-semibold text-text-muted whitespace-nowrap">{client.email}</td>
+                    <td class="px-6 py-4.5 text-xs text-text-muted/80 whitespace-nowrap">{registerDate}</td>
+                    <td class="px-6 py-4.5 whitespace-nowrap">
+                      {client.isAdmin ? (
+                        <span class="px-3 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-3xs font-black uppercase tracking-widest rounded-lg inline-flex items-center gap-1 shadow-sm shadow-amber-500/5">
+                          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                          Admin
+                        </span>
+                      ) : (
+                        <span class="px-3 py-1 bg-bg text-text-muted border border-glass-border text-3xs font-black uppercase tracking-widest rounded-lg">
+                          Cliente
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-6 py-4.5 text-right whitespace-nowrap">
+                      {isSelf ? (
+                        <span class="text-xs text-text-muted/80 font-bold italic tracking-wide">Tú (Actual)</span>
+                      ) : client.isAdmin ? (
+                        <button
+                          class="action-demote-btn inline-flex items-center gap-2 bg-surface border border-accent/20 hover:border-accent hover:bg-accent/10 text-accent px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                          data-email={client.email}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="22" x2="16" y1="11" y2="11"></line>
+                          </svg>
+                          Remover Admin
+                        </button>
+                      ) : (
+                        <button
+                          class="action-promote-btn inline-flex items-center gap-2 bg-surface border border-glass-border hover:border-primary hover:bg-primary/5 text-text-muted hover:text-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                          data-email={client.email}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" x2="19" y1="8" y2="14"></line>
+                            <line x1="22" x2="16" y1="11" y2="11"></line>
+                          </svg>
+                          Hacer Admin
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {managedUsers.length === 0 && (
+                <tr>
+                  <td colspan="5" class="px-6 py-16 text-center text-text-muted">
+                    <div class="flex flex-col items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-text-muted/40">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                      <p class="font-medium text-sm">No hay usuarios registrados en el sistema.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: ADMINISTRADORES AUTORIZADOS -->
+    <div id="tab-content-admins" class="hidden space-y-6">
+      <!-- Formulario para Pre-autorizar Admin -->
+      <div class="bg-surface border border-glass-border p-6 rounded-2xl shadow-md space-y-4">
+        <div>
+          <h3 class="text-sm font-black text-text uppercase tracking-wider">
+            Pre-autorizar Nuevo Administrador
+          </h3>
+          <p class="text-xs text-text-muted mt-1 font-medium">
+            Permite el acceso a un correo electrónico. El usuario obtendrá privilegios automáticamente en su primer inicio de sesión.
+          </p>
+        </div>
+        <form id="pre-auth-form" class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <input
+              type="email"
+              id="pre-auth-email"
+              placeholder="correo_electronico@gmail.com"
+              required
+              class="w-full bg-bg border border-glass-border rounded-xl pl-11 pr-4 py-2.5 text-sm text-text focus:outline-none focus:border-primary transition-colors placeholder:text-text-muted/40"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-primary hover:bg-primary-hover dark:text-stone-950 font-black text-sm px-6 py-2.5 rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 uppercase tracking-wider"
+            style="color: #ffffff !important;"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <path d="M5 12h14"></path>
+              <path d="M12 5v14"></path>
+            </svg>
+            Autorizar
+          </button>
+        </form>
+      </div>
+
+      <!-- Grid de Administradores Autorizados -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Admins Registrados -->
+        <div class="bg-surface border border-glass-border rounded-2xl p-6 shadow-md space-y-4">
+          <h3 class="text-sm font-black text-text uppercase tracking-wider pb-2 border-b border-glass-border flex items-center justify-between">
+            <span>Registrados en el Sistema</span>
+            <span id="registered-admins-count" class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+              {allowedAdmins.length - preAuthorizedAdmins.length}
+            </span>
+          </h3>
+          <div id="registered-admins-list" class="space-y-4 divide-y divide-glass-border/30">
+            {managedUsers.filter(u => u.isAdmin).map((admin) => {
+              const isSelf = admin.email.toLowerCase() === currentUserEmail;
+              return (
+                <div class="flex items-center justify-between pt-4 first:pt-0 admin-registered-row" data-admin-email={admin.email.toLowerCase()}>
+                  <div class="flex items-center gap-3">
+                    {admin.avatar_url ? (
+                      <img
+                        src={admin.avatar_url}
+                        alt={admin.full_name || "Admin"}
+                        class="w-9 h-9 rounded-full object-cover border border-glass-border"
+                        referrerpolicy="no-referrer"
+                      />
+                    ) : (
+                      <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-xs font-bold text-primary">
+                        {(admin.full_name || admin.email).charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <h4 class="text-sm font-bold text-text leading-none">{admin.full_name || "Sin Nombre"}</h4>
+                      <p class="text-3xs text-text-muted mt-1">{admin.email}</p>
+                    </div>
+                  </div>
+                  {isSelf ? (
+                    <span class="text-2xs text-text-muted/80 font-bold italic">Tú (Actual)</span>
+                  ) : (
+                    <button
+                      class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+                      data-email={admin.email}
+                      title="Quitar permisos de administrador"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <!-- Admins Pre-autorizados (Aún no registrados) -->
+        <div class="bg-surface border border-glass-border rounded-2xl p-6 shadow-md space-y-4">
+          <h3 class="text-sm font-black text-text uppercase tracking-wider pb-2 border-b border-glass-border flex items-center justify-between">
+            <span>Pre-autorizados (No registrados)</span>
+            <span id="pre-auth-count" class="text-xs font-bold text-text-muted bg-bg px-2 py-0.5 rounded-md">
+              {preAuthorizedAdmins.length}
+            </span>
+          </h3>
+          <div id="pre-auth-list" class="space-y-4 divide-y divide-glass-border/30">
+            {preAuthorizedAdmins.map((admin) => (
+              <div class="flex items-center justify-between pt-4 first:pt-0 pre-auth-row" data-email={admin.email}>
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-text-muted/60">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-text/80 leading-none">Invitación Pendiente</h4>
+                    <p class="text-3xs text-text-muted mt-1">{admin.email}</p>
+                  </div>
+                </div>
+                <button
+                  class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+                  data-email={admin.email}
+                  title="Cancelar pre-autorización"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    <line x1="10" x2="10" y1="11" y2="17"></line>
+                    <line x1="14" x2="14" y1="11" y2="17"></line>
+                  </svg>
+                </button>
+              </div>
+            ))}
+            {preAuthorizedAdmins.length === 0 && (
+              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
+                No hay invitaciones o pre-autorizaciones pendientes.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación Premium -->
+  <div
+    id="confirm-modal"
+    class="fixed inset-0 z-200 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
+  >
+    <div
+      id="confirm-modal-box"
+      class="bg-surface border border-glass-border max-w-sm w-full rounded-2xl p-6 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 space-y-5"
+    >
+      <div class="flex flex-col items-center text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+            <line x1="12" x2="12" y1="9" y2="13"></line>
+            <line x1="12" x2="12.01" y1="17" y2="17"></line>
+          </svg>
+        </div>
+        <h3 id="confirm-modal-title" class="text-base font-black text-text uppercase tracking-wider">
+          ¿Confirmar Acción?
+        </h3>
+        <p id="confirm-modal-message" class="text-xs text-text-muted font-medium">
+          ¿Estás seguro de que deseas realizar esta acción?
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button
+          id="confirm-modal-cancel"
+          class="flex-1 bg-surface-hover hover:bg-surface-hover/80 text-text-muted hover:text-text border border-glass-border py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer text-center"
+        >
+          Cancelar
+        </button>
+        <button
+          id="confirm-modal-submit"
+          class="flex-1 bg-accent hover:bg-accent/90 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer text-center"
+          style="color: #ffffff !important;"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificaciones -->
+  <div
+    id="toast-notification"
+    class="fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-stone-900 border text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3"
+  >
+    <span id="toast-message"></span>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  function initUsersPage() {
+    // === 1. LÓGICA DE PESTAÑAS ===
+    const tabClients = document.getElementById("tab-btn-clients");
+    const tabAdmins = document.getElementById("tab-btn-admins");
+    const contentClients = document.getElementById("tab-content-clients");
+    const contentAdmins = document.getElementById("tab-content-admins");
+
+    if (tabClients && tabAdmins && contentClients && contentAdmins) {
+      // Evitar acumulamiento de listeners
+      const newTabClients = tabClients.cloneNode(true);
+      tabClients.parentNode.replaceChild(newTabClients, tabClients);
+      const newTabAdmins = tabAdmins.cloneNode(true);
+      tabAdmins.parentNode.replaceChild(newTabAdmins, tabAdmins);
+
+      newTabClients.addEventListener("click", () => {
+        newTabClients.classList.remove("border-transparent", "text-text-muted");
+        newTabClients.classList.add("border-primary", "text-primary");
+        
+        newTabAdmins.classList.remove("border-primary", "text-primary");
+        newTabAdmins.classList.add("border-transparent", "text-text-muted");
+
+        contentClients.classList.remove("hidden");
+        contentAdmins.classList.add("hidden");
+      });
+
+      newTabAdmins.addEventListener("click", () => {
+        newTabAdmins.classList.remove("border-transparent", "text-text-muted");
+        newTabAdmins.classList.add("border-primary", "text-primary");
+        
+        newTabClients.classList.remove("border-primary", "text-primary");
+        newTabClients.classList.add("border-transparent", "text-text-muted");
+
+        contentAdmins.classList.remove("hidden");
+        contentClients.classList.add("hidden");
+      });
+    }
+
+    // === 2. LÓGICA DE BÚSQUEDA ===
+    const searchInput = document.getElementById("client-search");
+    const clientRows = document.querySelectorAll(".client-row");
+    const visibleCountText = document.getElementById("visible-clients-count");
+
+    if (searchInput) {
+      // Clona y reemplaza para limpiar listeners previos
+      const newSearchInput = searchInput.cloneNode(true);
+      searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+      newSearchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        clientRows.forEach((row) => {
+          const name = row.getAttribute("data-name")?.toLowerCase() || "";
+          const email = row.getAttribute("data-email")?.toLowerCase() || "";
+
+          if (name.includes(query) || email.includes(query)) {
+            row.classList.remove("hidden");
+            visibleCount++;
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+
+        if (visibleCountText) {
+          visibleCountText.textContent = visibleCount.toString();
+        }
+      });
+    }
+
+    // === 3. SISTEMA DE TOASTS ===
+    const toast = document.getElementById("toast-notification");
+    const toastMsg = document.getElementById("toast-message");
+
+    function showToast(message, isError = false) {
+      if (!toast || !toastMsg) return;
+
+      toastMsg.textContent = message;
+      if (isError) {
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-red-500/10 border-red-500/20 text-red-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+      } else {
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-0 opacity-100 bg-emerald-500/10 border-emerald-500/20 text-emerald-500 text-sm font-black px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+      }
+
+      setTimeout(() => {
+        toast.className = "fixed bottom-6 right-6 z-100 transform translate-y-20 opacity-0 bg-stone-900 border text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-3";
+      }, 4000);
+    }
+
+    // === 3.1 SISTEMA DE MODALES DE CONFIRMACIÓN ===
+    const confirmModal = document.getElementById("confirm-modal");
+    const confirmModalBox = document.getElementById("confirm-modal-box");
+    const confirmModalTitle = document.getElementById("confirm-modal-title");
+    const confirmModalMessage = document.getElementById("confirm-modal-message");
+    const confirmCancelBtn = document.getElementById("confirm-modal-cancel");
+    const confirmSubmitBtn = document.getElementById("confirm-modal-submit");
+
+    let activeConfirmCallback = null;
+
+    function openConfirmModal(title, message, onConfirm) {
+      if (!confirmModal || !confirmModalBox || !confirmModalTitle || !confirmModalMessage) return;
+
+      confirmModalTitle.textContent = title;
+      confirmModalMessage.textContent = message;
+      activeConfirmCallback = onConfirm;
+
+      // Mostrar el modal con transiciones
+      confirmModal.classList.remove("opacity-0", "pointer-events-none");
+      confirmModal.classList.add("opacity-100");
+      
+      confirmModalBox.classList.remove("scale-95", "opacity-0");
+      confirmModalBox.classList.add("scale-100", "opacity-100");
+    }
+
+    function closeConfirmModal() {
+      if (!confirmModal || !confirmModalBox) return;
+
+      confirmModalBox.classList.remove("scale-100", "opacity-100");
+      confirmModalBox.classList.add("scale-95", "opacity-0");
+
+      confirmModal.classList.remove("opacity-100");
+      confirmModal.classList.add("opacity-0", "pointer-events-none");
+
+      activeConfirmCallback = null;
+    }
+
+    if (confirmCancelBtn && confirmSubmitBtn && confirmModal) {
+      const newCancel = confirmCancelBtn.cloneNode(true);
+      confirmCancelBtn.parentNode.replaceChild(newCancel, confirmCancelBtn);
+      const newSubmit = confirmSubmitBtn.cloneNode(true);
+      confirmSubmitBtn.parentNode.replaceChild(newSubmit, confirmSubmitBtn);
+
+      newCancel.addEventListener("click", closeConfirmModal);
+      newSubmit.addEventListener("click", () => {
+        if (typeof activeConfirmCallback === "function") {
+          activeConfirmCallback();
+        }
+        closeConfirmModal();
+      });
+
+      // Cerrar al hacer clic en el backdrop
+      confirmModal.addEventListener("click", (e) => {
+        if (e.target === confirmModal) {
+          closeConfirmModal();
+        }
+      });
+    }
+
+    // === 3.2 ACTUALIZACIÓN REACTIVA DEL DOM ===
+    function updateDOMState(email, action) {
+      const emailLower = email.toLowerCase().trim();
+      const clientRow = document.querySelector(`.client-row[data-email="${emailLower}"]`);
+      
+      // 1. Deducir nombre e iniciales del usuario
+      let fullName = "Usuario";
+      let avatarHtml = "";
+      if (clientRow) {
+        fullName = clientRow.getAttribute("data-name") || "Usuario";
+        const avatarEl = clientRow.querySelector(".relative.flex-shrink-0");
+        if (avatarEl) {
+          avatarHtml = avatarEl.innerHTML;
+        }
+      }
+
+      // 2. Si el usuario existe en la tabla de clientes (Pestaña 1), actualizar su fila
+      if (clientRow) {
+        const cells = clientRow.querySelectorAll("td");
+        const roleCell = cells[3];
+        const actionCell = cells[4];
+
+        if (action === "promote") {
+          // Cambiar badge a Admin
+          if (roleCell) {
+            roleCell.innerHTML = `
+              <span class="px-3 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-3xs font-black uppercase tracking-widest rounded-lg inline-flex items-center gap-1 shadow-sm shadow-amber-500/5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                Admin
+              </span>
+            `;
+          }
+          // Cambiar botón a Remover Admin (y forzar texto blanco por el hack del layout)
+          if (actionCell) {
+            actionCell.innerHTML = `
+              <button
+                class="action-demote-btn inline-flex items-center gap-2 bg-surface border border-accent/20 hover:border-accent hover:bg-accent/10 text-accent px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                data-email="${emailLower}"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <line x1="22" x2="16" y1="11" y2="11"></line>
+                </svg>
+                Remover Admin
+              </button>
+            `;
+          }
+          // Actualizar atributo en la fila para búsqueda
+          clientRow.setAttribute("data-is-admin", "true");
+        } else {
+          // Cambiar badge a Cliente
+          if (roleCell) {
+            roleCell.innerHTML = `
+              <span class="px-3 py-1 bg-bg text-text-muted border border-glass-border text-3xs font-black uppercase tracking-widest rounded-lg">
+                Cliente
+              </span>
+            `;
+          }
+          // Cambiar botón a Hacer Admin
+          if (actionCell) {
+            actionCell.innerHTML = `
+              <button
+                class="action-promote-btn inline-flex items-center gap-2 bg-surface border border-glass-border hover:border-primary hover:bg-primary/5 text-text-muted hover:text-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-xs"
+                data-email="${emailLower}"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <line x1="19" x2="19" y1="8" y2="14"></line>
+                  <line x1="22" x2="16" y1="11" y2="11"></line>
+                </svg>
+                Hacer Admin
+              </button>
+            `;
+          }
+          clientRow.setAttribute("data-is-admin", "false");
+        }
+      }
+
+      // 3. Actualizar la Pestaña 2 (Administradores Autorizados)
+      const registeredList = document.getElementById("registered-admins-list");
+      const preAuthList = document.getElementById("pre-auth-list");
+      const registeredCountSpan = document.getElementById("registered-admins-count");
+      const preAuthCountSpan = document.getElementById("pre-auth-count");
+      const totalCountSpan = document.getElementById("total-admins-count");
+
+      let registeredCount = registeredCountSpan ? parseInt(registeredCountSpan.textContent || "0", 10) : 0;
+      let preAuthCount = preAuthCountSpan ? parseInt(preAuthCountSpan.textContent || "0", 10) : 0;
+
+      if (action === "promote") {
+        const existsInRegistered = registeredList ? registeredList.querySelector(`.admin-registered-row[data-admin-email="${emailLower}"]`) : null;
+        const preAuthRow = preAuthList ? preAuthList.querySelector(`.pre-auth-row[data-email="${emailLower}"]`) : null;
+
+        // Quitar de pre-autorizados si estaba ahí
+        if (preAuthRow) {
+          preAuthRow.remove();
+          preAuthCount = Math.max(0, preAuthCount - 1);
+          if (preAuthCountSpan) preAuthCountSpan.textContent = preAuthCount.toString();
+          if (preAuthCount === 0 && preAuthList) {
+            preAuthList.innerHTML = `
+              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
+                No hay invitaciones o pre-autorizaciones pendientes.
+              </div>
+            `;
+          }
+        }
+
+        // Si el usuario ya está registrado en el sistema, lo movemos a la lista de registrados
+        if (clientRow && !existsInRegistered && registeredList) {
+          const newAdminRow = document.createElement("div");
+          newAdminRow.className = "flex items-center justify-between pt-4 first:pt-0 admin-registered-row border-t border-glass-border/30 first:border-t-0";
+          newAdminRow.setAttribute("data-admin-email", emailLower);
+          newAdminRow.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="relative flex-shrink-0">
+                ${avatarHtml || `
+                  <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-xs font-bold text-primary">
+                    ${(fullName || emailLower).charAt(0).toUpperCase()}
+                  </div>
+                `}
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-text leading-none">${fullName}</h4>
+                <p class="text-3xs text-text-muted mt-1">${emailLower}</p>
+              </div>
+            </div>
+            <button
+              class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+              data-email="${emailLower}"
+              title="Quitar permisos de administrador"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                <line x1="10" x2="10" y1="11" y2="17"></line>
+                <line x1="14" x2="14" y1="11" y2="17"></line>
+              </svg>
+            </button>
+          `;
+          registeredList.appendChild(newAdminRow);
+          registeredCount++;
+          if (registeredCountSpan) registeredCountSpan.textContent = registeredCount.toString();
+        } else if (!clientRow && !preAuthRow && preAuthList) {
+          // Si no está registrado en la app, es una pre-autorización pura
+          const noPreAuthDiv = document.getElementById("no-pre-auth");
+          if (noPreAuthDiv) noPreAuthDiv.remove();
+
+          const newPreAuthRow = document.createElement("div");
+          newPreAuthRow.className = "flex items-center justify-between pt-4 first:pt-0 pre-auth-row border-t border-glass-border/30 first:border-t-0";
+          newPreAuthRow.setAttribute("data-email", emailLower);
+          newPreAuthRow.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-bg border border-glass-border flex items-center justify-center text-text-muted/60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-text/80 leading-none">Invitación Pendiente</h4>
+                <p class="text-3xs text-text-muted mt-1">${emailLower}</p>
+              </div>
+            </div>
+            <button
+              class="action-demote-btn p-2 text-text-muted hover:text-accent hover:bg-accent/10 rounded-xl transition-all cursor-pointer border border-transparent hover:border-accent/20"
+              data-email="${emailLower}"
+              title="Cancelar pre-autorización"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                <line x1="10" x2="10" y1="11" y2="17"></line>
+                <line x1="14" x2="14" y1="11" y2="17"></line>
+              </svg>
+            </button>
+          `;
+          preAuthList.appendChild(newPreAuthRow);
+          preAuthCount++;
+          if (preAuthCountSpan) preAuthCountSpan.textContent = preAuthCount.toString();
+        }
+
+        // Actualizar contador total
+        if (totalCountSpan) totalCountSpan.textContent = (registeredCount + preAuthCount).toString();
+
+      } else {
+        // Degradación (demote)
+        const registeredRow = registeredList ? registeredList.querySelector(`.admin-registered-row[data-admin-email="${emailLower}"]`) : null;
+        if (registeredRow) {
+          registeredRow.remove();
+          registeredCount = Math.max(0, registeredCount - 1);
+          if (registeredCountSpan) registeredCountSpan.textContent = registeredCount.toString();
+        }
+
+        const preAuthRow = preAuthList ? preAuthList.querySelector(`.pre-auth-row[data-email="${emailLower}"]`) : null;
+        if (preAuthRow) {
+          preAuthRow.remove();
+          preAuthCount = Math.max(0, preAuthCount - 1);
+          if (preAuthCountSpan) preAuthCountSpan.textContent = preAuthCount.toString();
+          if (preAuthCount === 0 && preAuthList) {
+            preAuthList.innerHTML = `
+              <div id="no-pre-auth" class="py-8 text-center text-xs text-text-muted/60 italic">
+                No hay invitaciones o pre-autorizaciones pendientes.
+              </div>
+            `;
+          }
+        }
+
+        if (totalCountSpan) totalCountSpan.textContent = (registeredCount + preAuthCount).toString();
+      }
+    }
+
+    // === 4. ACCIONES: PROMOVER Y DEMOVER ===
+    async function updateAdminRole(email, action) {
+      const method = action === "promote" ? "POST" : "DELETE";
+      
+      try {
+        const response = await fetch("/api/admin/users", {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Ocurrió un error inesperado.");
+        }
+
+        showToast(result.message);
+        
+        // Ejecutar los cambios de forma reactiva e instantánea en el DOM
+        updateDOMState(email, action);
+
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    // Usar un listener en el document pero limpiando el listener anterior
+    if (!globalThis.__usersPageListenerAdded) {
+      document.addEventListener("click", (e) => {
+        const promoteBtn = e.target.closest(".action-promote-btn");
+        const demoteBtn = e.target.closest(".action-demote-btn");
+
+        if (promoteBtn) {
+          const email = promoteBtn.getAttribute("data-email");
+          if (email) {
+            updateAdminRole(email, "promote");
+          }
+        }
+
+        if (demoteBtn) {
+          const email = demoteBtn.getAttribute("data-email");
+          if (email) {
+            openConfirmModal(
+              "Quitar Permisos",
+              `¿Estás seguro de que deseas quitar los privilegios de administrador a: ${email}?`,
+              () => updateAdminRole(email, "demote")
+            );
+          }
+        }
+      });
+      globalThis.__usersPageListenerAdded = true;
+    }
+
+    // === 5. FORMULARIO DE PRE-AUTORIZACIÓN ===
+    const preAuthForm = document.getElementById("pre-auth-form");
+    const preAuthEmailInput = document.getElementById("pre-auth-email");
+
+    if (preAuthForm && preAuthEmailInput) {
+      const newPreAuthForm = preAuthForm.cloneNode(true);
+      preAuthForm.parentNode.replaceChild(newPreAuthForm, preAuthForm);
+      
+      const newPreAuthEmailInput = document.getElementById("pre-auth-email");
+
+      newPreAuthForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = newPreAuthEmailInput.value.trim();
+        if (email) {
+          updateAdminRole(email, "promote");
+          newPreAuthEmailInput.value = ""; // Limpiar input tras enviar exitosamente
+        }
+      });
+    }
+  }
+
+  // Ejecutar inmediatamente
+  initUsersPage();
+
+  // Por si acaso se usa View Transitions
+  document.addEventListener("astro:page-load", initUsersPage);
+</script>

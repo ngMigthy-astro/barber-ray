@@ -32,6 +32,7 @@ if (request.method === "POST") {
         price: formData.get("price")?.toString().trim(),
         category: formData.get("category")?.toString().trim(),
         image_url,
+        stock: parseInt(formData.get("stock")?.toString() || "0", 10),
       };
 
       const { error } = id
@@ -199,7 +200,7 @@ const categories = dbCategories || [];
               />
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
               <div class="space-y-2">
                 <label
                   class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
@@ -227,6 +228,20 @@ const categories = dbCategories || [];
                   type="text"
                   name="price"
                   placeholder="$0.00"
+                  required
+                  class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
+                />
+              </div>
+              <div class="space-y-2">
+                <label
+                  class="text-2xs font-black text-stone-500 uppercase tracking-ultra px-1"
+                  >Stock</label
+                >
+                <input
+                  type="number"
+                  name="stock"
+                  min="0"
+                  value="0"
                   required
                   class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-amber-500"
                 />
@@ -381,22 +396,35 @@ const categories = dbCategories || [];
                   </div>
 
                   <div class="flex-1 space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <input
                         type="text"
                         name="name"
                         value={product.name}
                         required
-                        class="bg-transparent text-xl font-bold text-white outline-none focus:text-amber-500 transition-colors"
+                        class="bg-transparent text-xl font-bold text-white outline-none focus:text-amber-500 transition-colors md:col-span-1"
                       />
-                      <div class="flex items-center gap-2 justify-end">
-                        <input
-                          type="text"
-                          name="price"
-                          value={product.price}
-                          required
-                          class="w-24 bg-stone-950 border border-stone-800 rounded-lg px-3 py-1 text-emerald-500 text-sm font-black text-center focus:border-amber-500 outline-none"
-                        />
+                      <div class="flex items-center gap-2 justify-start md:justify-end md:col-span-2">
+                        <div class="relative w-24">
+                          <input
+                            type="text"
+                            name="price"
+                            value={product.price}
+                            required
+                            class="w-full bg-stone-950 border border-stone-800 rounded-lg px-3 py-1 text-emerald-500 text-sm font-black text-center focus:border-amber-500 outline-none"
+                          />
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          <span class="text-3xs font-black text-stone-500 uppercase tracking-ultra">Stock:</span>
+                          <input
+                            type="number"
+                            name="stock"
+                            min="0"
+                            value={product.stock || 0}
+                            required
+                            class="w-16 bg-stone-950 border border-stone-800 rounded-lg px-2 py-1 text-white text-xs font-bold text-center focus:border-amber-500 outline-none"
+                          />
+                        </div>
                       </div>
                     </div>
 

@@ -14,7 +14,7 @@ export default function SectionHeader({
       <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-2xs font-black uppercase tracking-mega mb-6 ${centered ? "mx-auto" : ""}`}>
         {subtitle}
       </div>
-      <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-gradient leading-ultra-tight">
+      <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-gradient leading-ultra-tight">
         {title}
       </h2>
     </div>

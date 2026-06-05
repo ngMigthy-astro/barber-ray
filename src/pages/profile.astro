@@ -12,8 +12,9 @@ if (!user) {
 const supabase = createSupabaseClient(Astro.request, Astro.cookies);
 
 const [
-  { data: appointments, error: errApp },
-  { data: navLinks, error: errNav }
+  { data: appointments },
+  { data: reservations },
+  { data: navLinks }
 ] = await Promise.all([
   supabase
     .from("appointments")
@@ -24,6 +25,18 @@ const [
     `)
     .eq("user_id", user.id)
     .order("appointment_date", { ascending: false }),
+  supabase
+    .from("product_reservations")
+    .select(`
+      id,
+      quantity,
+      reserved_at,
+      expires_at,
+      status,
+      products:product_id(id, name, price, category, image_url)
+    `)
+    .eq("user_id", user.id)
+    .order("reserved_at", { ascending: false }),
   supabase
     .from("nav_links")
     .select("*")
@@ -41,6 +54,7 @@ const [
       <ProfileView
         user={user}
         initialAppointments={appointments || []}
+        initialReservations={reservations || []}
         client:load
       />
     </div>

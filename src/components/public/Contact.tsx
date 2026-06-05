@@ -71,8 +71,8 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-surface/40 backdrop-blur-sm border border-glass-border p-8 rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="bg-surface/40 backdrop-blur-sm border border-glass-border p-8 rounded-3xl sm:rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
                 <div className="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-amber-500/5">
                   <MapPin className="w-7 h-7" />
                 </div>
@@ -84,7 +84,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
                 </p>
               </div>
 
-              <div className="bg-surface/40 backdrop-blur-sm border border-glass-border p-8 rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
+              <div className="bg-surface/40 backdrop-blur-sm border border-glass-border p-8 rounded-3xl sm:rounded-5xl hover:border-amber-500/30 transition-all duration-500 group">
                 <div className="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-amber-500/5">
                   <Phone className="w-7 h-7" />
                 </div>
@@ -103,7 +103,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
               </div>
             </div>
 
-            <div className="bg-surface/60 backdrop-blur-md border border-glass-border p-10 rounded-6xl relative overflow-hidden group">
+            <div className="bg-surface/60 backdrop-blur-md border border-glass-border p-8 sm:p-10 rounded-3xl sm:rounded-5xl md:rounded-6xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
                 <Clock className="w-32 h-32 rotate-12" />
               </div>
@@ -157,7 +157,7 @@ const Contact: React.FC<ContactProps> = ({ initialData, config }) => {
             </div>
           </div>
 
-          <div className="bg-surface border border-glass-border p-6 sm:p-10 md:p-14 rounded-7xl shadow-2xl relative overflow-hidden">
+          <div className="bg-surface border border-glass-border p-6 sm:p-10 md:p-14 rounded-3xl sm:rounded-5xl md:rounded-7xl shadow-2xl relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-3xl font-black text-text mb-2 uppercase tracking-tighter">
                 Hablemos
